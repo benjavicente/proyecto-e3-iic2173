@@ -1,0 +1,30 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "root",
+    },
+    {
+      "path": "./services/frontend",
+      "name": "frontend",
+    },
+    {
+      "path": "./services/backend",
+      "name": "backend",
+    },
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+  },
+  "extensions": {
+    "recommendations": [
+      "ahmadalli.vscode-nginx-conf",
+      "bradlc.vscode-tailwindcss",
+      "dbaeumer.vscode-eslint",
+      "EditorConfig.EditorConfig",
+      "esbenp.prettier-vscode",
+      "ms-azuretools.vscode-docker",
+      "ms-python.python"
+    ]
+  }
+}

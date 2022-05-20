@@ -1,0 +1,19 @@
+version: "3.7"
+
+# TODO: separar desarrollo de base
+
+services:
+  auth:
+    image: supertokens/supertokens-postgresql:3
+    depends_on:
+      - postgres
+    volumes:
+      - ./services/auth/config.yml:/usr/lib/supertokens/config.yaml
+    environment:
+      POSTGRESQL_CONNECTION_URI: "postgresql://user:password@postgres/auth"
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
