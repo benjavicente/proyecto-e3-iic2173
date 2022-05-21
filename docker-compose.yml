@@ -4,7 +4,7 @@ version: "3.7"
 
 services:
   auth:
-    image: supertokens/supertokens-postgresql:3
+    image: supertokens/supertokens-postgresql:3.13
     depends_on:
       - postgres
     volumes:

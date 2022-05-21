@@ -1,0 +1,4 @@
+- https://app.diagrams.net/#G16pbEy3YnKSAzVYZUebeVrf26CbTF9NBc
+- https://github.com/milliHQ/terraform-aws-next-js
+- https://supertokens.com/docs/thirdpartyemailpassword/serverless/with-aws-lambda/api-gateway-config
+- https://terraform.io/
