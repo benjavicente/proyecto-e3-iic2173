@@ -1,0 +1,36 @@
+<div class="container-sm auth-container">
+  <div class="text-center">
+    <h3>Iniciar Sesión</h3>
+  </div>
+  
+  <form action="<%= submitPath %>" method="POST">
+    <div class="auth-input-container">
+      <h5>Correo electrónico</h5>
+      <input 
+        name="email" 
+        class="form-control" 
+        type="text" 
+        aria-label="default input example"
+        value="<%= locals.email ? locals.email : ''%>"
+      />
+    </div>
+
+    <div class="auth-input-container">
+      <h5>Contraseña</h5>
+      <input name="password" class="form-control" type="password" aria-label="default input example">
+      <% if (locals.errors){ %>
+        <label class="error"><%= errors %></label>
+      <% } %>
+    </div>
+
+    <div class="text-center">
+      <div class=".auth-input-container">
+        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+      </div>
+
+      <div>
+        <span>¿Aún no tienes una cuenta? </span><a href="/register" class="">Registrarse</a>
+      </div>
+    </div>
+  </form>  
+</div>

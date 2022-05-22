@@ -1,0 +1,118 @@
+<% 
+  // User data before error
+  let userData = new Object();
+  // Errors messages
+  let errorLabels = new Object();
+
+  if (locals.errors){
+    errors.forEach(err => {
+      errorLabels[err.path] = err.message;
+    });
+    userData = user;
+  }
+%> 
+
+<div class="container-sm auth-container">
+  <div class="text-center">
+    <h3>Registrarse</h3>
+  </div>
+
+  <form action="<%= submitPath %>" method="POST">
+    <div class="auth-input-container">
+      <h5>Nombre*</h5>
+      <input 
+        name="firstname" 
+        class="form-control" 
+        type="text" 
+        aria-label="default input example"
+        value="<%= userData['firstname'] ? userData['firstname'] : ''%>"
+      />
+
+      <label class="error">
+        <%= errorLabels['firstname'] ? errorLabels['firstname'] : ''%>
+      </label>
+    </div>
+    
+    
+    <div class="auth-input-container">
+      <h5>Apellido*</h5>
+      <input 
+        name="lastname" 
+        class="form-control" 
+        type="text" 
+        aria-label="default input example"
+        value="<%= userData['lastname'] ? userData['lastname'] : ''%>"
+      />
+
+      <label class="error">
+        <%= errorLabels['lastname'] ? errorLabels['lastname'] : ''%>
+      </label>
+    </div>
+
+    <div class="auth-input-container">
+      <h5>Nombre de usuario*</h5>
+      <input 
+        name="username" 
+        class="form-control" 
+        type="text" 
+        aria-label="default input example"
+        value="<%= userData['username'] ? userData['username'] : ''%>"
+      />
+
+      <label class="error">
+        <%= errorLabels['username'] ? errorLabels['username'] : ''%>
+      </label>
+    </div>
+
+    <div class="auth-input-container">
+      <h5>Correo electrónico*</h5>
+      <input 
+        name="email" 
+        class="form-control" 
+        type="email" 
+        aria-label="default input example"
+        value="<%= userData['email'] ? userData['email'] : ''%>"
+      />
+
+      <label class="error">
+        <%= errorLabels['email'] ? errorLabels['email'] : ''%>
+      </label>
+    </div>
+
+    <div class="auth-input-container">
+      <h5>Teléfono</h5>
+      <div class="input-group mb-3 no-margin">
+        <span class="input-group-text" id="basic-addon1">+56</span>
+        <input 
+          type="text" 
+          name="phone" 
+          class="form-control" 
+          aria-label="Username" 
+          aria-describedby="basic-addon1"
+          value="<%= userData['phone'] ? userData['phone'] : '' %>"
+        >
+      </div>
+
+      <label class="error">
+        <%= errorLabels['phone'] ? errorLabels['phone'] : ''%>
+      </label>
+    </div>
+
+    <div class="auth-input-container">
+      <h5>Contraseña*</h5>
+      <input name="password" class="form-control" type="password" aria-label="default input example">
+      <label class="error"><%= errorLabels['password'] ? errorLabels['password'] : ''%></label>
+    </div>
+    <br/>
+
+    <div class="text-center">
+      <div class=".auth-input-container">
+        <button type="submit" class="btn btn-primary">Crear una cuenta</button>
+      </div>
+
+      <div>
+        <span>¿Ya tienes una cuenta? </span><a href="/login" class="">Iniciar Sesión</a>
+      </div>
+    </div>
+  </form>  
+</div>

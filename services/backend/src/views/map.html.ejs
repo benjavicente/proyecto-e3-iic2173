@@ -1,0 +1,151 @@
+<%
+const formatDate = (unformattedDate) => {
+  let date = new Date(unformattedDate);
+
+  date = date.toLocaleString([], {
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit',
+  });
+
+  return date;
+}
+%>
+
+<form id="deleteMarkerForm" method="POST" action="<%= delMarkerSubmitPath %>">
+  <input type="hidden" name="_method" value="delete" />
+  <input type="hidden" name="markerId" id="markerId" />
+</form>
+
+<form id="sendPingForm" method="POST" action="/pings">
+  <input type="hidden" name="userIdTo" id="userIdTo" />
+</form>
+
+<div id="mapContainer"></div>
+
+<form action="<%= newMarkerSubmitPath %>" method="POST" class="row g-3 position-form">
+  <div class="col-auto no-margin text-center">
+    <input type="text" name="name" class="form-control" />
+    <label class="opacity">Nombre</label>
+  </div>
+
+  <div class="col-auto no-margin text-center">
+    <input 
+      type="number" 
+      readonly
+      id="lat" 
+      name="lat" 
+      class="form-control opacity" 
+    />
+    <label class="opacity">Latitud</label>
+  </div>
+
+  <div class="col-auto no-margin text-center">
+    <input 
+      type="number" 
+      readonly
+      id="long" 
+      name="long" 
+      class="form-control opacity"
+    />
+    <label class="opacity">Longitud</label>
+  </div>
+
+  <div class="col-auto no-margin vertical-center">
+    <button id="addPositionButton" disabled type="submit" class="btn btn-primary">
+      Añadir
+    </button>
+  </div>
+
+  <% if (locals.errors){%> 
+    <label class="text-center error">
+      <%= errors[0].message %>
+    </label>
+  <% } %> 
+</form>
+
+<script src="<%= assetPath('app.js') %>"></script>
+
+<link 
+  rel="stylesheet" 
+  href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" 
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" 
+  crossorigin="" 
+/>
+
+<script 
+  src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" 
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" 
+  crossorigin="">
+</script>
+
+<script src="/aux_functions.js"></script>
+<script src="/map/map_utils.js"></script>
+<script>
+  const userData = <%- JSON.stringify(userPositions) %>;
+  const peopleData = <%- JSON.stringify(peoplePositions) %>;
+
+  let map = loadMap('mapContainer');
+
+  loadUserMarkers(map, userData);
+  loadPeopleMarkers(map, peopleData);
+</script>
+
+<div class="section">
+  <div class="text-center">
+    <h4 class="text-muted secondary-title">Tus registros</h4>
+  </div>
+
+  <div class="container elements-list">
+
+    <div class="row align-items-start list-header">
+      <div class="col align-self-center">
+        Nombre
+      </div>
+
+      <div class="col align-self-center">
+        Latitud
+      </div>
+
+      <div class="col align-self-center">
+        Longitud
+      </div>
+
+      <div class="col align-self-center">
+        Fecha
+      </div>
+
+      <div class="col align-self-center">
+        Acciones
+      </div>
+    </div>
+
+    <% let pos = 0; %>
+    <% userPositions.forEach(register => { %>
+      <div class="row align-items-start">
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= register.name %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= register.position.coordinates[0] %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= register.position.coordinates[1] %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= formatDate(register.createdAt) %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <span role="button" class="link-danger" onClick="deleteMarker(<%= register.id %>)">
+            <i class="fa fa-trash-o" aria-hidden="true"></i> Eliminar
+          </span>
+        </div>
+      </div>
+      <% pos += 1 %>
+    <% }); %>
+  </div>
+</div>

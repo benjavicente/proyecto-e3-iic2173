@@ -1,0 +1,133 @@
+<%
+const formatDate = (unformattedDate) => {
+  let date = new Date(unformattedDate);
+
+  date = date.toLocaleString([], {
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit',
+  });
+
+  return date;
+}
+%>
+
+<form id="delPingForm" method="POST" action="/pings">
+  <input type="hidden" name="_method" value="delete" />
+  <input type="hidden" name="pingId" id="pingId" />
+</form>
+
+<div class="section">
+  <div class="text-center">
+    <h4 class="text-muted secondary-title">Usuarios que pingueaste</h4>
+  </div>
+
+  <div class="container elements-list">
+
+    <div class="row align-items-start list-header">
+      <div class="col align-self-center">
+        Usuario
+      </div>
+
+      <div class="col align-self-center">
+        Fecha
+      </div>
+
+      <div class="col align-self-center">
+        Acciones
+      </div>
+    </div>
+
+    <% let pos = 0; %>
+    <% pingedUsers.forEach(ping => { %>
+      <div class="row align-items-start">
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= ping.pingedTo.username %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= formatDate(ping.createdAt) %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <span role="button" class="link-danger" onclick="deletePing(<%= ping.id %>)">
+            <i class="fa fa-trash-o" aria-hidden="true"></i> Eliminar
+          </span>
+        </div>
+      </div>
+      <% pos += 1 %>
+    <% }); %>
+  </div>
+</div>
+
+<div class="section">
+  <div class="text-center">
+    <h4 class="text-muted secondary-title">Usuarios que te han pingueado</h4>
+  </div>
+
+  <div class="container elements-list">
+
+    <div class="row align-items-start list-header">
+      <div class="col align-self-center">
+        Usuario
+      </div>
+
+      <div class="col align-self-center">
+        Nombre
+      </div>
+
+      <div class="col align-self-center">
+        Apellido
+      </div>
+
+      <div class="col align-self-center">
+        Correo
+      </div>
+
+      <div class="col align-self-center">
+        Teléfono
+      </div>
+
+      <div class="col align-self-center">
+        Fecha
+      </div>
+    </div>
+
+    <% pos = 0; %>
+    <% usersPingedBy.forEach(ping => { %>
+      <div class="row align-items-start">
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= ping.pingedFrom.username %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= ping.pingedFrom.firstname %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= ping.pingedFrom.lastname %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= ping.pingedFrom.email %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= ping.pingedFrom.phone %>
+        </div>
+
+        <div class="col align-self-center <%= pos % 2 === 0 ? 'alt-list-item' : 'list-item' %>">
+          <%= formatDate(ping.createdAt) %>
+        </div>
+      </div>
+      <% pos += 1 %>
+    <% }); %>
+  </div>
+</div>
+
+<script>
+  const deletePing = (value) => {
+    document.getElementById('pingId').value = value;
+    document.getElementById('delPingForm').submit();
+  }
+</script>
