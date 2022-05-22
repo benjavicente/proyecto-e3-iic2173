@@ -21,8 +21,8 @@ Botón que sirve como link a otra página
 */
 
 function HomePage() {
-  const { user, error, isLoading } = useUser();
-  
+  const { user } = useUser();  
+
   const Map = dynamic(
     () => import('../components/map'), 
     { 
