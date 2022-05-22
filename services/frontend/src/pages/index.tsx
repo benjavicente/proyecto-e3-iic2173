@@ -1,3 +1,6 @@
+import React from 'react';
+import { useUser } from '@auth0/nextjs-auth0';
+
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
@@ -18,6 +21,8 @@ Botón que sirve como link a otra página
 */
 
 function HomePage() {
+  const { user, error, isLoading } = useUser();
+  
   const Map = dynamic(
     () => import('../components/map'), 
     { 
@@ -28,6 +33,7 @@ function HomePage() {
       ssr: false // This line is important. It's what prevents server-side render
     }
   )
+
   return (
     <div className={styles.CenterContainer}>
       <Head>
@@ -36,10 +42,9 @@ function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <Navbar />
+      <Navbar logged={user !== undefined}/>
       <Map />
-      <Form />
-      
+      <Form />      
       <Footer />
     </div>
   )

@@ -1,6 +1,7 @@
 ## Problemas
-El css por algún motivo solo acepta al archivo Home.module.css
-No es posible por el momento colocar un png/icon al marker del mapa proveniente de recursos locales, solo acepta de internet
+- El css por algún motivo solo acepta al archivo Home.module.css
+- No es posible por el momento colocar un png/icon al marker del mapa proveniente de recursos locales, solo acepta de internet
+- El HEAD por algún motivo tiene que estar dentro de un div
 
 ## Deploy on Vercel
 
