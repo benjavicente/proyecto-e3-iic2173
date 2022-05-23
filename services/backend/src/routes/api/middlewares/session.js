@@ -22,13 +22,19 @@ const setCurrentUser = async (ctx, next) => {
   let user = await getUserByEmail(ctx.orm, userEmail);
 
   if (user) {
+    ctx.state.currentUserId = user.id;
     ctx.status = 200;
-  } else {
-    user = await registerNewUser(ctx, userEmail);
-    ctx.status = 201;
+    return next();
   }
-  ctx.state.currentUserId = user.id;
-  return next();
+
+  // If user doesn't exist yet, we'll create it
+  user = await registerNewUser(ctx, userEmail);
+
+  if (user){
+    ctx.state.currentUserId = user.id;
+    ctx.status = 201;
+    return next();
+  }
 };
 
 
@@ -48,6 +54,10 @@ const getUserByEmail = async (orm, email) => {
 const registerNewUser = async (ctx, email) => {
   const user = ctx.orm.user.build(ctx.request.body);
 
+  if (user.email !== email){
+    ctx.throw(400, 'El correo entregado no coincide con el del token');
+  }
+
   try {
     await user.save({
       fields: [
@@ -63,7 +73,8 @@ const registerNewUser = async (ctx, email) => {
     return newUser;
   } 
   catch (ValidationError) {
-    console.log(ValidationError);
+    ctx.throw(400, ValidationError);
+    ctx.body = ValidationError;
     return;
   }
 }
