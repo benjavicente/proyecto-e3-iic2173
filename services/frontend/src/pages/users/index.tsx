@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0';
 
 import Head from 'next/head'
@@ -6,20 +7,27 @@ import styles from '../../styles/Home.module.css'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 
-function UsersPage() {
-  const { user, error, isLoading } = useUser();
+import { getApi } from '../../lib/api';
 
-  if (isLoading) {
+function UsersPage() {
+  const { user } = useUser();  
+
+  const [loading, setLoading] = useState(true);
+  const [usersData, setUsersData] = useState(null);
+
+  if (loading) {
+    getApi('/api/users')
+      .then(data => {
+        setUsersData(data);
+        setLoading(false);
+      });
+    
     return (
       <h2>Cargando</h2>
     )
   }
 
-  if (error) {
-    return (
-      <div>{error.message}</div>
-    )    
-  }
+  console.log(usersData);
 
   const Users = () => {
     return (

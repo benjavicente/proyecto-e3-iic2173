@@ -11,14 +11,7 @@ import Footer from '../components/Footer'
 
 import Form from '../components/Form2'
 
-/*
-Botón que sirve como link a otra página
-<div className={styles.CenterContainer}>
-  <form action="new_location">
-    <input type="submit" value="Nueva ubicación"/>
-  </form>
-</div>
-*/
+import { getApi, postApi } from '../lib/api';
 
 function HomePage() {
   const { user } = useUser();  
@@ -33,6 +26,25 @@ function HomePage() {
       ssr: false // This line is important. It's what prevents server-side render
     }
   )
+  /*
+  {
+    "firstname": "Nico",
+    "lastname": "Meye",
+    "username": "Nuck",
+    "email": "nico@email.com",
+    "phone": "912345678"
+  }
+*/
+  if (user) {
+    const body = {
+      firstname: user['https://firstname'],
+      lastname: user['https://lastname'],      
+      phone: user['https://phone'],
+      email: user.email
+    }    
+    postApi('api/login', body)
+      .then(res => console.log("R:", res))
+  }
 
   return (
     <div className={styles.CenterContainer}>

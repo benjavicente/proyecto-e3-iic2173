@@ -8,13 +8,11 @@ import styles from '../../styles/Home.module.css'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 
-import useApi from '../../lib/use-api';
+import useApi from '../../lib/api';
 
 export default withPageAuthRequired(function Profile() {
   // useApi recibe la ruta del archivo a ejecutar
-  const { response, error, isLoading } = useApi('/api/test');
-
-  const { user } = useUser();
+  const { user, isLoading, error } = useUser();
 
   if (isLoading) {
     return (
