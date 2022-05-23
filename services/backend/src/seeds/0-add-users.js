@@ -1,10 +1,16 @@
-const bcrypt = require('bcrypt');
-
-const PASSWORD_SALT_ROUNDS = 10;
-
 module.exports = {
   up: async (queryInterface) => {
     const usersArray = [];
+
+    usersArray.push({
+      firstname: 'Nicolas',
+      lastname: 'Meyer1',
+      username: 'nmeya1',
+      email: 'nico3@email.com',
+      phone: '914768523',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
     usersArray.push({
       firstname: 'Angel',
@@ -12,7 +18,6 @@ module.exports = {
       username: 'dross',
       email: 'dross@test.com',
       phone: '914768523',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -23,7 +28,6 @@ module.exports = {
       username: 'jose',
       email: 'jose@test.com',
       phone: '968271543',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -34,7 +38,6 @@ module.exports = {
       username: 'vardoc',
       email: 'vardoc@test.com',
       phone: '971635248',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -45,7 +48,6 @@ module.exports = {
       username: 'ihuerta',
       email: 'ihuerta@test.com',
       phone: '934725186',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -56,7 +58,6 @@ module.exports = {
       username: 'Ibai',
       email: 'ibai@test.com',
       phone: '964381257',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -67,7 +68,6 @@ module.exports = {
       username: 'jaltozano',
       email: 'altozano@test.com',
       phone: '',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -78,7 +78,6 @@ module.exports = {
       username: 'aguero',
       email: 'aguero@test.com',
       phone: '985136472',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -89,7 +88,6 @@ module.exports = {
       username: 'Faker',
       email: 'faker@test.com',
       phone: '923184675',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -100,7 +98,6 @@ module.exports = {
       username: 'skyshock',
       email: 'skyshock@test.com',
       phone: '968425713',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -111,7 +108,6 @@ module.exports = {
       username: 'eurogamerspain',
       email: 'eurogamerspain@test.com',
       phone: '',
-      password: bcrypt.hashSync('1234', PASSWORD_SALT_ROUNDS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
