@@ -1,17 +1,17 @@
-// pages/api/auth/[...auth0].js
-import { handleAuth, handleCallback } from '@auth0/nextjs-auth0';
-
-const afterCallback = (req, res, session, state) => {
-  console.log(session);
-  return session;
-};
+import { handleAuth, handleLogin } from '@auth0/nextjs-auth0';
 
 export default handleAuth({
-  async callback(req, res) {
+  async login(req, res) {
     try {
-      await handleCallback(req, res, { afterCallback });
-    } catch (error) {
-      res.status(error.status || 500).end(error.message);
+      await handleLogin(req, res, {
+        authorizationParams: {
+          audience: process.env.AUTH0_AUDIENCE,
+          scope: 'openid profile email'
+        }
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(err.status || 400).end(err.message);
     }
   }
 });

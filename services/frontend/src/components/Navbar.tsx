@@ -12,14 +12,16 @@ const Navbar = ({ logged }) => {
           <a className={styles.rowItem} href="/">Mapa</a>
           <a className={styles.rowItem} href="/users">Usuarios</a>
         </div>
-        <div className={styles.row}>
+        <div>
           {logged ? 
-            <div>
+            <div className={styles.row}>
               <a className={styles.rowItem} href="/users/profile">Perfil</a>
               <a className={styles.rowItem} href="/api/auth/logout">Cerrar Sesión</a>
             </div>
             :
-            <a className={styles.rowItem} href="/api/auth/login">Iniciar Sesión</a>
+            <div className={styles.row}>
+              <a className={styles.rowItem} href="/api/auth/login">Iniciar Sesión</a>
+            </div>            
           }          
         </div>
       </div>

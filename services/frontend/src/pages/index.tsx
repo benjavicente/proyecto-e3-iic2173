@@ -14,10 +14,10 @@ import Form from '../components/Form2'
 /*
 Botón que sirve como link a otra página
 <div className={styles.CenterContainer}>
-        <form action="new_location">
-          <input type="submit" value="Nueva ubicación"/>
-        </form>
-      </div>
+  <form action="new_location">
+    <input type="submit" value="Nueva ubicación"/>
+  </form>
+</div>
 */
 
 function HomePage() {
