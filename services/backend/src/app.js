@@ -1,5 +1,6 @@
 const path = require('path');
 const Koa = require('koa');
+const cors = require('@koa/cors');
 const koaBody = require('koa-body');
 const koaLogger = require('koa-logger');
 const koaFlashMessage = require('koa-flash-message').default;
@@ -43,6 +44,8 @@ app.use((ctx, next) => {
 if (!testMode) {
   app.use(koaLogger());
 }
+
+app.use(cors({ origin: process.env.ORIGIN || 'http://localhost:3000' }));
 
 // webpack middleware for dev mode only
 if (developmentMode) {
