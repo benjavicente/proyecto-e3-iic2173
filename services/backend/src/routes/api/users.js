@@ -21,7 +21,7 @@ router.get('api.users.all', '/', async (ctx) => {
 router.use(jwtCheck);
 router.use(setCurrentUser);
 
-router.get('api.users.profile', '/me', async (ctx) => {
+router.get('api.users.currentUser', '/me', async (ctx) => {
   const { currentUserId } = ctx.state;
   const user = await ctx.orm.user.findByPk(currentUserId);
   ctx.body = user;
