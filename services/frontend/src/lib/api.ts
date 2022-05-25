@@ -1,14 +1,53 @@
 // Based on https://github.com/auth0/nextjs-auth0/tree/main/examples/kitchen-sink-example
-export async function getApi(url){
-  console.log("URL:", url);
-  const response = await fetch(url);
-  return await response;
+export async function getApi(url, params){
+  // url de fetch hay que hacerla desde el root de pages
+  const accessToken = await fetch('../api/getToken');
+  const token = await (await accessToken.text()).slice(1,-1);
+
+  // Colocar en el .env
+  const baseUrl = "http://localhost:8000/"
+
+  let urlParams = "";
+
+  if (params) {
+    if (params.id) {
+      urlParams += "/" + params.id;
+    }
+    else {
+      urlParams += "?";
+      for (const [key, value] of Object.entries(params)) {
+        urlParams += `${key}=${value}`
+      }
+    }  
+  }  
+  console.log(baseUrl + url + urlParams);
+
+  const response = await fetch(baseUrl + url + urlParams, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : '' 
+    },
+   });
+
+  return await JSON.parse(await response.text());
 }
 
 export async function postApi(url, body){
-  const response = await fetch(url, {
+  const accessToken = await fetch('api/getToken');
+  const token = await (await accessToken.text()).slice(1,-1);
+
+  // Colocar en el .env
+  const baseUrl = "http://localhost:8000/";
+  
+  const response = await fetch(baseUrl + url, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    },
     body: JSON.stringify(body)
-  });
-  return await response;
+   });
+
+  return await JSON.parse(await response.text());
 }

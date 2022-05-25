@@ -11,8 +11,6 @@ import Footer from '../components/Footer'
 
 import Form from '../components/Form2'
 
-import { getApi, postApi } from '../lib/api';
-
 function HomePage() {
   const { user } = useUser();  
 
@@ -34,7 +32,7 @@ function HomePage() {
     "email": "nico@email.com",
     "phone": "912345678"
   }
-*/
+
   if (user) {
     const body = {
       firstname: user['https://firstname'],
@@ -45,7 +43,7 @@ function HomePage() {
     postApi('api/login', body)
       .then(res => console.log("R:", res))
   }
-
+*/
   return (
     <div className={styles.CenterContainer}>
       <Head>

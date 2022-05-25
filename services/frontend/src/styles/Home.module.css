@@ -38,3 +38,36 @@
   margin-right:25%;
   width: 50%;
 }
+
+.flexWrapContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.fWElement {
+  margin: 70px;
+  text-align: center;
+  background-color: #F0F8FF;
+  width: 20%;
+  border-radius: 10%;
+}
+
+.imgUser {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%
+}
+
+.button {
+  background-color: #008CBA;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-left: 20px;
+  margin-right: 20px;
+}

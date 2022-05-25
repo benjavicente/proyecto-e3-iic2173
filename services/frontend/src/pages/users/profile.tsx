@@ -1,67 +1,45 @@
-import React from 'react';
-import { useUser } from '@auth0/nextjs-auth0';
+import React, { useState } from 'react';
+import { useRouter } from 'next/router'
 
-import { withPageAuthRequired } from '@auth0/nextjs-auth0';
+import { useUser } from '@auth0/nextjs-auth0';
 
 import styles from '../../styles/Home.module.css'
 
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import UserProfile from '../../components/UserProfile'
 
-import useApi from '../../lib/api';
+import { getApi } from '../../lib/api';
 
-export default withPageAuthRequired(function Profile() {
-  // useApi recibe la ruta del archivo a ejecutar
-  const { user, isLoading, error } = useUser();
+export default function Profile() {
+  const { query } = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  const { user } = useUser();
 
-  if (isLoading) {
+  if (loading) {
+    getApi('api/users', {id: query.id}) 
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      });
+
     return (
       <h2>Cargando</h2>
     )
   }
 
-  if (error) {
-    console.log(error);
-    return (
-      <div>Error</div>
-    )    
-  }
-
-  console.log(user);
- 
   return (
     <div>
       <Navbar logged={user !== undefined}/>
+      <UserProfile data={data} />
       {user ? 
-        <div className={styles.container}>
-          <h3 className={styles.rowItem}>Datos del perfil</h3>
-
-          <div className={styles.row}>
-            <h4 className={styles.rowItem}>Email:</h4>
-            <p className={styles.rowItemNB}>{user.email}</p>
-          </div>
-
-          <div className={styles.row}>
-            <h4 className={styles.rowItem}>Nombre:</h4>
-            <p className={styles.rowItemNB}>{user['https://firstname']}</p>
-          </div>
-
-          <div className={styles.row}>
-            <h4 className={styles.rowItem}>Apellido:</h4>
-            <p className={styles.rowItemNB}>{user['https://lastname']}</p>
-          </div>
-
-          <div className={styles.row}>
-            <h4 className={styles.rowItem}>Teléfono:</h4>
-            <p className={styles.rowItemNB}>{user['https://phone']}</p>
-          </div>
-
-          <h3 className={styles.rowItem}>Imágenes del perfil</h3>
-          <img src={user.picture} alt={user.name} />
-        </div> :
-        <h2>No hay usuario logueado</h2>
-      }
+        <div>
+          <h2>Está logueado</h2>
+        </div>        
+        : null}
+        
       <Footer />
     </div>
   );
-});
+};

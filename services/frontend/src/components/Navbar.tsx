@@ -1,9 +1,21 @@
+import { useRouter } from 'next/router'
+
 import styles from '../styles/Home.module.css'
 
 const Navbar = ({ logged }) => {
   // Logged es un parámetro booleano que indica si existe un 
   // usuario loggeado, este parámetro se le envía desde la vista a la 
   // que se llama este componente
+  const router = useRouter()
+
+  const press = () => {
+    console.log("V");
+    router.push({
+      pathname: 'users/profile',
+      query: { id: 'me' },
+  })
+  }
+
   return (
     <header>
       <div className={styles.navbarContainer}>
@@ -15,7 +27,7 @@ const Navbar = ({ logged }) => {
         <div>
           {logged ? 
             <div className={styles.row}>
-              <a className={styles.rowItem} href="/users/profile">Perfil</a>
+              <a className={styles.rowItem} onClick={() => press()}>Perfil</a>
               <a className={styles.rowItem} href="/api/auth/logout">Cerrar Sesión</a>
             </div>
             :
