@@ -1,49 +1,96 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0';
 
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
 import dynamic from 'next/dynamic'
+import { getApi } from '../lib/api';
 
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
-import Form from '../components/Form2'
+// import Map from '../components/Map'
+
+import Form from '../components/FormMarker'
 
 function HomePage() {
+  const [markers, setMarkers] = useState(null);
+  const [users, setUsers] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [userLoading, setUserLoading] = useState(true);
+  const [usersSelected, setUsersSelected] = useState([]);
+  const 
   const { user } = useUser();  
 
-  const Map = dynamic(
-    () => import('../components/map'), 
-    { 
-      loading: () => 
-      <h1 className={styles.title}>
-        El mapa está cargando...
-      </h1>,
-      ssr: false // This line is important. It's what prevents server-side render
-    }
-  )
-  /*
-  {
-    "firstname": "Nico",
-    "lastname": "Meye",
-    "username": "Nuck",
-    "email": "nico@email.com",
-    "phone": "912345678"
+  if (loading) {
+    getApi('api/markers', {filteredIds: []}) 
+      .then(data => {
+        setMarkers(JSON.parse(data));
+        setLoading(false);
+      })
+    
+    return (
+      <div>
+      </div>
+    )
   }
 
-  if (user) {
-    const body = {
-      firstname: user['https://firstname'],
-      lastname: user['https://lastname'],      
-      phone: user['https://phone'],
-      email: user.email
-    }    
-    postApi('api/login', body)
-      .then(res => console.log("R:", res))
+  if (userLoading) {
+    getApi('api/users', {'page_size': 1000}) 
+      .then(data => {
+        setUsers(JSON.parse(data));
+        setUserLoading(false);
+      })
+    
+    return (
+      <div>
+      </div>
+    )
   }
-*/
+
+  const filter = () => {
+
+  }
+
+  let selected = [];
+
+  const selectedUser = (user) => {
+    if (usersSelected.length < 5) {
+      if (!usersSelected.includes(user)) {
+        selected.push(user);
+        setUsersSelected([...usersSelected, user]);
+      }   
+    }     
+  }
+  
+  const selectedUsers = usersSelected.map((user) => {
+    const userData = JSON.parse(user);
+    return (
+      <p className={styles.rowItem}>{userData[1]} {userData[2]}</p>    
+    )
+  });
+  
+  console.log("S", usersSelected);
+  const usersOptions = users.map((user) => {
+    let exists = false;
+    for (var i = 0; i < usersSelected.length; i++) {
+      const jsonSelected = JSON.parse(usersSelected[i]);
+      if (jsonSelected[0] == user.id) {
+        exists = true;
+        break;
+      }
+    }
+    if (!exists) {
+      const value = `[${user.id}, "${user.firstname}", "${user.lastname}"]`;
+      return (
+        <option value={value}>{user.firstname} {user.lastname}</option>
+      )
+    }    
+  });
+
+  const Map = dynamic(() => import('../components/Map'))
+
   return (
     <div className={styles.CenterContainer}>
       <Head>
@@ -53,7 +100,17 @@ function HomePage() {
       </Head>
       
       <Navbar logged={user !== undefined}/>
-      <Map />
+      <div>
+        {selectedUsers}
+      </div>
+      
+      <div className={styles.flexContainer}>
+        <select name="users" id="users" onChange={user => selectedUser(user.target.value)}>
+          {usersOptions}
+        </select>
+      </div>
+
+      <Map markers={markers} />
       <Form />      
       <Footer />
     </div>

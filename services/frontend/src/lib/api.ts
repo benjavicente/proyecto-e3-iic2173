@@ -16,11 +16,10 @@ export async function getApi(url, params){
     else {
       urlParams += "?";
       for (const [key, value] of Object.entries(params)) {
-        urlParams += `${key}=${value}`
+        urlParams += `${key}=${JSON.stringify(value)}`
       }
     }  
   }  
-  console.log(baseUrl + url + urlParams);
 
   const response = await fetch(baseUrl + url + urlParams, {
     method: 'GET',
@@ -30,7 +29,7 @@ export async function getApi(url, params){
     },
    });
 
-  return await JSON.parse(await response.text());
+  return await await response.text();
 }
 
 export async function postApi(url, body){
@@ -49,5 +48,5 @@ export async function postApi(url, body){
     body: JSON.stringify(body)
    });
 
-  return await JSON.parse(await response.text());
+  return await response.text();
 }

@@ -1,22 +1,35 @@
 import React from 'react';
 import { useFormik } from 'formik';
 
+import { postApi } from '../lib/api';
+
 import styles from '../styles/Home.module.css'
  
 const NewLocationForm = () => {
   const formik = useFormik({
     initialValues: {
+      name: '',
       lat: '',
       long: '',
     },
     onSubmit: values => {
-      alert(JSON.stringify(values, null, 2));
+      postApi('api/markers/new', values);
     },
   });
   return (
     <div className={styles.flexContainer}>
       <form onSubmit={formik.handleSubmit}>
         <div className={styles.row}>
+        <div className={styles.rowItem}>
+            <label htmlFor="firstName">Nombre: </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              onChange={formik.handleChange}
+              value={formik.values.name}
+            />
+          </div>
           <div className={styles.rowItem}>
             <label htmlFor="firstName">Latitud: </label>
             <input
@@ -37,11 +50,10 @@ const NewLocationForm = () => {
               value={formik.values.long}
             /> 
           </div> 
-          
+          </div> 
           <div className={styles.rowItem}>
-            <button type="submit">Submit</button>
+            <button className={styles.button}type="submit">Crear marcador</button>
           </div>   
-          </div>        
       </form>
     </div>     
   );

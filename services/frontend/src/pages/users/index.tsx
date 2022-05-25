@@ -31,7 +31,8 @@ function UsersPage() {
   if (loading) {
     getApi('api/users', {'page': page}) 
       .then(data => {
-        setUsersData(data);
+        setUsersData(JSON.parse(data));
+        console.log(data);
         setLoading(false);
       });
 
