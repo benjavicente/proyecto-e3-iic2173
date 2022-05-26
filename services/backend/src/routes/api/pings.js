@@ -1,10 +1,12 @@
 const KoaRouter = require('koa-router');
+const sequelize = require('sequelize');
 const { jwtCheck, setCurrentUser } = require('./middlewares/session')
 
 const router = new KoaRouter();
 
 router.use(jwtCheck);
 router.use(setCurrentUser);
+
 
 router.get('api.pings.all', '/', async (ctx) => {
   const pingedUsers = await ctx.orm.ping.findAll({ 
@@ -23,8 +25,10 @@ router.get('api.pings.all', '/', async (ctx) => {
   }
 });
 
+
 router.post('api.pings.new', '/', async (ctx) => {
   const { pingedUserId } = ctx.request.body;
+
   const ping = ctx.orm.ping.build({
     userIdFrom: ctx.state.currentUserId,
     userIdTo: pingedUserId,
@@ -39,8 +43,9 @@ router.post('api.pings.new', '/', async (ctx) => {
     });
   } 
   catch (ValidationError) {
-    ctx.throw(400, ValidationError);
     ctx.body = ValidationError;
+    ctx.throw(400, ValidationError);
+
   }
   ctx.status = 200;
 });

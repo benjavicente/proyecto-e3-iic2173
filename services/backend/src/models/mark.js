@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.user, { foreignKey: 'userId' });
+      this.belongsToMany(models.tag, { through: 'marktags' });
     }
   }
   mark.init({
