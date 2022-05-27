@@ -20,15 +20,31 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const [userLoading, setUserLoading] = useState(true);
   const [usersSelected, setUsersSelected] = useState([]);
-  const 
-  const { user } = useUser();  
+  const [idSelected, setIdSelected] = useState([]);
+  const [filteredId, setFilteredId] = useState([]);
+
+  const { user, isLoading } = useUser();  
+
+  if (isLoading) {
+    return (
+      <div>
+      </div>
+    )
+  }
 
   if (loading) {
-    getApi('api/markers', {filteredIds: []}) 
+    if (user != undefined) {
+      getApi('api/markers', {filteredIds: filteredId}) 
       .then(data => {
         setMarkers(JSON.parse(data));
         setLoading(false);
       })
+    } else {
+      // Se deja de esa forma para que userPositions.map no tire problemas
+      console.log("No hay usario logueado");
+      setMarkers({"userPositions": [], "peoplePositions": []});    
+      setLoading(false);
+    }   
     
     return (
       <div>
@@ -38,11 +54,11 @@ function HomePage() {
 
   if (userLoading) {
     getApi('api/users', {'page_size': 1000}) 
-      .then(data => {
-        setUsers(JSON.parse(data));
-        setUserLoading(false);
-      })
-    
+    .then(data => {
+      setUsers(JSON.parse(data));
+      setUserLoading(false);
+    })
+
     return (
       <div>
       </div>
@@ -50,39 +66,43 @@ function HomePage() {
   }
 
   const filter = () => {
-
+    console.log("Se filtra con", idSelected);
+    setFilteredId(idSelected);
+    setLoading(true);
   }
 
-  let selected = [];
+  const removeFilter = () => {
+    setIdSelected([]);
+    setUsersSelected([]);
+    setLoading(true);
+  }
 
-  const selectedUser = (user) => {
-    if (usersSelected.length < 5) {
-      if (!usersSelected.includes(user)) {
-        selected.push(user);
-        setUsersSelected([...usersSelected, user]);
+  const selectedUser = (user) => {   
+    const userData = JSON.parse(user);
+    if (idSelected.length < 5) {
+      if (!idSelected.includes(userData.id)) {
+        setUsersSelected([...usersSelected, userData]);
+        setIdSelected([...idSelected, userData.id]);        
       }   
     }     
   }
   
   const selectedUsers = usersSelected.map((user) => {
-    const userData = JSON.parse(user);
     return (
-      <p className={styles.rowItem}>{userData[1]} {userData[2]}</p>    
+      <p className={styles.rowItem} key={user.id}>{user.name} {user.lastname}</p>    
     )
   });
   
-  console.log("S", usersSelected);
   const usersOptions = users.map((user) => {
     let exists = false;
     for (var i = 0; i < usersSelected.length; i++) {
-      const jsonSelected = JSON.parse(usersSelected[i]);
-      if (jsonSelected[0] == user.id) {
+      if (usersSelected[i].id == user.id) {
         exists = true;
         break;
       }
     }
     if (!exists) {
-      const value = `[${user.id}, "${user.firstname}", "${user.lastname}"]`;
+      const value = `{"id":${user.id},"name":"${user.firstname}","lastname":"${user.lastname}"}`;
       return (
         <option value={value}>{user.firstname} {user.lastname}</option>
       )
@@ -100,18 +120,28 @@ function HomePage() {
       </Head>
       
       <Navbar logged={user !== undefined}/>
-      <div>
-        {selectedUsers}
-      </div>
+      { user ? 
+        <div>
+          <h3 className={styles.centerContainer}>Usuarios seleccionados:</h3>
+          <div className={styles.rowUsers}>
+            {selectedUsers}
+          </div>
       
-      <div className={styles.flexContainer}>
-        <select name="users" id="users" onChange={user => selectedUser(user.target.value)}>
-          {usersOptions}
-        </select>
-      </div>
+          <div className={styles.flexContainer}>
+            <select name="users" id="users" className={styles.selectDropdown} onChange={user => selectedUser(user.target.value)}>
+              <option value="">Seleccionar usuario</option>
+              {usersOptions}
+            </select>
 
-      <Map markers={markers} />
-      <Form />      
+            <button className={styles.button} onClick={filter}>Filtrar</button>
+            <button className={styles.button} onClick={removeFilter}>Eliminar filtros</button>
+          </div>
+        </div>        
+      : null }      
+
+      <Map markers={ markers } />
+      { user ? <Form /> : null }
+           
       <Footer />
     </div>
   )

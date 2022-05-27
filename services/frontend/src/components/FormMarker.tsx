@@ -1,6 +1,6 @@
 import React from 'react';
-import { useFormik } from 'formik';
 
+import { useFormik } from 'formik';
 import { postApi } from '../lib/api';
 
 import styles from '../styles/Home.module.css'

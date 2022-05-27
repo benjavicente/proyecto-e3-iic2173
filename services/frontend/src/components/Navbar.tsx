@@ -7,13 +7,12 @@ const Navbar = ({ logged }) => {
   // usuario loggeado, este parámetro se le envía desde la vista a la 
   // que se llama este componente
   const router = useRouter()
-
-  const press = () => {
-    console.log("V");
+  
+  const press = () => {    
     router.push({
-      pathname: 'users/profile',
-      query: { id: 'me' },
-  })
+      pathname: '/users/profile',
+      query: { id: 'me', reload: 'true' },
+    })
   }
 
   return (
@@ -27,7 +26,8 @@ const Navbar = ({ logged }) => {
         <div>
           {logged ? 
             <div className={styles.row}>
-              <a className={styles.rowItem} onClick={() => press()}>Perfil</a>
+              <a className={styles.rowItemPress} href="/users/pings">Pings</a>
+              <a className={styles.rowItemPress} onClick={() => press()}>Perfil</a>              
               <a className={styles.rowItem} href="/api/auth/logout">Cerrar Sesión</a>
             </div>
             :

@@ -1,7 +1,7 @@
 // Based on https://github.com/auth0/nextjs-auth0/tree/main/examples/kitchen-sink-example
 export async function getApi(url, params){
   // url de fetch hay que hacerla desde el root de pages
-  const accessToken = await fetch('../api/getToken');
+  const accessToken = await fetch('/api/getToken');
   const token = await (await accessToken.text()).slice(1,-1);
 
   // Colocar en el .env
@@ -29,11 +29,11 @@ export async function getApi(url, params){
     },
    });
 
-  return await await response.text();
+  return await response.text();
 }
 
 export async function postApi(url, body){
-  const accessToken = await fetch('api/getToken');
+  const accessToken = await fetch('/api/getToken');
   const token = await (await accessToken.text()).slice(1,-1);
 
   // Colocar en el .env
