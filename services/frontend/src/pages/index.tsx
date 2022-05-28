@@ -20,6 +20,7 @@ function HomePage() {
   const [usersSelected, setUsersSelected] = useState([]);
   const [idSelected, setIdSelected] = useState([]);
   const [filteredId, setFilteredId] = useState([]);
+  const [weatherData, setWeatherData] = useState(null);
 
   const { user, isLoading } = useUser();  
 
@@ -105,6 +106,21 @@ function HomePage() {
 
   const Map = dynamic(() => import('../components/Map'))
 
+  let coordinates = {lat: null, lng: null};
+
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      coordinates.lat = position.coords.latitude;
+      coordinates.lng = position.coords.longitude;
+     });
+  }; 
+
+  getApi('api/weather', coordinates) 
+    .then(data => {
+      const jsonData = JSON.parse(data);
+      setWeatherData(jsonData["temp_c"]);
+    })
+  
   return (
     <div className={styles.CenterContainer}>
       <Head>
@@ -114,6 +130,12 @@ function HomePage() {
       </Head>
       
       <Navbar logged={user !== undefined}/>
+      { weatherData ? 
+        <div className={styles.centerContainer}>
+          <h2>El tiempo actual es: {weatherData}°C</h2>
+        </div>
+      : null }
+      
       { user ? 
         <div>
           <h3 className={styles.centerContainer}>Usuarios seleccionados:</h3>

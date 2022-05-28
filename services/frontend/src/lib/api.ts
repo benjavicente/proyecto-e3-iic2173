@@ -16,7 +16,8 @@ export async function getApi(url, params){
     else {
       urlParams += "?";
       for (const [key, value] of Object.entries(params)) {
-        urlParams += `${key}=${JSON.stringify(value)}`
+        urlParams += `${key}=${JSON.stringify(value)}`;
+        urlParams += '&';
       }
     }  
   }  
