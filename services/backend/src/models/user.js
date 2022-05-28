@@ -5,10 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.mark);
-    }
-
-    async checkPassword(password) {
-      return bcrypt.compare(password, this.password);
+      this.hasMany(models.image);
     }
   }
   user.init({
