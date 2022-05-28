@@ -17,8 +17,11 @@ export default function PostLogin() {
       firstname: user['https://firstname'],
       lastname: user['https://lastname'],      
       phone: user['https://phone'],
+      username: `${user['https://firstname']}${user['https://lastname']}`,
       email: user.email
     }    
+
+    console.log(body);
     postApi('api/login', body)
       .then(res => {
         router.push("/");

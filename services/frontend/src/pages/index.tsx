@@ -10,8 +10,6 @@ import { getApi } from '../lib/api';
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
-// import Map from '../components/Map'
-
 import Form from '../components/FormMarker'
 
 function HomePage() {
@@ -27,8 +25,7 @@ function HomePage() {
 
   if (isLoading) {
     return (
-      <div>
-      </div>
+      <div />
     )
   }
 
@@ -41,32 +38,28 @@ function HomePage() {
       })
     } else {
       // Se deja de esa forma para que userPositions.map no tire problemas
-      console.log("No hay usario logueado");
       setMarkers({"userPositions": [], "peoplePositions": []});    
       setLoading(false);
     }   
     
     return (
-      <div>
-      </div>
+      <div />
     )
   }
 
   if (userLoading) {
-    getApi('api/users', {'page_size': 1000}) 
+    getApi('api/users/all', null) 
     .then(data => {
       setUsers(JSON.parse(data));
       setUserLoading(false);
     })
 
     return (
-      <div>
-      </div>
+      <div />
     )
   }
 
   const filter = () => {
-    console.log("Se filtra con", idSelected);
     setFilteredId(idSelected);
     setLoading(true);
   }
@@ -74,6 +67,7 @@ function HomePage() {
   const removeFilter = () => {
     setIdSelected([]);
     setUsersSelected([]);
+    setFilteredId([]);
     setLoading(true);
   }
 
@@ -104,7 +98,7 @@ function HomePage() {
     if (!exists) {
       const value = `{"id":${user.id},"name":"${user.firstname}","lastname":"${user.lastname}"}`;
       return (
-        <option value={value}>{user.firstname} {user.lastname}</option>
+        <option value={value} key={user.id}>{user.firstname} {user.lastname}</option>
       )
     }    
   });
