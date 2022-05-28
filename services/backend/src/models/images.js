@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
-    imgUrl: {
+    imageUrl: {
       type: DataTypes.STRING,
       validate: {
         notEmpty: { args: true, msg: 'Ingresa una url de imagen válida' },

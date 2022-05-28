@@ -1,13 +1,30 @@
 const KoaRouter = require('koa-router');
 const { jwtCheck, setCurrentUser } = require('./middlewares/session');
-// const { upload } = require('./s3/s3');
+const { uploadFile } = require('./s3/fileUploader');
 
 const router = new KoaRouter();
 
 
-router.post('api.users.uploadImage', '/upload/image', jwtCheck, setCurrentUser, async (ctx) => {
+router.post('api.users.uploadImage', '/upload/image', async (ctx) => {
   const { currentUserId } = ctx.state;
+  const uploadResults = await uploadFile(ctx);
+
+  await Promise.all(
+    uploadResults.map(async (result) => {
+      const { Location } = result;
+  
+      const image = ctx.orm.image.build({
+        userId: 1,
+        imageUrl: Location,
+      });
+
+      return await image.save({ fields: ['userId', 'imageUrl'] });
+    })
+  );
+  ctx.body = uploadResults;
+  ctx.status = 200;
 });
+
 
 router.get('api.users.currentUser', '/me', jwtCheck, setCurrentUser, async (ctx) => {
   const { currentUserId } = ctx.state;
@@ -17,13 +34,19 @@ router.get('api.users.currentUser', '/me', jwtCheck, setCurrentUser, async (ctx)
 
 
 router.get('api.users.all', '/all', async (ctx) => {
-  const users = await ctx.orm.user.findAll();
+  const users = await ctx.orm.user.findAll({
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
+    include: [{ model: ctx.orm.image, attributes: ['id', 'imageUrl'] }]
+  });
   ctx.body = users;
 });
 
 
 router.get('api.users.profile', '/:id', async (ctx) => {
-  const searchedUser = await ctx.orm.user.findByPk(ctx.params.id);
+  const searchedUser = await ctx.orm.user.findByPk(ctx.params.id, {
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
+    include: [{ model: ctx.orm.image, attributes: ['id', 'imageUrl'] }]
+  });
   ctx.body = searchedUser;
 });
 
@@ -34,6 +57,8 @@ router.get('api.users.paginated', '/', async (ctx) => {
   const users = await ctx.orm.user.findAll({
     offset: (page - 1) * pageSize,
     limit: pageSize,
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
+    include: [{ model: ctx.orm.image, attributes: ['id', 'imageUrl'] }]
   });
   ctx.body = users;
 });
