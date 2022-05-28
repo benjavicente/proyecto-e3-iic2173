@@ -37,6 +37,8 @@ export async function postApi(url, body){
   const accessToken = await fetch('/api/getToken');
   const token = await (await accessToken.text()).slice(1,-1);
 
+  console.log("B", body);
+
   // Colocar en el .env
   const baseUrl = "http://localhost:8000/";
   

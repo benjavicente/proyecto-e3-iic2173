@@ -60,6 +60,21 @@ function HomePage() {
     )
   }
 
+  let coordinates = {lat: null, lng: null};
+
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      coordinates.lat = position.coords.latitude;
+      coordinates.lng = position.coords.longitude;
+     });
+  }; 
+
+  getApi('api/weather', coordinates) 
+    .then(data => {
+      const jsonData = JSON.parse(data);
+      setWeatherData(jsonData["temp_c"]);
+    })
+
   const filter = () => {
     setFilteredId(idSelected);
     setLoading(true);
@@ -105,21 +120,6 @@ function HomePage() {
   });
 
   const Map = dynamic(() => import('../components/Map'))
-
-  let coordinates = {lat: null, lng: null};
-
-  if ('geolocation' in navigator) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      coordinates.lat = position.coords.latitude;
-      coordinates.lng = position.coords.longitude;
-     });
-  }; 
-
-  getApi('api/weather', coordinates) 
-    .then(data => {
-      const jsonData = JSON.parse(data);
-      setWeatherData(jsonData["temp_c"]);
-    })
   
   return (
     <div className={styles.CenterContainer}>
