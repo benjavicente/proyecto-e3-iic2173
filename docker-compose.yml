@@ -2,18 +2,98 @@ version: "3.7"
 
 # TODO: separar desarrollo de base
 
-services:
-  auth:
-    image: supertokens/supertokens-postgresql:3.13
-    depends_on:
-      - postgres
-    volumes:
-      - ./services/auth/config.yml:/usr/lib/supertokens/config.yaml
-    environment:
-      POSTGRESQL_CONNECTION_URI: "postgresql://user:password@postgres/auth"
+volumes:
+  nginx_secrets:
 
+services:
   postgres:
-    image: postgres:14
+    image: postgis/postgis:14-master
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: main
+
+  redis:
+    image: redis
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - 6379:6379
+
+  redis-commander: 
+    # TODO: mover a dev
+    image: rediscommander/redis-commander
+    restart: always
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    ports:
+      - 8081:8081
+    depends_on:
+      - redis
+
+  backend:
+    build:
+      context: ./services/backend
+      dockerfile: Dockerfile.prod
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - 8000:8000
+    environment:
+      INDEX_HOST: http://indexes:8002
+      PORT: 8000
+      DB_HOST: postgres
+      DB_USERNAME: user
+      NODE_ENV: production
+      DB_PASSWORD: password
+      DB_NAME: main
+      DATABASE_URL: postgres://user:password@postgres:5432/main
+    command: ["sh", "init-server.sh"]
+
+  frontend:
+    build:
+      context: ./services/frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - 3000:3000
+    command: ["node", "server.js"]
+
+  # Hace la pega de configurar los scripts del cerbot
+  # https://hub.docker.com/r/jonasal/nginx-certbot
+  # nginx:
+  #   image: jonasal/nginx-certbot:3
+  #   environment:
+  #     RENEWAL_INTERVAL: 1d
+  #     CERTBOT_EMAIL: 0zpowqamd@mozmail.com
+  nginx:
+    image: nginx
+    volumes:
+      # TODO: cambiar
+      - ./services/nginx/nginx.conf:/etc/nginx/user_conf.d/default.conf
+      - nginx_secrets:/etc/letsencrypt
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - backend
+      - frontend
+
+  indexes:
+    build:
+      context: ./services/indexes
+      dockerfile: Dockerfile.prod
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - 8002:8002
+    environment:
+      PORT: 8002
+      DB_HOST: postgres
+      DB_USERNAME: user
+      NODE_ENV: production
+      DB_PASSWORD: password
+      DB_NAME: main
+      DATABASE_URL: postgres://user:password@postgres:5432/main
+    command: ["sh", "init-server.sh"]
