@@ -49,6 +49,11 @@ router.get('api.users.profile', '/:id', async (ctx) => {
     attributes: { exclude: ['createdAt', 'updatedAt'] },
     include: [{ model: ctx.orm.image, attributes: ['id', 'imageUrl'] }]
   });
+
+  if (!searchedUser){
+    ctx.throw(404, 'El usuario indicado no existe');
+  }
+  
   ctx.body = searchedUser;
 });
 
