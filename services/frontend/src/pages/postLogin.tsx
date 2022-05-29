@@ -21,7 +21,6 @@ export default function PostLogin() {
       email: user.email
     }    
 
-    console.log(body);
     postApi('api/authenticate', body)
       .then(res => {
         router.push("/");

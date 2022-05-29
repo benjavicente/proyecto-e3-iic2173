@@ -57,8 +57,6 @@ export async function uploadApi(url, file){
   const accessToken = await fetch('/api/getToken');
   const token = await (await accessToken.text()).slice(1,-1);
 
-  console.log("File:", file);
-
   // Colocar en el .env
   const baseUrl = "http://localhost:8000/";
   

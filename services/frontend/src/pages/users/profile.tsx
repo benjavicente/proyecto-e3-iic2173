@@ -52,7 +52,6 @@ export default function Profile() {
           setError(true);
           setLoading(false);
         } else {
-          console.log(info);
           setData(JSON.parse(info));
           setLoading(false);
         }
@@ -69,7 +68,6 @@ export default function Profile() {
     }    
     postApi('api/pings/create', body)
       .then(res => {
-        console.log(res);
         if (res != 'Created') {
           setPingMessage('Ya has hecho ping con este usario');
         } else {

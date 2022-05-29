@@ -8,14 +8,14 @@ import styles from '../styles/Home.module.css'
 const NewLocationForm = ({ setLoading }) => {
   const [tagsSelected, setTagsSelected] = useState([]);
   const [idSelected, setIdSelected] = useState([]);
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState([]); 
 
-  getApi('api/tags/all', null) 
+  if (tags == []) {
+    getApi('api/tags/all', null) 
     .then(data => {
       setTags(JSON.parse(data));
     });
-
-  if (tags == []) {
+    
     return (
       <div />
     )
@@ -26,10 +26,8 @@ const NewLocationForm = ({ setLoading }) => {
       alert("Por favor, escoge al menos un tag");
     } else {
       values.filteredTags = idSelected;    
-      console.log("Se crea", values);
       postApi('api/markers/create', values)
         .then(res => {
-          console.log(res);
           setLoading(true);
         });
     }    
