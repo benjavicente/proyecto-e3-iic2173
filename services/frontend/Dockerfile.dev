@@ -6,4 +6,5 @@ RUN npm ci
 
 COPY . .                                                                                            
 
+EXPOSE 3000
 
