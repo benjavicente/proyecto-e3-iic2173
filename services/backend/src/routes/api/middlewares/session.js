@@ -23,7 +23,6 @@ const setCurrentUser = async (ctx, next) => {
 
   if (user) {
     ctx.state.currentUserId = user.id;
-    ctx.status = 200;
     return next();
   }
 

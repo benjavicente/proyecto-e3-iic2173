@@ -4,14 +4,12 @@ const { jwtCheck, setCurrentUser } = require('./middlewares/session')
 
 const router = new KoaRouter();
 
-// router.use(jwtCheck);
-// router.use(setCurrentUser);
+router.use(jwtCheck);
+router.use(setCurrentUser);
 
 router.get('api.markers.all', '/', async (ctx) => {
-  // const { currentUserId } = ctx.state;
+  const { currentUserId } = ctx.state;
   let { filteredIds } = ctx.request.query;
-
-  const currentUserId = 1;
 
   if (filteredIds){
     filteredIds = JSON.parse(filteredIds);
@@ -57,8 +55,7 @@ router.get('api.markers.all', '/', async (ctx) => {
 });
 
 router.post('api.markers.new', '/create', async (ctx) => {
-  // const { currentUserId } = ctx.state;
-  const currentUserId = 1
+  const { currentUserId } = ctx.state;
   const { lat, lng, name, tagsIds = [] } = ctx.request.body;
 
   const tags = await ctx.orm.tag.findAll({
