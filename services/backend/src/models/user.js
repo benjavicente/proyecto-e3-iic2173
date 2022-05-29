@@ -1,17 +1,11 @@
 const { Model } = require('sequelize');
-const bcrypt = require('bcrypt');
-
-const PASSWORD_SALT_ROUNDS = 10;
 
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     static associate(models) {
       // define association here
       this.hasMany(models.mark);
-    }
-
-    async checkPassword(password) {
-      return bcrypt.compare(password, this.password);
+      this.hasMany(models.image);
     }
   }
   user.init({
@@ -52,22 +46,9 @@ module.exports = (sequelize, DataTypes) => {
         is: { args: /\d{9}/, msg: 'Ingresa un número de teléfono válido'}
       },
     },
-    password: {
-      type: DataTypes.STRING,
-      validate: {
-        notEmpty: { args: true, msg: 'Ingresa una contraseña válida' },
-      },
-    },
   }, {
     sequelize,
     modelName: 'user',
-  });
-
-  user.beforeSave(async (instance) => {
-    if (instance.changed('password')) {
-      const hashedPassword = await bcrypt.hash(instance.password, PASSWORD_SALT_ROUNDS);
-      instance.set('password', hashedPassword);
-    }
   });
 
   return user;

@@ -1,14 +1,14 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('pings', {
+    await queryInterface.createTable('images', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      userIdFrom: {
+      userId: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         allowNull: false,
@@ -17,14 +17,9 @@ module.exports = {
           key: 'id',
         },
       },
-      userIdTo: {
-        type: Sequelize.INTEGER,
-        onDelete: 'CASCADE',
+      imageUrl: {
+        type: Sequelize.STRING,
         allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
       },
       createdAt: {
         allowNull: false,
@@ -34,15 +29,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    }, {
-      uniqueKeys: {
-        Items_unique: {
-          fields: ['userIdFrom', 'userIdTo']
-        }
-      }
     });
-  }, 
+  },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('pings');
+    await queryInterface.dropTable('images');
   }
 };

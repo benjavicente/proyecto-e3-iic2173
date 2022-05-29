@@ -32,6 +32,14 @@ module.exports = (sequelize, DataTypes) => {
         notEmpty: true,
       },
     },
+    status: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      validate: {
+        notEmpty: true,
+        isIn: [[-1, 0, 1]]
+      },
+    }
   }, {
     sequelize,
     modelName: 'ping',

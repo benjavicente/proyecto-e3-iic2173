@@ -1,11 +1,5 @@
 const KoaRouter = require('koa-router');
 
-const index = require('./routes/index');
-const register = require('./routes/authentication/register');
-const login = require('./routes/authentication/login');
-const map = require('./routes/map');
-const pings = require('./routes/pings');
-
 const router = new KoaRouter();
 
 router.use(async (ctx, next) => {
@@ -45,11 +39,5 @@ router.use(async (ctx, next) => {
 
   return next();
 });
-
-router.use('/', index.routes());
-router.use('/register', register.routes());
-router.use('/login', login.routes());
-router.use('/map', map.routes());
-router.use('/pings', pings.routes());
 
 module.exports = router;

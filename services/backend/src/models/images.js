@@ -1,36 +1,30 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class mark extends Model {
+  class image extends Model {
     static associate(models) {
       // define association here
       this.belongsTo(models.user, { foreignKey: 'userId' });
-      this.belongsToMany(models.tag, { through: 'marktags' });
     }
   }
-  mark.init({
+  image.init({
     userId: {
       type: DataTypes.INTEGER,
       validate: {
         notEmpty: true,
       },
     },
-    name: {
+    imageUrl: {
       type: DataTypes.STRING,
       validate: {
-        notEmpty: { args: true, msg: 'Ingresa un nombre válido' },
-      },
-    },
-    position: {
-      type: DataTypes.GEOMETRY('POINT'),
-      validate: {
-        notEmpty: { args: true, msg: 'Ingresa unas coordenadas válidas' },
+        notEmpty: { args: true, msg: 'Ingresa una url de imagen válida' },
+        isUrl: { args: true, msg: 'Ingresa una url de imagen válida' },
       },
     },
   }, {
     sequelize,
-    modelName: 'mark',
+    modelName: 'image',
   });
 
-  return mark;
+  return image;
 };
