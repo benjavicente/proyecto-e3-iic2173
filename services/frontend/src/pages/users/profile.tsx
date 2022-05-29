@@ -96,6 +96,7 @@ export default function Profile() {
           console.log(res);
           // Luego de la request se debe eliminar la imagen
           setFile(null);
+          setLoading(true);
         });
     }  
   }

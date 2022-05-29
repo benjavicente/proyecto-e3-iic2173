@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 import { useUser } from '@auth0/nextjs-auth0'
 
-import { getApi } from '../../lib/api';
+import { getApi, patchApi } from '../../lib/api';
 
 import Head from 'next/head'
 
@@ -21,6 +21,7 @@ function PingsPage() {
   if (loading) {
     getApi('api/pings/all', null) 
       .then(data => {
+        console.log(data);
         setPingsData(JSON.parse(data));
         setLoading(false);
       });
@@ -44,10 +45,37 @@ function PingsPage() {
     })
   }
 
+  const respondingPing = (answer, id) => {
+    console.log(answer);
+    patchApi(`api/pings/update/${id}`, { status: answer}) 
+      .then(res => {
+        setLoading(true);
+      });
+    
+  }
+
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
-    return (
-      <p key={ping.id}>Te han hecho un ping, <a className={styles.rowItemPress} onClick={() => visitToProfile(ping.pingedFrom)}> Visitar perfil</a></p>     
-    )
+    if (ping.status == 0) {      
+      return (
+        <div className={styles.row}>
+          <p key={ping.id}>Te han hecho un ping, <a className={styles.rowItemPress} onClick={() => visitToProfile(ping.pingedFrom)}>Visitar perfil</a></p> 
+          <button className={styles.button} onClick={() => respondingPing(1, ping.id)}> 
+            Aceptar
+          </button> 
+          <button className={styles.buttonReject} onClick={() => respondingPing(-1, ping.id)}> 
+            Rechazar
+          </button> 
+        </div>
+        
+      ) 
+    } else {
+      return (
+        <div className={styles.row}>
+          <p key={ping.id}>Te han hecho un ping, <a className={styles.rowItemPress} onClick={() => visitToProfile(ping.pingedFrom)}> Visitar perfil</a> | {ping.status == 1 ? 'Aceptado' : 'Rechazado' }</p>
+        </div>
+      ) 
+    }
+    
   });
 
   const pingsFromUser = pingsData.pingedUsers.map((ping) => {

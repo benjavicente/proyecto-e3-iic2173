@@ -53,6 +53,26 @@ export async function postApi(url, body){
   return await response.text();
 }
 
+export async function patchApi(url, body){
+  const accessToken = await fetch('/api/getToken');
+  const token = await (await accessToken.text()).slice(1,-1);
+
+  console.log("ENV:", process.env.API_URL);
+  // Colocar en el .env
+  const baseUrl = "http://localhost:8000/";
+  
+  const response = await fetch(baseUrl + url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify(body)
+   });
+
+  return await response.text();
+}
+
 export async function uploadApi(url, file){
   const accessToken = await fetch('/api/getToken');
   const token = await (await accessToken.text()).slice(1,-1);
