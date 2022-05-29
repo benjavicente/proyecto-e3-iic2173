@@ -19,7 +19,7 @@ const Map = ({ markers }) => {
   let peopleMarkers;
 
   if (markers) {
-    userMarkers = markers.userPositions.map((marker) => {
+    userMarkers = markers.userMarkers.map((marker) => {
       return (
         <Marker position={[marker.position.coordinates[0], marker.position.coordinates[1]]} icon={ICON} key={marker.id}>
           <Popup>
@@ -29,7 +29,7 @@ const Map = ({ markers }) => {
       )
     });
 
-    peopleMarkers = markers.peoplePositions.map((marker) => {
+    peopleMarkers = markers.peopleMarkers.map((marker) => {
       return (
         <Marker position={[marker.position.coordinates[0], marker.position.coordinates[1]]} icon={ICONPEOPLE} key={marker.id}>
           <Popup>

@@ -19,7 +19,7 @@ function PingsPage() {
   const [pingsData, setPingsData] = useState(null);
 
   if (loading) {
-    getApi('api/pings', null) 
+    getApi('api/pings/all', null) 
       .then(data => {
         setPingsData(JSON.parse(data));
         setLoading(false);
@@ -33,26 +33,26 @@ function PingsPage() {
   const visitToProfile = (user) => {
     router.push({
       pathname: '/users/profile',
-      query: { id: user.userIdFrom },
+      query: { id: user.id },
     })
   }
 
   const visitFromProfile = (user) => {
     router.push({
       pathname: '/users/profile',
-      query: { id: user.userIdTo },
+      query: { id: user.id },
     })
   }
 
-  const pingsToUser = pingsData.usersPingedBy.map((user) => {
+  const pingsToUser = pingsData.usersPingedBy.map((ping) => {
     return (
-      <p key={user.userIdFrom}>Te han hecho un ping, <a className={styles.rowItemPress} onClick={() => visitToProfile(user)}> Visitar perfil</a></p>     
+      <p key={ping.id}>Te han hecho un ping, <a className={styles.rowItemPress} onClick={() => visitToProfile(ping.pingedFrom)}> Visitar perfil</a></p>     
     )
   });
 
-  const pingsFromUser = pingsData.pingedUsers.map((user) => {
+  const pingsFromUser = pingsData.pingedUsers.map((ping) => {
     return (
-      <p key={user.userIdTo}>Has hecho un ping, <a className={styles.rowItemPress} onClick={() => visitFromProfile(user)}> Visitar perfil</a></p>     
+      <p key={ping.id}>Has hecho un ping, <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}> Visitar perfil</a></p>     
     )
   });
 

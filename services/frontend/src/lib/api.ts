@@ -22,6 +22,7 @@ export async function getApi(url, params){
     }  
   }  
 
+  console.log(baseUrl + url + urlParams);
   const response = await fetch(baseUrl + url + urlParams, {
     method: 'GET',
     headers: {
@@ -36,8 +37,6 @@ export async function getApi(url, params){
 export async function postApi(url, body){
   const accessToken = await fetch('/api/getToken');
   const token = await (await accessToken.text()).slice(1,-1);
-
-  console.log("B", body);
 
   // Colocar en el .env
   const baseUrl = "http://localhost:8000/";

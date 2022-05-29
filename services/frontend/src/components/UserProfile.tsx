@@ -1,7 +1,14 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styles from '../styles/Home.module.css'
 
 const UserProfile = ({ data }) => {
+
+  const userImages = data.images.map((image) => {
+    return (
+      <img key={image.id} className={styles.imgUser} src={image.imageUrl} alt={data.email} />
+    )
+  });
+
   return (
     <div className={styles.container}>
       <h3 className={styles.rowItem}>Datos del perfil</h3>
@@ -27,7 +34,12 @@ const UserProfile = ({ data }) => {
       </div>
 
       <h3 className={styles.rowItem}>Imágenes del perfil</h3>
-      <img className={styles.imgUser}src={data.picture ? data.picture : 'https://pbs.twimg.com/profile_images/1117986986508394496/bq8RcTlm_400x400.png'} alt={data.email} />
+      <div>
+        { data.images.length != 0 ? userImages 
+        : <img className={styles.imgUser} src={'https://pbs.twimg.com/profile_images/1117986986508394496/bq8RcTlm_400x400.png'} alt={data.email} />   
+        }             
+      </div>
+      
     </div>    
   )
 }

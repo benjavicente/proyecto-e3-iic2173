@@ -1,64 +1,33 @@
 import React, { useState } from 'react';
 
 import { useFormik } from 'formik';
-import { postApi } from '../lib/api';
+import { getApi, postApi } from '../lib/api';
 
 import styles from '../styles/Home.module.css'
  
 const NewLocationForm = ({ setLoading }) => {
   const [tagsSelected, setTagsSelected] = useState([]);
   const [idSelected, setIdSelected] = useState([]);
+  const [tags, setTags] = useState([]);
 
-  const tags = [
-    {
-      id: 1,
-      name: 'Deportes',      
-    },
-    {
-      id: 2,
-      name: 'Naturaleza',      
-    },
-    {
-      id: 3,
-      name: 'Comida',      
-    },
-    {
-      id: 4,
-      name: 'Música',      
-    },
-    {
-      id: 5,
-      name: 'Baile',      
-    },
-    {
-      id: 6,
-      name: 'Videojuegos',      
-    },
-    {
-      id: 7,
-      name: 'Arte',      
-    },
-    {
-      id: 8,
-      name: 'Política',      
-    },
-    {
-      id: 9,
-      name: 'Estudios',      
-    },
-    {
-      id: 10,
-      name: 'Animales',      
-    },
-  ];
+  getApi('api/tags/all', null) 
+    .then(data => {
+      setTags(JSON.parse(data));
+    });
 
+  if (tags == []) {
+    return (
+      <div />
+    )
+  }
+ 
   const Create = (values) => {
     if (idSelected.length == 0) {
       alert("Por favor, escoge al menos un tag");
     } else {
       values.filteredTags = idSelected;    
       console.log("Se crea", values);
-      postApi('api/markers/new', values)
+      postApi('api/markers/create', values)
         .then(res => {
           console.log(res);
           setLoading(true);
@@ -70,6 +39,7 @@ const NewLocationForm = ({ setLoading }) => {
     setIdSelected([]);
     setTagsSelected([]);
   }
+  
   const selectedTag = (tag) => {   
     const tagData = JSON.parse(tag);
     if (!idSelected.includes(tag.id)) {
@@ -147,7 +117,7 @@ const NewLocationForm = ({ setLoading }) => {
                 name="lng"
                 type="text"
                 onChange={formik.handleChange}
-                value={formik.values.long}
+                value={formik.values.lng}
               /> 
             </div> 
           </div> 

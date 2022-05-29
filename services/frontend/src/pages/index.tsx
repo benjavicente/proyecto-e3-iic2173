@@ -39,7 +39,7 @@ function HomePage() {
       })
     } else {
       // Se deja de esa forma para que userPositions.map no tire problemas
-      setMarkers({"userPositions": [], "peoplePositions": []});    
+      setMarkers({"userMarkers": [], "peopleMarkers": []});    
       setLoading(false);
     }   
     

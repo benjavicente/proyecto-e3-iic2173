@@ -22,7 +22,7 @@ export default function PostLogin() {
     }    
 
     console.log(body);
-    postApi('api/login', body)
+    postApi('api/authenticate', body)
       .then(res => {
         router.push("/");
       });

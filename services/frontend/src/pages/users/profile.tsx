@@ -52,6 +52,7 @@ export default function Profile() {
           setError(true);
           setLoading(false);
         } else {
+          console.log(info);
           setData(JSON.parse(info));
           setLoading(false);
         }
@@ -66,9 +67,10 @@ export default function Profile() {
     const body = {
       pingedUserId: data.id
     }    
-    postApi('api/pings', body)
+    postApi('api/pings/create', body)
       .then(res => {
-        if (res == 'Validation error') {
+        console.log(res);
+        if (res != 'Created') {
           setPingMessage('Ya has hecho ping con este usario');
         } else {
           setPingMessage('Ping hecho con éxito');
