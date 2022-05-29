@@ -5,7 +5,7 @@ const { uploadFile } = require('./s3/fileUploader');
 const router = new KoaRouter();
 
 
-router.post('api.users.uploadImage', '/upload/image', async (ctx) => {
+router.post('api.users.uploadImage', '/upload/image', jwtCheck, setCurrentUser, async (ctx) => {
   const { currentUserId } = ctx.state;
   const uploadResults = await uploadFile(ctx);
 
@@ -14,21 +14,23 @@ router.post('api.users.uploadImage', '/upload/image', async (ctx) => {
       const { Location } = result;
   
       const image = ctx.orm.image.build({
-        userId: 1,
+        userId: currentUserId,
         imageUrl: Location,
       });
 
       return await image.save({ fields: ['userId', 'imageUrl'] });
     })
   );
-  ctx.body = uploadResults;
-  ctx.status = 200;
+  ctx.status = 201;
 });
 
 
 router.get('api.users.currentUser', '/me', jwtCheck, setCurrentUser, async (ctx) => {
   const { currentUserId } = ctx.state;
-  const user = await ctx.orm.user.findByPk(currentUserId);
+  const user = await ctx.orm.user.findByPk(currentUserId, {
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
+    include: [{ model: ctx.orm.image, attributes: ['id', 'imageUrl'] }]
+  });
   ctx.body = user;
 });
 

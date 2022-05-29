@@ -6,9 +6,11 @@ const router = new KoaRouter();
 router.use(jwtCheck);
 router.use(setCurrentUser);
 
-router.post('api.handleUserSession', '/login', async (ctx) => {
+router.post('api.handleUserSession', '/authenticate', async (ctx) => {
   const { currentUserId } = ctx.state;
-  const user = await ctx.orm.user.findByPk(currentUserId);
+  const user = await ctx.orm.user.findByPk(currentUserId, {
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
+  });
   ctx.body = user;
 });
 

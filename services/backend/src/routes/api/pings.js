@@ -1,5 +1,4 @@
 const KoaRouter = require('koa-router');
-const sequelize = require('sequelize');
 const { jwtCheck, setCurrentUser } = require('./middlewares/session')
 
 const router = new KoaRouter();
@@ -8,15 +7,29 @@ router.use(jwtCheck);
 router.use(setCurrentUser);
 
 
-router.get('api.pings.all', '/', async (ctx) => {
+router.get('api.pings.all', '/all', async (ctx) => {
+  const { currentUserId } = ctx.state;
+
   const pingedUsers = await ctx.orm.ping.findAll({ 
-    where: { userIdFrom: ctx.state.currentUserId },
-    include: [{ model: ctx.orm.user, as: 'pingedTo' }]
+    where: { userIdFrom: currentUserId },
+    attributes: ['id'],
+    include: [
+      {
+        model: ctx.orm.user, 
+        as: 'pingedTo', 
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+      }]
   });
 
   const usersPingedBy = await ctx.orm.ping.findAll({ 
-    where: { userIdTo: ctx.state.currentUserId },
-    include: [{ model: ctx.orm.user, as: 'pingedFrom' }]
+    where: { userIdTo: currentUserId },
+    attributes: ['id'],
+    include: [
+      {
+        model: ctx.orm.user, 
+        as: 'pingedFrom', 
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+      }]
   });
 
   ctx.body = {
@@ -26,11 +39,12 @@ router.get('api.pings.all', '/', async (ctx) => {
 });
 
 
-router.post('api.pings.new', '/', async (ctx) => {
+router.post('api.pings.new', '/create', async (ctx) => {
+  const { currentUserId } = ctx.state;
   const { pingedUserId } = ctx.request.body;
 
   const ping = ctx.orm.ping.build({
-    userIdFrom: ctx.state.currentUserId,
+    userIdFrom: currentUserId,
     userIdTo: pingedUserId,
   });
 
@@ -47,7 +61,7 @@ router.post('api.pings.new', '/', async (ctx) => {
     ctx.throw(400, ValidationError);
 
   }
-  ctx.status = 200;
+  ctx.status = 201;
 });
 
 module.exports = router;
