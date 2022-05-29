@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const AWS = require('aws-sdk');
+const { v4: uuid } = require('uuid');
 const fs = require('fs');
 
 const bucketConfig = { 
@@ -21,7 +22,8 @@ const uploadFile = async (ctx) => {
       const filePromises = images.map(image => {
         const s3 = new AWS.S3()
 
-        const { path, name, type } = image;
+        const { path, type } = image;
+        const name = uuid();
         const body = fs.createReadStream(path);
 
         const params = {
