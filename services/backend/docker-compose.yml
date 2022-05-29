@@ -30,6 +30,8 @@ services:
       yarn start"
     networks:
       - app-network
+    ports:
+      - 3000:3000
 
   nginx:
     image: nginx
