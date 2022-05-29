@@ -2,16 +2,18 @@ version: "3.7"
 
 services:
   frontend:
-    build: .
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
     volumes: 
        - ./src:/workspace/src
        - /workspace/node_modules
        - /workspace/.next
-    command: ["npm", "run", "dev"]
     networks:
       - app-network
+    command: ["npm", "run", "dev"]
 
   nginx:
     image: nginx
@@ -35,7 +37,3 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-
-networks:                     
-  app-network:
-    driver: bridge
