@@ -65,6 +65,13 @@ function UsersPage() {
       <div className={styles.flexWrapContainer}>
         {usersData.length !== 0 ? Users : <h2> No hay más usuarios</h2>}
       </div>
+      
+      { usersData.length !== 0 ? 
+        <div className={styles.centerContainer}>
+          <button className={styles.button} onClick={prevPage} disabled={page == 1}>Página anterior</button>
+          <button className={styles.button} onClick={nextPage} disabled={usersData.length == 0}>Siguiente página</button>
+        </div> 
+      : null }      
 
       <Footer />
     </div>
