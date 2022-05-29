@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useUser } from '@auth0/nextjs-auth0';
+import React, { useState } from 'react'
+import { useUser } from '@auth0/nextjs-auth0'
 import Head from 'next/head'
 
 import Navbar from '../../components/Navbar'

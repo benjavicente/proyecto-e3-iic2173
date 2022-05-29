@@ -103,11 +103,11 @@ const NewLocationForm = () => {
     initialValues: {
       name: '',
       lat: '',
-      long: '',
+      lng: '',
       filteredTags: [],
     },
     onSubmit: values => {
-      if (!values.name || !values.lat || !values.long) {
+      if (!values.name || !values.lat || !values.lng) {
         alert("Por favor, ingresa valores válidos");
       } else {
         Create(values);
@@ -142,8 +142,8 @@ const NewLocationForm = () => {
             <div className={styles.rowItem}>
               <label htmlFor="lastName">Longitud: </label>
               <input
-                id="long"
-                name="long"
+                id="lng"
+                name="lng"
                 type="text"
                 onChange={formik.handleChange}
                 value={formik.values.long}

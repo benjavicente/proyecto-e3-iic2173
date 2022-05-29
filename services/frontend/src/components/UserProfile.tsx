@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import styles from '../styles/Home.module.css'
 
 const UserProfile = ({ data }) => {
@@ -26,8 +27,8 @@ const UserProfile = ({ data }) => {
       </div>
 
       <h3 className={styles.rowItem}>Imágenes del perfil</h3>
-      <img src={data.picture ? data.picture : 'https://pbs.twimg.com/profile_images/1117986986508394496/bq8RcTlm_400x400.png'} alt={data.email} />
-    </div>
+      <img className={styles.imgUser}src={data.picture ? data.picture : 'https://pbs.twimg.com/profile_images/1117986986508394496/bq8RcTlm_400x400.png'} alt={data.email} />
+    </div>    
   )
 }
 

@@ -53,3 +53,23 @@ export async function postApi(url, body){
 
   return await response.text();
 }
+
+export async function uploadApi(url, file){
+  const accessToken = await fetch('/api/getToken');
+  const token = await (await accessToken.text()).slice(1,-1);
+
+  console.log("File:", file);
+
+  // Colocar en el .env
+  const baseUrl = "http://localhost:8000/";
+  
+  const response = await fetch(baseUrl + url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}` 
+    },
+    body: file
+   });
+
+  return await response.text();
+}

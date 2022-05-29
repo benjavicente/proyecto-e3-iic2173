@@ -9,6 +9,8 @@ import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import UserProfile from '../../components/UserProfile'
 
+import { uploadApi } from '../../lib/api';
+
 import styles from '../../styles/Home.module.css'
 
 export default function Profile() {
@@ -19,6 +21,7 @@ export default function Profile() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
   const [pingMessage, setPingMessage] = useState('');
+  const [file, setFile] = useState(null);
   const { user, isLoading } = useUser();
   
  
@@ -73,6 +76,30 @@ export default function Profile() {
       });
   }
 
+  const onFileChange = event => { 
+    setFile(event.target.files[0]); 
+  }; 
+
+  const uploadImage = () => {
+    if (file == undefined) {
+      alert("Por favor, escoge una imagen");
+    } else {
+      const formData = new FormData(); 
+     
+      formData.append( 
+        "userImages", 
+        file,
+      ); 
+
+      uploadApi('api/users/upload/image', formData)
+        .then(res => {
+          console.log(res);
+          // Luego de la request se debe eliminar la imagen
+          setFile(null);
+        });
+    }  
+  }
+
   return (
     <div>
       <Navbar logged={user !== undefined }/>
@@ -84,10 +111,21 @@ export default function Profile() {
       }
       
       { user && query.id != 'me' ? 
-        <div className={styles.row}>
-          <button className={styles.button} onClick={makePing}>Hacer Ping</button>
-          <p className={styles.rowItem}>{pingMessage}</p> 
-        </div>               
+        <div>
+          <div className={styles.row}> 
+            <button className={styles.button} onClick={makePing}>Hacer Ping</button>
+            <p className={styles.rowItem}>{pingMessage}</p> 
+          </div>
+          <div> 
+            <h3 className={styles.rowItem}>¿Deseas subir imágenes de perfil?</h3>
+            <div>        
+              <input className={styles.button} type="file" onChange={onFileChange} />
+              <button className={styles.button} onClick={uploadImage}> 
+                Subir imagen 
+              </button> 
+            </div>
+          </div>     
+        </div>                    
       : null }      
         
       <Footer />
