@@ -69,6 +69,9 @@ function HomePage() {
      });
   }; 
 
+  if (coordinates.lat == null && coordinates.lng == null) {
+    
+  }
   getApi('api/weather', coordinates) 
     .then(data => {
       const jsonData = JSON.parse(data);
