@@ -116,17 +116,19 @@ export default function Profile() {
             <button className={styles.button} onClick={makePing}>Hacer Ping</button>
             <p className={styles.rowItem}>{pingMessage}</p> 
           </div>
-          <div> 
-            <h3 className={styles.rowItem}>¿Deseas subir imágenes de perfil?</h3>
-            <div>        
-              <input className={styles.button} type="file" onChange={onFileChange} />
-              <button className={styles.button} onClick={uploadImage}> 
-                Subir imagen 
-              </button> 
-            </div>
-          </div>     
         </div>                    
-      : null }      
+      : null }  
+      { user && query.id == 'me' ? 
+        <div> 
+          <h3 className={styles.rowItem}>¿Deseas subir imágenes de perfil?</h3>
+        <div>        
+          <input className={styles.button} type="file" onChange={onFileChange} />
+          <button className={styles.button} onClick={uploadImage}> 
+            Subir imagen 
+          </button> 
+        </div>
+      </div>
+      : null }    
         
       <Footer />
     </div>
