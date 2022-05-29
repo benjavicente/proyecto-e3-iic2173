@@ -5,7 +5,7 @@ import { postApi } from '../lib/api';
 
 import styles from '../styles/Home.module.css'
  
-const NewLocationForm = () => {
+const NewLocationForm = ({ setLoading }) => {
   const [tagsSelected, setTagsSelected] = useState([]);
   const [idSelected, setIdSelected] = useState([]);
 
@@ -61,6 +61,7 @@ const NewLocationForm = () => {
       postApi('api/markers/new', values)
         .then(res => {
           console.log(res);
+          setLoading(true);
         });
     }    
   }

@@ -156,7 +156,7 @@ function HomePage() {
       : null }      
 
       <Map markers={ markers } />
-      { user ? <Form /> : null }
+      { user ? <Form setLoading={setLoading}/> : null }
            
       <Footer />
     </div>

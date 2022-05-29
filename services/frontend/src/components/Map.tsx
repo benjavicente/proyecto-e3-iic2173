@@ -15,7 +15,6 @@ const ICONPEOPLE = icon({
 })
 
 const Map = ({ markers }) => {
-  console.log(markers);
   let userMarkers;
   let peopleMarkers;
 
