@@ -2,8 +2,6 @@ version: "3.7"
 
 services:
   frontend:
-    depends_on:
-      - postgres
     build:
       context: ./services/frontend/
       dockerfile: Dockerfile.dev

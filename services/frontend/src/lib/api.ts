@@ -5,7 +5,7 @@ export async function getApi(url, params){
   const token = await (await accessToken.text()).slice(1,-1);
 
   // Colocar en el .env
-  const baseUrl = "http://localhost:8000/"
+  const baseUrl = "https://pingtoc-api-arquisoftware.tk/"
 
   let urlParams = "";
 
@@ -22,7 +22,6 @@ export async function getApi(url, params){
     }  
   }  
 
-  console.log(baseUrl + url + urlParams);
   const response = await fetch(baseUrl + url + urlParams, {
     method: 'GET',
     headers: {
@@ -39,7 +38,7 @@ export async function postApi(url, body){
   const token = await (await accessToken.text()).slice(1,-1);
 
   // Colocar en el .env
-  const baseUrl = "http://localhost:8000/";
+  const baseUrl = "https://pingtoc-api-arquisoftware.tk/";
   
   const response = await fetch(baseUrl + url, {
     method: 'POST',
@@ -57,9 +56,8 @@ export async function patchApi(url, body){
   const accessToken = await fetch('/api/getToken');
   const token = await (await accessToken.text()).slice(1,-1);
 
-  console.log("ENV:", process.env.API_URL);
   // Colocar en el .env
-  const baseUrl = "http://localhost:8000/";
+  const baseUrl = "https://pingtoc-api-arquisoftware.tk/";
   
   const response = await fetch(baseUrl + url, {
     method: 'PATCH',
@@ -78,7 +76,7 @@ export async function uploadApi(url, file){
   const token = await (await accessToken.text()).slice(1,-1);
 
   // Colocar en el .env
-  const baseUrl = "http://localhost:8000/";
+  const baseUrl = "https://pingtoc-api-arquisoftware.tk/";
   
   const response = await fetch(baseUrl + url, {
     method: 'POST',
