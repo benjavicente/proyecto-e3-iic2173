@@ -9,6 +9,7 @@ import { getApi } from '../lib/api';
 
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import FormLocation from '../components/FormLocation'
 
 import Form from '../components/FormMarker'
 
@@ -21,6 +22,7 @@ function HomePage() {
   const [idSelected, setIdSelected] = useState([]);
   const [filteredId, setFilteredId] = useState([]);
   const [weatherData, setWeatherData] = useState(null);
+  const [initialCoordinates, setInitialCoordinates] = useState(null);
 
   const { user, isLoading } = useUser();  
 
@@ -61,15 +63,6 @@ function HomePage() {
   }
 
   let coordinates = {lat: null, lng: null};
-
-  /*
-  if ('geolocation' in navigator) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      coordinates.lat = position.coords.latitude;
-      coordinates.lng = position.coords.longitude;
-     });
-  }; 
-  */
 
   navigator.geolocation.getCurrentPosition(function(position) {
     coordinates.lat = position.coords.latitude;
@@ -139,9 +132,9 @@ function HomePage() {
       <Navbar logged={user !== undefined}/>
       { weatherData ? 
         <div className={styles.centerContainer}>
-          <h2>El tiempo actual es: {weatherData}°C</h2>
+          <h2>La temperatura actual es: {weatherData}°C</h2>
         </div>
-      : null }
+      : <FormLocation setLoading={setLoading} setInitialCoordinates={setInitialCoordinates} /> }
       
       { user ? 
         <div>
@@ -162,7 +155,7 @@ function HomePage() {
         </div>        
       : null }      
 
-      <Map markers={ markers } />
+      <Map markers={ markers } initialCoordinates={initialCoordinates} />
       { user ? <Form setLoading={setLoading}/> : null }
            
       <Footer />

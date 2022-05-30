@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className={styles.centerContainer}>
       <a
-        href="https://github.com/iic2173/e1-2022-1-grupo_03"
+        href="https://github.com/benjavicente/proyecto-e3-iic2173/tree/frontend"
         target="_blank"
         rel="noopener noreferrer"
       >

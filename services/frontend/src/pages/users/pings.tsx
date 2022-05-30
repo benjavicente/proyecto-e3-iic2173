@@ -21,7 +21,6 @@ function PingsPage() {
   if (loading) {
     getApi('api/pings/all', null) 
       .then(data => {
-        console.log(data);
         setPingsData(JSON.parse(data));
         setLoading(false);
       });
@@ -46,7 +45,6 @@ function PingsPage() {
   }
 
   const respondingPing = (answer, id) => {
-    console.log(answer);
     patchApi(`api/pings/update/${id}`, { status: answer}) 
       .then(res => {
         setLoading(true);

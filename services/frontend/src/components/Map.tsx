@@ -14,9 +14,13 @@ const ICONPEOPLE = icon({
   iconSize: [36, 36],
 })
 
-const Map = ({ markers }) => {
+const Map = ({ markers, initialCoordinates }) => {
   let userMarkers;
   let peopleMarkers;
+
+  if (initialCoordinates == null) {
+    initialCoordinates = {lat: -33.498617, lng: -70.615722};
+  } 
 
   if (markers) {
     userMarkers = markers.userMarkers.map((marker) => {
@@ -41,7 +45,7 @@ const Map = ({ markers }) => {
   }  
 
   return (
-    <MapContainer center={[-33.498617, -70.615722]} zoom={13} scrollWheelZoom={true} style={{height: 400, width: "100%"}}>
+    <MapContainer center={[initialCoordinates.lat, initialCoordinates.lng]} zoom={13} scrollWheelZoom={true} style={{height: 400, width: "100%"}}>
       <TileLayer
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

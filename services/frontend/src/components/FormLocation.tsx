@@ -1,62 +1,13 @@
 import React, { useState } from 'react';
 
 import { useFormik } from 'formik';
-import { getApi, postApi } from '../lib/api';
+import { getApi } from '../lib/api';
 
 import styles from '../styles/Home.module.css'
  
-const LocationForm = ({ setLoading }) => {
-  const [tagsSelected, setTagsSelected] = useState([]);
-  const [idSelected, setIdSelected] = useState([]);
-  const [coordinates, setCoordinates] = useState({lat: null, lng: null}); 
-
-  const Create = (values) => {
-    if (idSelected.length == 0) {
-      alert("Por favor, escoge al menos un tag");
-    } else {
-      values.filteredTags = idSelected;    
-      postApi('api/markers/create', values)
-        .then(res => {
-          setLoading(true);
-        });
-    }    
-  }
-
-  const removeTags = () => {
-    setIdSelected([]);
-    setTagsSelected([]);
-  }
+const FormLocation = ({ setLoading, setInitialCoordinates }) => {
+  const [temperature, setTemperature] = useState('16');
   
-  const selectedTag = (tag) => {   
-    const tagData = JSON.parse(tag);
-    if (!idSelected.includes(tag.id)) {
-      setTagsSelected([...tagsSelected, tagData]);
-      setIdSelected([...idSelected, tagData.id]);        
-    }    
-  }
-  
-  const selectedTags = tagsSelected.map((tag) => {
-    return (
-      <p className={styles.rowItem} key={tag.id}>{tag.name}</p>    
-    )
-  });
-  
-  const tagsOptions = tags.map((tag) => {
-    let exists = false;
-    for (var i = 0; i < tagsSelected.length; i++) {
-      if (tagsSelected[i].id == tag.id) {
-        exists = true;
-        break;
-      }
-    }
-    if (!exists) {
-      const value = `{"id":${tag.id},"name":"${tag.name}"}`;
-      return (
-        <option value={value} key={tag.id}>{tag.name}</option>
-      )
-    }    
-  });
-
   const formik = useFormik({
     initialValues: {
       lat: '',
@@ -66,13 +17,22 @@ const LocationForm = ({ setLoading }) => {
       if (!values.lat || !values.lng) {
         alert("Por favor, ingresa valores válidos");
       } else {
-        Create(values);
+        getApi('api/weather', values) 
+          .then(data => {
+            const jsonData = JSON.parse(data);
+            setTemperature(jsonData["temp_c"]);
+            setInitialCoordinates(values);
+            setLoading(true);
+          })
       }    
     },
   });
 
   return (
     <div className={styles.flexContainer}>
+      <div className={styles.centerContainer}>
+          <h2>La temperatura actual es: {temperature}°C</h2>
+        </div>
       <form onSubmit={formik.handleSubmit}>
         <div className={styles.row}>
             <div className={styles.rowItem}>
@@ -97,12 +57,11 @@ const LocationForm = ({ setLoading }) => {
             </div> 
           </div> 
           <div className={styles.rowItem}>
-            <button className={styles.button}type="submit">Crear marcador</button>            
-            <a className={styles.button} onClick={removeTags}>Eliminar tags seleccionados</a>
+            <button className={styles.button}type="submit">Encontrar temperatura</button>            
           </div>   
       </form>
     </div>     
   );
 };
 
-export default LocationForm
+export default FormLocation
