@@ -1,11 +1,13 @@
 const KoaRouter = require("koa-router");
 const sequelize = require("sequelize");
-const { jwtCheck, setCurrentUser } = require("./middlewares/session");
 
 const router = new KoaRouter();
+const Queue = require("bull");
 
-// router.use(jwtCheck);
-// router.use(setCurrentUser);
+const indexQueue = new Queue("indexes queue", process.env.REDIS_URL); // Specify Redis connection using object
+const CalculateIndexJob = (data) => {
+  return indexQueue.add(data);
+};
 
 const countTags = async (markertags) => {
   const tagsCount = {};
@@ -22,7 +24,7 @@ const countTags = async (markertags) => {
 };
 
 // Find the centroid (simple mean) of a set of latitudes longitudes
-const centroid = (markers) => {
+const centroid = async (markers) => {
   let latXTotal = 0;
   let latYTotal = 0;
   let lonDegreesTotal = 0;
@@ -61,45 +63,27 @@ const euclideanDistanceOfGeographicCoordinates = (lat1, lng1, lat2, lng2) => {
   return R * c; // in metres
 };
 
-const calculateSidi = async (currenUserId, pingedUserId, ctx) => {
-  const currentUserMarkers = ctx.orm.mark.findAll({
-    where: { userId: currenUserId },
-    include: [{ model: ctx.orm.tag, attributes: ["id", "name"] }],
-  });
-  const pingedUserMarkers = ctx.orm.mark.findAll({
-    where: { userId: pingedUserId },
-    include: [{ model: ctx.orm.tag, attributes: ["id", "name"] }],
-  });
-  currentUserCentroid = centroid(currentUserMarkers);
-  pingedUserCentroid = centroid(pingedUserMarkers);
+const calculateSidi = async (userIdFromMarkers, userIdToMarkers) => {
+  currentUserCentroid = await centroid(userIdFromMarkers);
+  pingedUserCentroid = await centroid(userIdToMarkers);
 
-  return (
-    (currentUserMarkers.length + pingedUserMarkers.length) /
-    Math.log(
-      euclideanDistanceOfGeographicCoordinates(
-        currentUserCentroid[0],
-        currentUserCentroid[1],
-        pingedUserCentroid[0],
-        pingedUserCentroid[1]
-      )
+  const numerador = userIdFromMarkers.length + userIdToMarkers.length;
+  const denominador = Math.log(
+    euclideanDistanceOfGeographicCoordinates(
+      currentUserCentroid[0],
+      currentUserCentroid[1],
+      pingedUserCentroid[0],
+      pingedUserCentroid[1]
     )
   );
+  let sidi = numerador / denominador;
+  return sidi;
 };
 
-const calculateSiin = async (currentUserId, pingedUserId, ctx) => {
-  const currentUserMarkerTags = await ctx.orm.mark.findAll({
-    where: { userId: currentUserId },
-    include: [{ model: ctx.orm.tag, attributes: ["id", "name"] }],
-  });
-
-  const pingedUserMarkerTags = await ctx.orm.mark.findAll({
-    where: { userId: pingedUserId },
-    include: [{ model: ctx.orm.tag, attributes: ["id", "name"] }],
-  });
-
+const calculateSiin = async (userIdFromMarkers, userIdToMarkers) => {
   // count frecuency of all tags of every marker
-  const currentUserTagsCount = await countTags(currentUserMarkerTags);
-  const pingedUserTagsCount = await countTags(pingedUserMarkerTags);
+  const currentUserTagsCount = { deportes: 2 }; // await countTags(userIdFromMarkers);
+  const pingedUserTagsCount = { deportes: 3 }; // await countTags(userIdToMarkers);
 
   const tagsDifference = {};
   for (const tag in currentUserTagsCount) {
@@ -134,23 +118,69 @@ const calculateSiin = async (currentUserId, pingedUserId, ctx) => {
   return siin;
 };
 
-const calculateDindin = async (currentUserId, pingedUserId, ctx) => {
-  const siin = await calculateSiin(currentUserId, pingedUserId, ctx);
-  const sidi = await calculateSidi(currentUserId, pingedUserId, ctx);
+const calculateDindin = async (job) => {
+  return { siin: 2, sidi: 2, diin: 4 };
+  data = job.data;
+  userIdFromMarkers = data.userIdFromMarkers;
+  userIdToMarkers = data.userIdToMarkers;
+
+  let siin = await calculateSiin(userIdFromMarkers, userIdToMarkers);
+  let sidi = await calculateSidi(userIdFromMarkers, userIdToMarkers);
+  if (siin === NaN) {
+    siin = 0;
+  }
+  if (sidi === NaN) {
+    sidi = 0;
+  }
   const diin = siin * sidi;
-  console.log("DIIIIN");
-  console.log(siin);
-  console.log(sidi);
-  console.log(diin);
-  return diin;
+  console.log("final diin: ", diin);
+
+  return { siin: siin, sidi: sidi, diin: diin };
 };
 
-router.get("api.tags.calculateindex", "/:id/:id2", async (ctx) => {
-  const currentUserId = ctx.params.id;
-  const pingedUserId = ctx.params.id2;
+const getMarkersOfUser = async (userId, ctx) => {
+  const userMarkers = await ctx.orm.mark.findAll({
+    where: { userId: userId },
+    include: [{ model: ctx.orm.tag, attributes: ["id", "name"] }],
+  });
+  return userMarkers;
+};
 
+indexQueue.process(calculateDindin);
+
+router.get("api.tags.calculateindex", "/:userIdFrom/:userIdTo", async (ctx) => {
+  const { userIdFrom, userIdTo } = ctx.params;
+
+  const userIdFromMarkers = await getMarkersOfUser(userIdFrom, ctx);
+  const userIdToFromMarkers = await getMarkersOfUser(userIdTo, ctx);
+
+  // console.log("calculateindex");
+  // const currentUserId = ctx.params.id;
+  // const pingedUserId = ctx.params.id2;
+  CalculateIndexJob({
+    userIdFromMarkers: userIdFromMarkers,
+    userIdToFromMarkers: userIdToFromMarkers,
+  });
+  indexQueue.on("completed", (job) => {
+    // actualizar el indexesStatus de el ping correspondiente a los dos usuarios
+    //
+    // ctx.orm.ping.update(
+    //   { indexesStatus: "pinged", diin: job.returnvalue.diin },
+    //   { where: { userId: userIdTo } }
+    // );
+
+    console.log(job.returnvalue);
+    console.log(`Job with id ${job.id} has been completed`);
+  });
+  indexQueue.on("failed", (job) => {
+    console.log(`Job with id ${job.id} has been failed`);
+    // ctx.body = {
+    //   message: "error",
+    // };
+  });
   ctx.body = {
-    index: await calculateDindin(currentUserId, pingedUserId, ctx),
+    userIdFromMarkers,
+    userIdToFromMarkers,
   };
 });
 

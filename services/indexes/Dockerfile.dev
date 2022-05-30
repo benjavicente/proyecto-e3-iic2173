@@ -1,0 +1,11 @@
+FROM node:12.22.11
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+COPY yarn.lock ./
+
+RUN yarn install --immutable --immutable-cache --check-cache
+
+# Copy files
+COPY . .
