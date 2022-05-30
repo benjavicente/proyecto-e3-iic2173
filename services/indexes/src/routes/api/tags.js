@@ -7,10 +7,10 @@ const router = new KoaRouter();
 // router.use(jwtCheck);
 // router.use(setCurrentUser);
 
-const countTags = (markertags) => {
+const countTags = async (markertags) => {
   const tagsCount = {};
   markertags.map((mark) => {
-    mark.tags.forEach((tag) => {
+    mark.tags.map((tag) => {
       if (tagsCount[tag.tagId]) {
         tagsCount[tag.tagId] += 1;
       } else {
@@ -42,7 +42,7 @@ const centroid = (markers) => {
   let finalLatRadians = Math.atan2(latYTotal, latXTotal);
   let finalLatDegrees = (finalLatRadians * 180) / Math.PI;
 
-  let finalLonDegrees = lonDegreesTotal / google_latlngs.length;
+  let finalLonDegrees = lonDegreesTotal / markers.length;
   return [finalLatDegrees, finalLonDegrees];
 };
 
@@ -92,16 +92,14 @@ const calculateSiin = async (currentUserId, pingedUserId, ctx) => {
     include: [{ model: ctx.orm.tag, attributes: ["id", "name"] }],
   });
 
-  const pingedUserMarkerTags = ctx.orm.mark.findAll({
+  const pingedUserMarkerTags = await ctx.orm.mark.findAll({
     where: { userId: pingedUserId },
     include: [{ model: ctx.orm.tag, attributes: ["id", "name"] }],
   });
-  console.log("currentUserMarkerTags");
-  console.log(currentUserMarkerTags);
 
   // count frecuency of all tags of every marker
-  const currentUserTagsCount = countTags(currentUserMarkerTags);
-  const pingedUserTagsCount = countTags(pingedUserMarkerTags);
+  const currentUserTagsCount = await countTags(currentUserMarkerTags);
+  const pingedUserTagsCount = await countTags(pingedUserMarkerTags);
 
   const tagsDifference = {};
   for (const tag in currentUserTagsCount) {
@@ -137,15 +135,20 @@ const calculateSiin = async (currentUserId, pingedUserId, ctx) => {
 };
 
 const calculateDindin = async (currentUserId, pingedUserId, ctx) => {
-  return (
-    (await calculateSiin(currentUserId, pingedUserId, ctx)) *
-    (await calculateSidi(currentUserId, pingedUserId, ctx))
-  );
+  const siin = await calculateSiin(currentUserId, pingedUserId, ctx);
+  const sidi = await calculateSidi(currentUserId, pingedUserId, ctx);
+  const diin = siin * sidi;
+  console.log("DIIIIN");
+  console.log(siin);
+  console.log(sidi);
+  console.log(diin);
+  return diin;
 };
 
 router.get("api.tags.calculateindex", "/:id/:id2", async (ctx) => {
   const currentUserId = ctx.params.id;
   const pingedUserId = ctx.params.id2;
+
   ctx.body = {
     index: await calculateDindin(currentUserId, pingedUserId, ctx),
   };
