@@ -62,16 +62,20 @@ function HomePage() {
 
   let coordinates = {lat: null, lng: null};
 
+  /*
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(function(position) {
       coordinates.lat = position.coords.latitude;
       coordinates.lng = position.coords.longitude;
      });
   }; 
+  */
 
-  if (coordinates.lat == null && coordinates.lng == null) {
-    
-  }
+  navigator.geolocation.getCurrentPosition(function(position) {
+    coordinates.lat = position.coords.latitude;
+    coordinates.lng = position.coords.longitude;
+    });
+
   getApi('api/weather', coordinates) 
     .then(data => {
       const jsonData = JSON.parse(data);

@@ -8,19 +8,8 @@ import styles from '../styles/Home.module.css'
 const LocationForm = ({ setLoading }) => {
   const [tagsSelected, setTagsSelected] = useState([]);
   const [idSelected, setIdSelected] = useState([]);
-  const [tags, setTags] = useState([]); 
+  const [coordinates, setCoordinates] = useState({lat: null, lng: null}); 
 
-  if (tags == []) {
-    getApi('api/tags/all', null) 
-    .then(data => {
-      setTags(JSON.parse(data));
-    });
-    
-    return (
-      <div />
-    )
-  }
- 
   const Create = (values) => {
     if (idSelected.length == 0) {
       alert("Por favor, escoge al menos un tag");
