@@ -4,13 +4,16 @@
 Se implementaron todos los requisitos funcionales y no funcionales en una aplicación que utiliza KOA node.js, PostgresSQL (con PostGIS) y utilizando Sequelize como ORM. Se implementaron todaos los requisitos variables de `docker-compose` y de SSL. Todo el detalle se puede ver en la _task list_ que está en las _issues_.
 
 ## Dominio
-El dominio del sitio es: iic2173-feballa-e0.tk
+El dominio de la API es: pingtoc-api-arquisoftware.tk
 
 ## Método de acceso
 Se accede con SSH y las credenciales .pem adjuntadas en Canvas
 
 ## Sitio web
-El sitio web está alojado en AWS EC2 y se puede acceder por la siguiente URL: https://www.iic2173-feballa-e0.tk/
+El sitio web está alojado en AWS EC2 y se puede acceder por la siguiente URL: https://pingtoc-api-arquisoftware.tk
+
+## Documentación de la API
+https://documenter.getpostman.com/view/11782650/Uz5CLHvE#0adaff88-a81c-4674-a97e-4afd08ecfff2
 
 ## Consideraciones
 El docker-compose es para producción. Si se quisiera correr local se debería ocupar una estructura como la siguiente:
@@ -83,8 +86,18 @@ DB_USERNAME=
 DB_NAME=
 DB_PASSWORD=
 PORT=
+ORIGIN=
 DB_HOST=
 DATABASE_URL=
+
+
+WEATHER_API_ID=
+WEATHER_API_KEY=
+
+S3_BUCKET_NAME=
+S3_ACCESS_KEY=
+S3_SECRET_ACCESS_KEY=
+S3_BUCKET_REGION=
 ```
 
 ## Ejecución
