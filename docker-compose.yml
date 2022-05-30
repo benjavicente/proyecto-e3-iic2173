@@ -84,6 +84,7 @@ services:
       context: ./services/indexes
       dockerfile: Dockerfile.prod
     depends_on:
+      - backend
       - postgres
       - redis
     ports:
