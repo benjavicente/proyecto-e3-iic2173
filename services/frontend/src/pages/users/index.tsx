@@ -30,6 +30,7 @@ function UsersPage() {
   if (loading) {
     getApi('api/users', {'page': page}) 
       .then(data => {
+        console.log(data);
         setUsersData(JSON.parse(data));
         setLoading(false);
       });

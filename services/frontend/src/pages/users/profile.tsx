@@ -52,6 +52,7 @@ export default function Profile() {
           setError(true);
           setLoading(false);
         } else {
+          console.log("Profile:", info);
           setData(JSON.parse(info));
           setLoading(false);
         }
@@ -68,10 +69,14 @@ export default function Profile() {
     }    
     postApi('api/pings/create', body)
       .then(res => {
-        if (res != 'Created') {
-          setPingMessage('Ya has hecho ping con este usario');
-        } else {
+        console.log(res);
+        if (res == 'Created') {
           setPingMessage('Ping hecho con éxito');
+        } else if (res == 'Lo sentimos, pero no puedes enviarte un ping a ti mismo') {
+          setPingMessage('No puedes hacerte ping contigo mismo');
+        }
+        else {
+          setPingMessage('Ya has hecho ping con este usario');
         }
       });
   }
