@@ -23,6 +23,7 @@ function HomePage() {
   const [filteredId, setFilteredId] = useState([]);
   const [weatherData, setWeatherData] = useState(null);
   const [initialCoordinates, setInitialCoordinates] = useState(null);
+  const [tags, setTags] = useState([]);
 
   const { user, isLoading } = useUser();  
 
@@ -74,6 +75,14 @@ function HomePage() {
       const jsonData = JSON.parse(data);
       setWeatherData(jsonData["temp_c"]);
     })
+
+  // Se cargan los tags
+  if (tags.length == 0) {
+    getApi('api/tags/all', null) 
+      .then(data => {
+        setTags(JSON.parse(data));
+      })
+  }
 
   const filter = () => {
     setFilteredId(idSelected);
@@ -156,7 +165,7 @@ function HomePage() {
       : null }      
 
       <Map markers={ markers } initialCoordinates={initialCoordinates} />
-      { user ? <Form setLoading={setLoading}/> : null }
+      { user ? <Form setLoading={setLoading} tags={tags}/> : null }
            
       <Footer />
     </div>

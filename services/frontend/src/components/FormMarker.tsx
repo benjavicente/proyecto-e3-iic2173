@@ -5,22 +5,10 @@ import { getApi, postApi } from '../lib/api';
 
 import styles from '../styles/Home.module.css'
  
-const NewLocationForm = ({ setLoading }) => {
+const NewLocationForm = ({ setLoading, tags }) => {
   const [tagsSelected, setTagsSelected] = useState([]);
   const [idSelected, setIdSelected] = useState([]);
-  const [tags, setTags] = useState([]); 
 
-  if (tags == []) {
-    getApi('api/tags/all', null) 
-    .then(data => {
-      setTags(JSON.parse(data));
-    });
-    
-    return (
-      <div />
-    )
-  }
- 
   const Create = (values) => {
     if (idSelected.length == 0) {
       alert("Por favor, escoge al menos un tag");
