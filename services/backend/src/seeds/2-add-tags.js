@@ -3,77 +3,77 @@ module.exports = {
     const tagsArray = [];
 
     tagsArray.push({
-      name: 'Deportes',
+      name: "Deportes",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Naturaleza',
+      name: "Naturaleza",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Comida',
+      name: "Comida",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Música',
+      name: "Música",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Baile',
+      name: "Baile",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Videojuegos',
+      name: "Videojuegos",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Arte',
+      name: "Arte",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Política',
+      name: "Política",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Estudios',
+      name: "Estudios",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Animales',
+      name: "Animales",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Cine',
+      name: "Cine",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     tagsArray.push({
-      name: 'Espectáculo',
+      name: "Espectáculo",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
-    return queryInterface.bulkInsert('tags', tagsArray);
+    return queryInterface.bulkInsert("tags", tagsArray);
   },
 };

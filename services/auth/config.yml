@@ -1,5 +1,0 @@
-core_config_version: 0
-host: "0.0.0.0"
-postgresql_config_version: 0
-info_log_path: null
-error_log_path: null

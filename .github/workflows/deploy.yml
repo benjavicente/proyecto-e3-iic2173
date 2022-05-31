@@ -1,0 +1,54 @@
+name: Deploy
+
+# Para que esto funcione, se necesita añadir 2 secretos a GitHub Actions
+# - SSH_PRIVATE_KEY: La llave para conectarse a la instancia
+# - DEPLOY_HOST: El host de ls instancia ("ssh://user@ip:port")
+# NO ESTÄ PROBADA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Start deployment
+        uses: bobheadxi/deployments@v1
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: main
+          override: true
+
+      - uses: webfactory/ssh-agent@master
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add known_hosts
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: ssh-keyscan -H "${DEPLOY_HOST#*@}" >> ~/.ssh/known_hosts
+
+      - name: Upload changes to instance
+        run: >
+          rsync . ${{ secrets.DEPLOY_HOST }}:/app --exclude=".git"
+          --update --delete --recursive --itemize-changes --delete-after
+
+      - name: Run docker compose in the server
+        run: ssh 'make prod'
+
+      - name: Update deployment status
+        uses: bobheadxi/deployments@v1
+        if: always()
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
+          env: ${{ steps.deployment.outputs.env }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}

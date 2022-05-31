@@ -5,7 +5,7 @@ services:
     image: cmihai/postgis
     restart: always
     volumes:
-      - ./.docker/volumes/database:/var/lib/postgresql/data
+      - /var/lib/postgresql/data
     env_file:
       - .env
     environment:
@@ -14,6 +14,21 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     networks:                 
       - app-network
+  redis:
+    image: redis
+    container_name: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6379:6379
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=localhost:6379
+    ports:
+      - "8081:8081"
 
   app:
     build: .
@@ -24,6 +39,8 @@ services:
       - /usr/app/node_modules
     depends_on:
       - db
+      - redis
+      - redis-commander
     command: sh -c "yarn sequelize-cli db:migrate:undo:all && 
       yarn sequelize-cli db:migrate &&
       yarn sequelize-cli db:seed:all &&
@@ -36,9 +53,9 @@ services:
   nginx:
     image: nginx
     volumes:
-      - ./data/nginx:/etc/nginx/conf.d
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - /etc/nginx/conf.d
+      - /etc/letsencrypt
+      - /var/www/certbot
     ports:
       - 80:80
       - 443:443
@@ -52,8 +69,8 @@ services:
     image: certbot/certbot
     restart: unless-stopped
     volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
+      - /etc/letsencrypt
+      - /var/www/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 networks:                     
