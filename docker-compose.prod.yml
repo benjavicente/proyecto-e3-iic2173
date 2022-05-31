@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  backend:
+    build:
+      context: ./services/backend
+      dockerfile: Dockerfile.prod
+    environment:
+      NODE_ENV: production
+    command: ["sh", "init-server.sh"]
+
+  indexes:
+    build:
+      context: ./services/indexes
+      dockerfile: Dockerfile.prod
+    command: ["sh", "init-server.sh"]
