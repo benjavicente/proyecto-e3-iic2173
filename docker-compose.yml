@@ -47,27 +47,14 @@ services:
       timeout: 5s
       retries: 5
 
-  frontend:
-    environment:
-      PORT: 3000
-
-  # https://github.com/JonasAlfredsson/docker-nginx-certbot
   nginx:
-    image: jonasal/nginx-certbot:3
-    environment:
-      RENEWAL_INTERVAL: 1d
-      CERTBOT_EMAIL: 0zpowqamd@mozmail.com
-    volumes:
-      - ./services/nginx/nginx.conf:/etc/nginx/user_conf.d/default.conf
-      - nginx_secrets:/etc/letsencrypt
+    image: nginx
+    depends_on:
+      - backend
     ports:
       - 80:80
-      - 443:443
-    depends_on:
-      backend:
-        condition: service_healthy
-      frontend:
-        condition: service_started
+    volumes:
+      - ./services/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
 
   indexes:
     depends_on:
