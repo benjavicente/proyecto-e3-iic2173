@@ -3,10 +3,10 @@ module.exports = {
     const usersArray = [];
 
     usersArray.push({
-      firstname: "juan",
+      firstname: "Nicolas",
       lastname: "Meyer1",
       username: "nmeya1",
-      email: "nico3@email.com",
+      email: "nmeya@uc.cl",
       phone: "914768523",
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -107,7 +107,29 @@ module.exports = {
       lastname: "Spain",
       username: "eurogamerspain",
       email: "eurogamerspain@test.com",
-      phone: "",
+      phone: "968425713",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    //12
+    usersArray.push({
+      firstname: "Fernando",
+      lastname: "Balladares",
+      username: "FeBalla",
+      email: "fernando.balladares.03@gmail.com",
+      phone: "968425713",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    //13
+    usersArray.push({
+      firstname: "Maggie",
+      lastname: "Munoz",
+      username: "MaggieM",
+      email: "maggie.munoz@uc.cl",
+      phone: "968425713",
       createdAt: new Date(),
       updatedAt: new Date(),
     });

@@ -8,7 +8,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./services/indexes/src:/workspace/src
+      - ./services/backend/src:/workspace/src
       - /workspace/node_modules
     command: ["sh", "init-server.sh"]
 
@@ -47,3 +47,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+
+  nginx:
+    environment:
+      STAGING: 1
+      DEBUG: 1

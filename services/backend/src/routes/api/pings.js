@@ -1,4 +1,5 @@
 const KoaRouter = require('koa-router');
+const fetch = require("node-fetch");
 const { jwtCheck, setCurrentUser } = require('./middlewares/session')
 
 const router = new KoaRouter();
@@ -42,6 +43,8 @@ router.get('api.pings.all', '/all', async (ctx) => {
 router.post('api.pings.new', '/create', async (ctx) => {
   const { currentUserId } = ctx.state;
   const { pingedUserId } = ctx.request.body;
+  // const currentUserId = 1;
+  // const pingedUserId = 6;
 
   if (currentUserId === pingedUserId){
     ctx.throw(400, 'Lo sentimos, pero no puedes enviarte un ping a ti mismo');
@@ -51,6 +54,7 @@ router.post('api.pings.new', '/create', async (ctx) => {
     userIdFrom: currentUserId,
     userIdTo: pingedUserId,
     status: 0,
+    analyticStatus: 0,
   });
 
   try {
@@ -59,15 +63,42 @@ router.post('api.pings.new', '/create', async (ctx) => {
         'userIdFrom',
         'userIdTo',
         'status',
+        'analyticStatus',
       ],
     });
+
+    ctx.status = 201;
   } 
   catch (ValidationError) {
     ctx.body = ValidationError;
     ctx.throw(400, ValidationError);
-
   }
-  ctx.status = 201;
+
+  const { id: pingId } = await ctx.orm.ping.findOne({
+    where: { userIdFrom: currentUserId, userIdTo: pingedUserId }
+  });
+
+  const analyticsBody = {
+    userIdFrom: currentUserId,
+    userIdTo: pingedUserId,
+    pingId: pingId,
+  }
+
+  try {
+    await fetch(`${process.env.INDEX_HOST}/api/pings/queue`,
+      {
+        method: 'POST',
+        headers: { 
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(analyticsBody),
+      }
+    )
+  } catch (error) {
+    ctx.body = error;
+    ctx.throw(400, error);
+  }
 });
 
 

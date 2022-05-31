@@ -1,5 +1,4 @@
 const KoaRouter = require("koa-router");
-const sequelize = require("sequelize");
 const fetch = require("node-fetch");
 const { jwtCheck, setCurrentUser } = require("./middlewares/session");
 
@@ -12,15 +11,15 @@ router.get("api.tags.all", "/all", async (ctx) => {
   ctx.body = tags;
 });
 
-router.use(jwtCheck);
-router.use(setCurrentUser);
+// router.use(jwtCheck);
+// router.use(setCurrentUser);
 
 router.post("api.tags.send", "/:id", async (ctx) => {
   const currentUserId = ctx.state.currentUserId;
   const pingedUserId = parseInt(ctx.params.id);
   try {
     const response = await fetch(
-      `${process.env.INDEX_HOST}/api/tags/${currentUserId}/${pingedUserId}`,
+      `${process.env.INDEX_HOST}/api/pings/${currentUserId}/${pingedUserId}`,
       {
         method: "GET",
         headers: {

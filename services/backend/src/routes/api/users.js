@@ -4,12 +4,7 @@ const { uploadFile } = require("./s3/fileUploader");
 
 const router = new KoaRouter();
 
-router.post(
-  "api.users.uploadImage",
-  "/upload/image",
-  jwtCheck,
-  setCurrentUser,
-  async (ctx) => {
+router.post("api.users.uploadImage","/upload/image", jwtCheck, setCurrentUser, async (ctx) => {
     const { currentUserId } = ctx.state;
     const uploadResults = await uploadFile(ctx);
 
@@ -29,31 +24,21 @@ router.post(
   }
 );
 
-router.get(
-  "api.users.currentUser",
-  "/me",
-  jwtCheck,
-  setCurrentUser,
-  async (ctx) => {
+router.get("api.users.currentUser", "/me", jwtCheck, setCurrentUser, async (ctx) => {
     const { currentUserId } = ctx.state;
     const user = await ctx.orm.user.findByPk(currentUserId);
     ctx.body = user;
   }
 );
 
-router.get(
-  "api.users.currentUser",
-  "/me",
-  jwtCheck,
-  setCurrentUser,
-  async (ctx) => {
-    const { currentUserId } = ctx.state;
-    const user = await ctx.orm.user.findByPk(currentUserId, {
-      attributes: { exclude: ["createdAt", "updatedAt"] },
-      include: [{ model: ctx.orm.image, attributes: ["id", "imageUrl"] }],
-    });
-    ctx.body = user;
-  }
+router.get("api.users.currentUser", "/me",jwtCheck, setCurrentUser, async (ctx) => {
+  const { currentUserId } = ctx.state;
+  const user = await ctx.orm.user.findByPk(currentUserId, {
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+    include: [{ model: ctx.orm.image, attributes: ["id", "imageUrl"] }],
+  });
+  ctx.body = user;
+}
 );
 
 router.get("api.users.all", "/all", async (ctx) => {

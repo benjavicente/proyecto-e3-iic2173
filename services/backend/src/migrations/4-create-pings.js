@@ -32,20 +32,20 @@ module.exports = {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
-        dindin: {
-          type: Sequelize.FLOAT,
-          allowNull: false,
-        },
         siin: {
           type: Sequelize.FLOAT,
-          allowNull: false,
+          allowNull: true,
         },
         sidi: {
           type: Sequelize.FLOAT,
-          allowNull: false,
+          allowNull: true,
         },
-        indexesStatus: {
+        dindin: {
           type: Sequelize.FLOAT,
+          allowNull: true,
+        },
+        analyticStatus: {
+          type: Sequelize.INTEGER,
           allowNull: false,
         },
         createdAt: {

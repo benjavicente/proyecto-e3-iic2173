@@ -51,6 +51,7 @@ services:
     environment:
       PORT: 3000
 
+  # https://github.com/JonasAlfredsson/docker-nginx-certbot
   nginx:
     image: jonasal/nginx-certbot:3
     environment:
