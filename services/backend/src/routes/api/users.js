@@ -24,12 +24,6 @@ router.post("api.users.uploadImage","/upload/image", jwtCheck, setCurrentUser, a
   }
 );
 
-router.get("api.users.currentUser", "/me", jwtCheck, setCurrentUser, async (ctx) => {
-    const { currentUserId } = ctx.state;
-    const user = await ctx.orm.user.findByPk(currentUserId);
-    ctx.body = user;
-  }
-);
 
 router.get("api.users.currentUser", "/me",jwtCheck, setCurrentUser, async (ctx) => {
   const { currentUserId } = ctx.state;
@@ -41,6 +35,7 @@ router.get("api.users.currentUser", "/me",jwtCheck, setCurrentUser, async (ctx) 
 }
 );
 
+
 router.get("api.users.all", "/all", async (ctx) => {
   const users = await ctx.orm.user.findAll({
     attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -48,6 +43,7 @@ router.get("api.users.all", "/all", async (ctx) => {
   });
   ctx.body = users;
 });
+
 
 router.get("api.users.profile", "/:id", async (ctx) => {
   const searchedUser = await ctx.orm.user.findByPk(ctx.params.id, {
