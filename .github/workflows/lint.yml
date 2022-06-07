@@ -14,9 +14,6 @@ jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./services/backend
 
     steps:
       - name: Check out Git repository
@@ -34,6 +31,7 @@ jobs:
           yarn install
 
       - name: Run linters
+        run: cd ./services/backend
         uses: wearerequired/lint-action@v2
         with:
           eslint: true
