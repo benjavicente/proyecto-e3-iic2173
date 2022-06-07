@@ -29,6 +29,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
+          cache: 'yarn'
+          cache-dependency-path: ./services/backend/package.json
 
       # ESLint must be in `package.json`
       - name: Install Node.js dependencies
