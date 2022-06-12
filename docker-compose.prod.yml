@@ -9,6 +9,12 @@ services:
       NODE_ENV: production
     command: ["sh", "init-server.sh", "start"]
 
+  chat:
+    build:
+      context: ./services/chat
+      dockerfile: Dockerfile.prod
+    command: ["uvicorn", "app:app", "--port", "8030", "--host", "0.0.0.0"]
+
   indexes:
     build:
       context: ./services/indexes

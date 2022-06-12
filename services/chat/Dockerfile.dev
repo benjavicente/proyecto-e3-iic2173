@@ -1,0 +1,14 @@
+# Development dockerfile for FastAPI app
+FROM python:3.10-slim
+WORKDIR /workspace
+
+# Install poetry
+RUN pip install "poetry>=1.0"
+RUN poetry config virtualenvs.in-project true
+
+# Install dependencies
+COPY pyproject.toml poetry.lock ./
+RUN poetry install --no-interaction
+ENV PATH="/workspace/.venv/bin:$PATH"
+
+COPY . .
