@@ -1,8 +1,8 @@
 const KoaRouter = require("koa-router");
 
 const router = new KoaRouter({ prefix: "/api" });
-const pings = require("./pings");
+const analytics = require("./analytics");
 
-router.use("/pings", pings.routes());
+router.use("/analytics", analytics.routes());
 
 module.exports = router;

@@ -6,6 +6,7 @@ module.exports = {
       userIdFrom: 1,
       userIdTo: 2,
       status: 0,
+      analyticStatus: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -14,6 +15,7 @@ module.exports = {
       userIdFrom: 1,
       userIdTo: 3,
       status: 0,
+      analyticStatus: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -22,6 +24,7 @@ module.exports = {
       userIdFrom: 1,
       userIdTo: 4,
       status: 0,
+      analyticStatus: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -30,6 +33,7 @@ module.exports = {
       userIdFrom: 2,
       userIdTo: 1,
       status: 0,
+      analyticStatus: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -38,6 +42,7 @@ module.exports = {
       userIdFrom: 3,
       userIdTo: 4,
       status: 0,
+      analyticStatus: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -46,6 +51,7 @@ module.exports = {
       userIdFrom: 3,
       userIdTo: 1,
       status: 0,
+      analyticStatus: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -54,6 +60,7 @@ module.exports = {
       userIdFrom: 4,
       userIdTo: 1,
       status: 0,
+      analyticStatus: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -62,6 +69,7 @@ module.exports = {
       userIdFrom: 4,
       userIdTo: 3,
       status: 0,
+      analyticStatus: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
