@@ -2,13 +2,17 @@
 FROM python:3.10-slim
 WORKDIR /workspace
 
+# Install DB client
+RUN apt-get update
+RUN apt-get install -y libpq-dev gcc
+
 # Install poetry
+RUN pip install -U pip
 RUN pip install "poetry>=1.0"
-RUN poetry config virtualenvs.in-project true
 
 # Install dependencies
 COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-interaction
-ENV PATH="/workspace/.venv/bin:$PATH"
+RUN poetry export -f requirements.txt -o requirements.txt --without-hashes --dev
+RUN pip install -r requirements.txt
 
 COPY . .

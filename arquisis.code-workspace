@@ -25,10 +25,11 @@
       "ahmadalli.vscode-nginx-conf",
       "bradlc.vscode-tailwindcss",
       "dbaeumer.vscode-eslint",
-      "EditorConfig.EditorConfig",
+      "editorconfig.editorconfig",
       "esbenp.prettier-vscode",
       "ms-azuretools.vscode-docker",
-      "ms-python.python"
+      "ms-python.python",
+      "ms-python.isort"
     ]
   }
 }
