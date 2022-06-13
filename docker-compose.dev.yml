@@ -10,7 +10,7 @@ services:
     volumes:
       - ./services/backend/src:/workspace/src
       - /workspace/node_modules
-    command: ["sh", "init-server.sh"]
+    command: ["sh", "init-server.sh", "dev"]
 
   indexes:
     build:
@@ -23,7 +23,7 @@ services:
       - 8080:8080
     environment:
       NODE_ENV: production
-    command: ["sh", "init-server.sh"]
+    command: ["yarn", "dev"]
 
   redis-commander:
     image: rediscommander/redis-commander

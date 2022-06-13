@@ -7,10 +7,10 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       NODE_ENV: production
-    command: ["sh", "init-server.sh"]
+    command: ["sh", "init-server.sh", "start"]
 
   indexes:
     build:
       context: ./services/indexes
       dockerfile: Dockerfile.prod
-    command: ["sh", "init-server.sh"]
+    command: ["yarn", "dev"]

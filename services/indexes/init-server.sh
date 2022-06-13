@@ -1,2 +1,0 @@
-# Start server
-yarn start
