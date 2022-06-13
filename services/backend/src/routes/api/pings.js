@@ -13,7 +13,7 @@ router.get('api.pings.all', '/all', async (ctx) => {
 
   const pingedUsers = await ctx.orm.ping.findAll({ 
     where: { userIdFrom: currentUserId },
-    attributes: ['id'],
+    attributes: ['id', 'status', 'analyticStatus', 'siin', 'sidi', 'dindin'],
     include: [
       {
         model: ctx.orm.user, 
@@ -24,7 +24,7 @@ router.get('api.pings.all', '/all', async (ctx) => {
 
   const usersPingedBy = await ctx.orm.ping.findAll({ 
     where: { userIdTo: currentUserId },
-    attributes: ['id', 'status'],
+    attributes: ['id', 'status', 'analyticStatus', 'siin', 'sidi', 'dindin'],
     include: [
       {
         model: ctx.orm.user, 
@@ -43,8 +43,6 @@ router.get('api.pings.all', '/all', async (ctx) => {
 router.post('api.pings.new', '/create', async (ctx) => {
   const { currentUserId } = ctx.state;
   const { pingedUserId } = ctx.request.body;
-  // const currentUserId = 1;
-  // const pingedUserId = 6;
 
   if (currentUserId === pingedUserId){
     ctx.throw(400, 'Lo sentimos, pero no puedes enviarte un ping a ti mismo');
@@ -85,7 +83,7 @@ router.post('api.pings.new', '/create', async (ctx) => {
   }
 
   try {
-    await fetch(`${process.env.INDEX_HOST}/api/pings/queue`,
+    await fetch(`${process.env.INDEX_HOST}/api/analytics/indexes`,
       {
         method: 'POST',
         headers: { 

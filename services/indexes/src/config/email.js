@@ -13,6 +13,6 @@ module.exports = {
   },
   // defaults to be passed to nodemailer's emails
   defaults: {
-    from: 'template <fballadares@uc.cl>',
+    from: 'Pingtoc <fballadares@uc.cl>',
   },
 };

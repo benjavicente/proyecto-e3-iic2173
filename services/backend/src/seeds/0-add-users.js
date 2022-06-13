@@ -3,11 +3,11 @@ module.exports = {
     const usersArray = [];
 
     usersArray.push({
-      firstname: "Nicolas",
-      lastname: "Meyer1",
-      username: "nmeya1",
-      email: "nmeya@uc.cl",
-      phone: "914768523",
+      firstname: "Fernando",
+      lastname: "Balladares",
+      username: "FeBalla",
+      email: "fernando.balladares.03@gmail.com",
+      phone: "968425713",
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -17,6 +17,16 @@ module.exports = {
       lastname: "Revilla",
       username: "dross",
       email: "dross@test.com",
+      phone: "914768523",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    usersArray.push({
+      firstname: "Nicolas",
+      lastname: "Meyer1",
+      username: "nmeya1",
+      email: "nmeya@uc.cl",
       phone: "914768523",
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -112,18 +122,6 @@ module.exports = {
       updatedAt: new Date(),
     });
 
-    //12
-    usersArray.push({
-      firstname: "Fernando",
-      lastname: "Balladares",
-      username: "FeBalla",
-      email: "fernando.balladares.03@gmail.com",
-      phone: "968425713",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    //13
     usersArray.push({
       firstname: "Maggie",
       lastname: "Munoz",
