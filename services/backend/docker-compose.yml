@@ -1,0 +1,78 @@
+version: "3"
+
+services:
+  db:
+    image: cmihai/postgis
+    restart: always
+    volumes:
+      - /var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    networks:                 
+      - app-network
+  redis:
+    image: redis
+    container_name: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6379:6379
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=localhost:6379
+    ports:
+      - "8081:8081"
+
+  app:
+    build: .
+    env_file:
+      - .env
+    volumes: 
+      - .:/usr/app
+      - /usr/app/node_modules
+    depends_on:
+      - db
+      - redis
+      - redis-commander
+    command: sh -c "yarn sequelize-cli db:migrate:undo:all && 
+      yarn sequelize-cli db:migrate &&
+      yarn sequelize-cli db:seed:all &&
+      yarn start"
+    networks:
+      - app-network
+    ports:
+      - 3000:3000
+
+  nginx:
+    image: nginx
+    volumes:
+      - /etc/nginx/conf.d
+      - /etc/letsencrypt
+      - /var/www/certbot
+    ports:
+      - 80:80
+      - 443:443
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - /etc/letsencrypt
+      - /var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:                     
+  app-network:
+    driver: bridge
