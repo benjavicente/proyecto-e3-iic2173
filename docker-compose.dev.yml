@@ -11,7 +11,7 @@ services:
        - ./services/frontend/src:/workspace/src
        - /workspace/node_modules
        - /workspace/.next
-    command: ["npm", "run", "dev"]
+    command: ["npm", "run", "dev", "--", "-H", "0.0.0.0"]
 
   backend:
     build:
@@ -50,5 +50,4 @@ services:
 
   nginx:
     environment:
-      STAGING: 1
-      DEBUG: 1
+      USE_LOCAL_CA: 1
