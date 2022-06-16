@@ -43,6 +43,10 @@ export async function postApi(url, body){
   const accessToken = await fetch('/api/getToken');
   const token = await (await accessToken.text()).slice(1,-1);
 
+  console.log("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-TOKEN-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|");
+  console.log(token);
+  console.log("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-TOKEN-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|");
+
   // Colocar en el .env
   const baseUrl = "http://real-back-arquie2.tk/";
   
