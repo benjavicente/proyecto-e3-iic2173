@@ -18,4 +18,3 @@ class ConnectionManager:
                 yield data
         finally:
             self.connections.pop(user_id)
-

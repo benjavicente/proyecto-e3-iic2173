@@ -1,12 +1,12 @@
-from pathlib import Path
 import re
-
 from functools import wraps
+from pathlib import Path
 from urllib.parse import scheme_chars
-from fastapi.openapi.utils import get_openapi
-from fastapi import FastAPI
 
-from .models.messages import PublicMessageInput, PrivateMessageInput
+from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
+
+from .models.messages import PrivateMessageInput, PublicMessageInput
 
 
 def custom_openapi(app: FastAPI):

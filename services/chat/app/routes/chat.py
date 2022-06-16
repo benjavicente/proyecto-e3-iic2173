@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, WebSocket
-from pydantic import parse_obj_as, ValidationError
+from pydantic import ValidationError, parse_obj_as
 from sqlmodel import Session, select
 
 from app import all_chats

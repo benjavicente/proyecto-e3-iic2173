@@ -4,6 +4,7 @@ from typing import ClassVar, Literal, Union
 from pydantic import BaseModel
 from sqlmodel import Field, SQLModel
 
+
 # Other
 class MessageToUser(BaseModel):
     to_user_id: str = Field(min_length=1, description="User ID of the recipient")
