@@ -10,7 +10,7 @@ const Navbar = ({ logged }) => {
   // que se llama este componente
   const router = useRouter()
 
-  const { loginWithRedirect } = useAuth0();
+  const { loginWithRedirect, logout } = useAuth0();
 
   function handleLogin() {
     loginWithRedirect();
@@ -37,12 +37,14 @@ const Navbar = ({ logged }) => {
           {logged ? 
             <div className={styles.row}>
               <a className={styles.rowItemPress} href="/users/pings">Pings</a>
-              <a className={styles.rowItemPress} onClick={() => press()}>Perfil</a>              
-              <a className={styles.rowItem} href="/api/auth/logout">Cerrar Sesión</a>
+              <a className={styles.rowItemPress} onClick={() => press()}>Perfil</a>   
+              <a className={styles.rowItemPress} onClick={() => logout({ returnTo: window.location.origin })}>Cerrar Sesión</a>  
+              <a className={styles.rowItemPress} onClick={() => handleLogin()}>Iniciar Sesión</a>         
             </div>
             :
             <div className={styles.row}>
-              <a className={styles.rowItemPress} onClick={() => handleLogin()}>Iniciar Sesión</a>   
+              <a className={styles.rowItemPress} onClick={() => handleLogin()}>Iniciar Sesión</a>
+              <a className={styles.rowItemPress} onClick={() => logout({ returnTo: window.location.origin })}>Cerrar Sesión</a>    
             </div>            
           }          
         </div>

@@ -5,7 +5,7 @@ import { getApi } from '../lib/api';
 
 import styles from '../styles/Home.module.css'
  
-const FormLocation = ({ setLoading, setInitialCoordinates }) => {
+const FormLocation = ({ token, setLoading, setInitialCoordinates }) => {
   const [temperature, setTemperature] = useState('16');
   
   const formik = useFormik({
@@ -14,10 +14,11 @@ const FormLocation = ({ setLoading, setInitialCoordinates }) => {
       lng: '',
     },
     onSubmit: values => {
+      console.log("V", values);
       if (!values.lat || !values.lng) {
         alert("Por favor, ingresa valores válidos");
       } else {
-        getApi('api/weather', values) 
+        getApi(token, 'api/weather', values) 
           .then(data => {
             const jsonData = JSON.parse(data);
             setTemperature(jsonData["temp_c"]);

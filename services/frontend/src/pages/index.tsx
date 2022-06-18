@@ -15,7 +15,6 @@ import FormLocation from '../components/FormLocation'
 import Form from '../components/FormMarker'
 
 function HomePage() {
-  console.log("Cargando");
   const [markers, setMarkers] = useState(null);
   const [users, setUsers] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,18 +25,33 @@ function HomePage() {
   const [weatherData, setWeatherData] = useState(null);
   const [initialCoordinates, setInitialCoordinates] = useState(null);
   const [tags, setTags] = useState([]);
+  const [token, setToken] = useState('');
 
-  const { user, isLoading } = useAuth0(); 
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0(); 
 
-  if (isLoading) {
+  console.log("Status:", user, isAuthenticated, isLoading);
+
+  const getToken = async () => {
+    const accessToken = await getAccessTokenSilently({
+      audience: process.env.AUTH0_AUDIENCE,
+      scope: process.env.AUTH0_SCOPE,
+    });
+    setToken(accessToken);
+  }
+
+  if (isLoading) {    
     return (
       <div />
     )
   }
 
+  if (!isLoading){
+    console.log("Cargó", isAuthenticated, user, token)
+  }
+
   if (loading) {
     if (user != undefined) {
-      getApi('api/markers', {filteredIds: filteredId}) 
+      getApi(token, 'api/markers', {filteredIds: filteredId}) 
       .then(data => {
         setMarkers(JSON.parse(data));
         setLoading(false);
@@ -54,9 +68,8 @@ function HomePage() {
   }
 
   if (userLoading) {
-    getApi('api/users/all', null) 
+    getApi(token, 'api/users/all', null) 
     .then(data => {
-      console.log(data);
       setUsers(JSON.parse(data));
       setUserLoading(false);
     })
@@ -73,16 +86,15 @@ function HomePage() {
     coordinates.lng = position.coords.longitude;
     });
 
-  getApi('api/weather', coordinates) 
+  getApi(token, 'api/weather', coordinates) 
     .then(data => {
-      console.log(data)
       const jsonData = JSON.parse(data);
       setWeatherData(jsonData["temp_c"]);
     })
 
   // Se cargan los tags
   if (tags.length == 0) {
-    getApi('api/tags/all', null) 
+    getApi(token, 'api/tags/all', null) 
       .then(data => {
         setTags(JSON.parse(data));
       })
@@ -133,6 +145,8 @@ function HomePage() {
   });
 
   const Map = dynamic(() => import('../components/Map'))
+
+  console.log("User", user);
   
   return (
     <div className={styles.CenterContainer}>
@@ -147,7 +161,7 @@ function HomePage() {
         <div className={styles.centerContainer}>
           <h2>La temperatura actual es: {weatherData}°C</h2>
         </div>
-      : <FormLocation setLoading={setLoading} setInitialCoordinates={setInitialCoordinates} /> }
+      : <FormLocation token={token} setLoading={setLoading} setInitialCoordinates={setInitialCoordinates} /> }
       
       { user ? 
         <div>

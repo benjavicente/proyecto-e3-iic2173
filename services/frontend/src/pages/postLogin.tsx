@@ -1,18 +1,31 @@
+import { useState } from 'react';
+
 import { useRouter } from 'next/router'
-import { useUser } from '@auth0/nextjs-auth0';
+import { useAuth0 } from "@auth0/auth0-react";
 
 import { postApi } from '../lib/api';
 
 // Vista cuyo único propósito es redireccionar a index y hacer un post del user al back luego del login
 export default function PostLogin() {
   const router = useRouter();
-  const { user, isLoading } = useUser();
+
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0(); 
+
+  const getToken = async () => {
+    const accessToken = await getAccessTokenSilently({
+      audience: process.env.AUTH0_AUDIENCE,
+      scope: process.env.AUTH0_SCOPE,
+    });
+    console.log(await accessToken);
+    return await accessToken;
+  }
 
   if (!isLoading) {
-    if (user == undefined) {
+    if (!isAuthenticated) {
       // Si se ingreso a la ruta sin haberse logueado
       router.push("/");
     }
+
     const body = {
       firstname: user['https://firstname'],
       lastname: user['https://lastname'],      
@@ -21,9 +34,12 @@ export default function PostLogin() {
       email: user.email
     }    
 
-    postApi('api/authenticate', body)
+    getToken().then(token => {
+      console.log(token);
+      postApi(token, 'api/authenticate', body)
       .then(res => {
         router.push("/");
       });
+    })    
   }
 };

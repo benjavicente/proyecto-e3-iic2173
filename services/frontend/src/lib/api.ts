@@ -1,24 +1,4 @@
-import { useAuth0 } from '@auth0/auth0-react';
-
-export async function getApi(url, params) {
-  const { getAccessTokenSilently, isAuthenticated, } = useAuth0();
-
-  console.log("AHHHH");
-  let token = ""
-  if (isAuthenticated) {
-    token = await getAccessTokenSilently({
-      audience: process.env.AUTH0_AUDIENCE,
-      scope: process.env.AUTH0_SCOPE,
-    });
-  }
-
-  console.log("Token:", await token);
-
-  // const token =  (await accessToken.text()).slice(1,-1);
-
-  // Colocar en el .env
-  const baseUrl = "";
-
+export async function getApi(token, url, params) {
   let urlParams = "";
 
   if (params) {
@@ -39,8 +19,8 @@ export async function getApi(url, params) {
     }  
   }  
 
-  console.log(baseUrl + url + urlParams, token);
-  const response = await fetch(baseUrl + url + urlParams, {
+  console.log(url + urlParams, token);
+  const response = await fetch(url + urlParams, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -51,18 +31,12 @@ export async function getApi(url, params) {
   return await response.text();
 }
 
-export async function postApi(url, body){
-  const accessToken = await fetch('/api/getToken');
-  const token = await (await accessToken.text()).slice(1,-1);
-
+export async function postApi(token, url, body) {
   console.log("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-TOKEN-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|");
   console.log(token);
   console.log("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-TOKEN-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|");
-
-  // Colocar en el .env
-  const baseUrl = "";
   
-  const response = await fetch(baseUrl + url, {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -74,14 +48,8 @@ export async function postApi(url, body){
   return await response.text();
 }
 
-export async function patchApi(url, body){
-  const accessToken = await fetch('/api/getToken');
-  const token = await (await accessToken.text()).slice(1,-1);
-
-  // Colocar en el .env
-  const baseUrl = "";
-  
-  const response = await fetch(baseUrl + url, {
+export async function patchApi(token, url, body) {
+  const response = await fetch(url, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -93,14 +61,8 @@ export async function patchApi(url, body){
   return await response.text();
 }
 
-export async function uploadApi(url, file){
-  const accessToken = await fetch('/api/getToken');
-  const token = await (await accessToken.text()).slice(1,-1);
-
-  // Colocar en el .env
-  const baseUrl = "";
-  
-  const response = await fetch(baseUrl + url, {
+export async function uploadApi(token, url, file) {  
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}` 
