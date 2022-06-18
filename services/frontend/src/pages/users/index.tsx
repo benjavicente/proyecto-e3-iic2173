@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useUser } from '@auth0/nextjs-auth0'
+import { useAuth0 } from "@auth0/auth0-react";
 import Head from 'next/head'
 
 import Navbar from '../../components/Navbar'
@@ -11,7 +11,7 @@ import { getApi } from '../../lib/api'
 import styles from '../../styles/Home.module.css'
 
 function UsersPage() {
-  const { user } = useUser();  
+  const { user } = useAuth0();   
 
   const [loading, setLoading] = useState(true);
   const [usersData, setUsersData] = useState(null);
@@ -28,6 +28,7 @@ function UsersPage() {
   }
 
   if (loading) {
+    console.log("Cargando")
     getApi('api/users', {'page': page}) 
       .then(data => {
         console.log(data);

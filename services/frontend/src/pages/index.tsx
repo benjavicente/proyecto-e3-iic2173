@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0';
+import { useAuth0 } from "@auth0/auth0-react";
 
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
@@ -14,6 +15,7 @@ import FormLocation from '../components/FormLocation'
 import Form from '../components/FormMarker'
 
 function HomePage() {
+  console.log("Cargando");
   const [markers, setMarkers] = useState(null);
   const [users, setUsers] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ function HomePage() {
   const [initialCoordinates, setInitialCoordinates] = useState(null);
   const [tags, setTags] = useState([]);
 
-  const { user, isLoading } = useUser();  
+  const { user, isLoading } = useAuth0(); 
 
   if (isLoading) {
     return (
@@ -54,6 +56,7 @@ function HomePage() {
   if (userLoading) {
     getApi('api/users/all', null) 
     .then(data => {
+      console.log(data);
       setUsers(JSON.parse(data));
       setUserLoading(false);
     })
@@ -72,6 +75,7 @@ function HomePage() {
 
   getApi('api/weather', coordinates) 
     .then(data => {
+      console.log(data)
       const jsonData = JSON.parse(data);
       setWeatherData(jsonData["temp_c"]);
     })

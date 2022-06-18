@@ -5,7 +5,7 @@ export default async function getToken(req, res) {
     const { accessToken } = await getAccessToken(req, res);
     
     // Quitar al deployar
-    console.log(await accessToken);
+    console.log("Token:", await accessToken);
     res.status(200).json(accessToken);
   } catch(err) {
     // No hay usuario logueado

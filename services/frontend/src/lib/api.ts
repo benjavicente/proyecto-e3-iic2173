@@ -1,11 +1,23 @@
-// Based on https://github.com/auth0/nextjs-auth0/tree/main/examples/kitchen-sink-example
-export async function getApi(url, params){
-  // url de fetch hay que hacerla desde el root de pages
-  const accessToken = await fetch('/api/getToken');
-  const token = await (await accessToken.text()).slice(1,-1);
+import { useAuth0 } from '@auth0/auth0-react';
+
+export async function getApi(url, params) {
+  const { getAccessTokenSilently, isAuthenticated, } = useAuth0();
+
+  console.log("AHHHH");
+  let token = ""
+  if (isAuthenticated) {
+    token = await getAccessTokenSilently({
+      audience: process.env.AUTH0_AUDIENCE,
+      scope: process.env.AUTH0_SCOPE,
+    });
+  }
+
+  console.log("Token:", await token);
+
+  // const token =  (await accessToken.text()).slice(1,-1);
 
   // Colocar en el .env
-  const baseUrl = "http://real-back-arquie2.tk/"
+  const baseUrl = "";
 
   let urlParams = "";
 
@@ -27,7 +39,7 @@ export async function getApi(url, params){
     }  
   }  
 
-  console.log(baseUrl + url + urlParams);
+  console.log(baseUrl + url + urlParams, token);
   const response = await fetch(baseUrl + url + urlParams, {
     method: 'GET',
     headers: {
@@ -48,7 +60,7 @@ export async function postApi(url, body){
   console.log("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-TOKEN-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|");
 
   // Colocar en el .env
-  const baseUrl = "http://real-back-arquie2.tk/";
+  const baseUrl = "";
   
   const response = await fetch(baseUrl + url, {
     method: 'POST',
@@ -67,7 +79,7 @@ export async function patchApi(url, body){
   const token = await (await accessToken.text()).slice(1,-1);
 
   // Colocar en el .env
-  const baseUrl = "http://real-back-arquie2.tk/";
+  const baseUrl = "";
   
   const response = await fetch(baseUrl + url, {
     method: 'PATCH',
@@ -86,7 +98,7 @@ export async function uploadApi(url, file){
   const token = await (await accessToken.text()).slice(1,-1);
 
   // Colocar en el .env
-  const baseUrl = "http://real-back-arquie2.tk/";
+  const baseUrl = "";
   
   const response = await fetch(baseUrl + url, {
     method: 'POST',

@@ -11,7 +11,7 @@ const override = require('koa-override-method');
 const assets = require('./assets');
 const mailer = require('./mailers');
 const routes = require('./routes');
-const api = require('./routes/api');
+const api = require('./routes/ap');
 const orm = require('./models');
 
 // App constructor
@@ -45,7 +45,7 @@ if (!testMode) {
   app.use(koaLogger());
 }
 
-app.use(cors({ origin: process.env.ORIGIN || 'http://localhost:3000' }));
+app.use(cors({ origin: process.env.ORIGIN || 'https://localhost' }));
 
 // webpack middleware for dev mode only
 if (developmentMode) {
