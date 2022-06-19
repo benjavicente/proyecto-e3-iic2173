@@ -8,7 +8,7 @@ export default function PostLogin() {
   const router = useRouter();
 
   // user necesario para extraer la metadata del user (datos obtenidos del register)
-  const { user, isLoading, isAuthenticated, getAccessTokenSilently, logout } = useAuth0(); 
+  const { user, isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0(); 
 
   const getToken = async () => {
     const accessToken = await getAccessTokenSilently();
