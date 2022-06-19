@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth0 } from "@auth0/auth0-react";
 
 import { useRouter } from 'next/router';
@@ -14,8 +14,6 @@ import { uploadApi } from '../../lib/api';
 import styles from '../../styles/Home.module.css'
 
 export default function Profile() {
-  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0(); 
-
   const router = useRouter()
   const { query } = useRouter();
 
@@ -26,42 +24,27 @@ export default function Profile() {
   const [file, setFile] = useState(null);
 
   const [token, setToken] = useState('');
-  const [authLoading, setAuthLoading] = useState(true)  
 
-  const getToken = async () => {
-    if (isAuthenticated) {
-      const accessToken = await getAccessTokenSilently();
-      setToken(accessToken);
-    }
-    setAuthLoading(false)
-  }
-
-  if (isLoading) {
-    return (
-      <div />
-    )
-  }
-
-  if (authLoading) {
-    getToken()
-    return (
-      <div />
-    )
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setToken(token);
+  }, []);
   
  
   if (query.reload == 'true') {    
     query.reload = 'false';
+    setError(false);
     setLoading(true);
   }
 
-  if (isLoading) {
+  if (token === '') {
     return (
-      <h2>Cargando</h2>
+      <div />
     )
-  }  
+  }
 
-  if (!isAuthenticated && query.id == 'me') {
+  // Caso cuando se intenta acceder al perfil sin haber iniciado sesión
+  if (query.id === 'me' && token === null) {
     router.push({
       pathname: '/',
     })
@@ -70,19 +53,19 @@ export default function Profile() {
     )
   }
 
-  if (loading && !authLoading) {
-    getApi(token, '/api/users', {id: query.id}) 
-      .then(info => {
-        if (info == '') {
-          setError(true);
-          setLoading(false);
-        } else {
-          console.log("I:", info)
-          setData(JSON.parse(info));
-          setLoading(false);
-        }
-      });
-
+  if (loading) {
+    getApi(token, 'api/users', {id: query.id}) 
+    .then(info => {
+      console.log(info)
+      try {
+        setData(JSON.parse(info));
+        setLoading(false);
+      }
+      catch (err) {
+        setError(true);
+        setLoading(false);
+      }
+    })
     return (
       <h2>Cargando</h2>
     )
@@ -94,7 +77,6 @@ export default function Profile() {
     }    
     postApi(token, '/api/pings/create', body)
       .then(res => {
-        console.log(res);
         if (res == 'Created') {
           setPingMessage('Ping hecho con éxito');
         } else if (res == 'Lo sentimos, pero no puedes enviarte un ping a ti mismo') {
@@ -123,7 +105,6 @@ export default function Profile() {
 
       uploadApi(token, '/api/users/upload/image', formData)
         .then(res => {
-          console.log(res);
           // Luego de la request se debe eliminar la imagen
           setFile(null);
           setLoading(true);
@@ -133,7 +114,7 @@ export default function Profile() {
 
   return (
     <div>
-      <Navbar logged={user !== undefined }/>
+      <Navbar logged={token !== null}/>
       { error ? 
         <div className={styles.centerContainer}>
             <h2>No sé encontró al usuario</h2>
@@ -141,7 +122,7 @@ export default function Profile() {
         <UserProfile data={data} />
       }
       
-      { user && query.id != 'me' ? 
+      {query.id !== 'me' && !error ? 
         <div>
           <div className={styles.row}> 
             <button className={styles.button} onClick={makePing}>Hacer Ping</button>
@@ -149,7 +130,7 @@ export default function Profile() {
           </div>
         </div>                    
       : null }  
-      { user && query.id == 'me' ? 
+      {query.id === 'me' ? 
         <div> 
           <h3 className={styles.rowItem}>¿Deseas subir imágenes de perfil?</h3>
         <div>        

@@ -11,7 +11,7 @@ const override = require('koa-override-method');
 const assets = require('./assets');
 const mailer = require('./mailers');
 const routes = require('./routes');
-const api = require('./routes/ap');
+const api = require('./routes/api');
 const orm = require('./models');
 
 // App constructor

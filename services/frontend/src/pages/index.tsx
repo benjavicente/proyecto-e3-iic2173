@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useAuth0 } from "@auth0/auth0-react";
+import React, { useState, useEffect } from 'react';
 
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
@@ -10,60 +9,42 @@ import { getApi } from '../lib/api';
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import FormLocation from '../components/FormLocation'
-
-import useSWR from 'swr';
-
 import Form from '../components/FormMarker'
 
 function HomePage() {
   const [markers, setMarkers] = useState(null);
   const [users, setUsers] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [userLoading, setUserLoading] = useState(true);
   const [usersSelected, setUsersSelected] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [temperature, setTemperature] = useState('0');
   const [idSelected, setIdSelected] = useState([]);
   const [filteredId, setFilteredId] = useState([]);
   const [weatherData, setWeatherData] = useState(null);
   const [initialCoordinates, setInitialCoordinates] = useState(null);
-  const [tags, setTags] = useState([]);
+  
   const [token, setToken] = useState('');
-  const [authLoading, setAuthLoading] = useState(true)
 
-  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0(); 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setToken(token);
+  }, []);
 
-  const getToken = async () => {
-    if (isAuthenticated) {
-      const accessToken = await getAccessTokenSilently();
-      setToken(accessToken);
-    }
-    setAuthLoading(false)
-  }
-
-  if (isLoading) {
+  if (token === '') {
     return (
       <div />
     )
   }
 
-  if (authLoading) {
-    getToken()
-    return (
-      <div />
-    )
-  }
-
-  if (loading) {
-    if (user != undefined) {
+  if (markers === null) {
+    if (token !== null) {
       getApi(token, 'api/markers', {filteredIds: filteredId}) 
       .then(data => {
         console.log(data);
         setMarkers(JSON.parse(data));
-        setLoading(false);
       })
     } else {
       // Se deja de esa forma para que userPositions.map no tire problemas
       setMarkers({"userMarkers": [], "peopleMarkers": []});    
-      setLoading(false);
     }   
     
     return (
@@ -71,11 +52,10 @@ function HomePage() {
     )
   }
 
-  if (userLoading) {
+  if (users === null) {
     getApi(token, 'api/users/all', null) 
     .then(data => {
       setUsers(JSON.parse(data));
-      setUserLoading(false);
     })
 
     return (
@@ -90,12 +70,14 @@ function HomePage() {
     coordinates.lng = position.coords.longitude;
     });
 
-  getApi(token, 'api/weather', coordinates) 
+  if (weatherData === null) {
+    getApi(token, 'api/weather', coordinates) 
     .then(data => {
       const jsonData = JSON.parse(data);
       setWeatherData(jsonData["temp_c"]);
     })
-
+  }
+  
   // Se cargan los tags
   if (tags.length == 0) {
     getApi(token, 'api/tags/all', null) 
@@ -106,14 +88,14 @@ function HomePage() {
 
   const filter = () => {
     setFilteredId(idSelected);
-    setLoading(true);
+    setMarkers(null);
   }
 
   const removeFilter = () => {
     setIdSelected([]);
     setUsersSelected([]);
     setFilteredId([]);
-    setLoading(true);
+    setMarkers(null);
   }
 
   const selectedUser = (user) => {   
@@ -148,8 +130,8 @@ function HomePage() {
     }    
   });
 
-  const Map = dynamic(() => import('../components/Map'))
-  
+  const Map = dynamic(() => import('../components/Map'));
+
   return (
     <div className={styles.CenterContainer}>
       <Head>
@@ -158,14 +140,20 @@ function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       
-      <Navbar logged={user !== undefined}/>
+      <Navbar logged={token !== null}/>
       { weatherData ? 
         <div className={styles.centerContainer}>
           <h2>La temperatura actual es: {weatherData}°C</h2>
         </div>
-      : <FormLocation token={token} setLoading={setLoading} setInitialCoordinates={setInitialCoordinates} /> }
+      : <FormLocation 
+          token={token} 
+          setInitialCoordinates={setInitialCoordinates} 
+          temperature={temperature}
+          setTemperature={setTemperature} 
+        /> 
+      }
       
-      { user ? 
+      { token ? 
         <div>
           <h3 className={styles.centerContainer}>Usuarios seleccionados:</h3>
           <div className={styles.rowUsers}>
@@ -185,7 +173,7 @@ function HomePage() {
       : null }      
 
       <Map markers={ markers } initialCoordinates={initialCoordinates} />
-      { user ? <Form token={token} setLoading={setLoading} tags={tags}/> : null }
+      { token !== null ? <Form token={token} setMarkers={setMarkers} tags={tags}/> : null }
            
       <Footer />
     </div>

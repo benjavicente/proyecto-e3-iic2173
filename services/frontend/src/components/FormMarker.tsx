@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
-import { getApi, postApi } from '../lib/api';
+import { postApi } from '../lib/api';
 
 import styles from '../styles/Home.module.css'
  
-const NewLocationForm = ({ token, setLoading, tags }) => {
+const NewLocationForm = ({ token, setMarkers, tags }) => {
   const [tagsSelected, setTagsSelected] = useState([]);
   const [idSelected, setIdSelected] = useState([]);
 
   const Create = (values) => {
-    console.log(values)
     if (idSelected.length == 0) {
       alert("Por favor, escoge al menos un tag");
     } else {
       values.tagsIds = idSelected;    
       postApi(token, 'api/markers/create', values)
         .then(res => {
-          setLoading(true);
+          setMarkers(null);
         });
     }    
   }

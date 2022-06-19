@@ -15,6 +15,11 @@ const Navbar = ({ logged }) => {
   function handleLogin() {
     loginWithRedirect();
   }
+
+  function handleLogout() {
+    localStorage.removeItem('token');
+    logout({ returnTo: window.location.origin })
+  }
   
   const press = () => {    
     router.push({
@@ -22,8 +27,6 @@ const Navbar = ({ logged }) => {
       query: { id: 'me', reload: 'true' },
     })
   }
-
-  
 
   return (
     <header>
@@ -38,7 +41,7 @@ const Navbar = ({ logged }) => {
             <div className={styles.row}>
               <a className={styles.rowItemPress} href="/users/pings">Pings</a>
               <a className={styles.rowItemPress} onClick={() => press()}>Perfil</a>   
-              <a className={styles.rowItemPress} onClick={() => logout({ returnTo: window.location.origin })}>Cerrar Sesión</a>        
+              <a className={styles.rowItemPress} onClick={() => handleLogout()}>Cerrar Sesión</a>        
             </div>
             :
             <div className={styles.row}>

@@ -9,7 +9,6 @@ const UserProfile = ({ data }) => {
     data.images = [];
   }
   
-  
   const userImages = data.images.map((image) => {
     return (
       <img key={image.id} className={styles.imgUser} src={image.imageUrl} alt={data.email} />
@@ -49,9 +48,7 @@ const UserProfile = ({ data }) => {
           }             
         </div>
       </div>       
-      : null }
-      
-      
+      : null }    
     </div>    
   )
 }

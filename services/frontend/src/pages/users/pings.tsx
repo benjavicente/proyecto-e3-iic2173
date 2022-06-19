@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { useAuth0 } from "@auth0/auth0-react";
 
 import { getApi, patchApi } from '../../lib/api';
 
@@ -12,40 +11,26 @@ import Footer from '../../components/Footer'
 import styles from '../../styles/Home.module.css'
 
 function PingsPage() {
-  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0(); 
   const router = useRouter()
 
   const [loading, setLoading] = useState(true);
   const [pingsData, setPingsData] = useState(null);
-
   const [token, setToken] = useState('');
-  const [authLoading, setAuthLoading] = useState(true)  
 
-  const getToken = async () => {
-    if (isAuthenticated) {
-      const accessToken = await getAccessTokenSilently();
-      setToken(accessToken);
-    }
-    setAuthLoading(false)
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setToken(token);
+  }, []);
 
-  if (isLoading) {
-    return (
-      <div />
-    )
-  }
-
-  if (authLoading) {
-    getToken()
+  if (token === '') {
     return (
       <div />
     )
   }
 
   if (loading) {
-    getApi(token, '/api/pings/all', null) 
+    getApi(token, 'api/pings/all', null) 
       .then(data => {
-        console.log(data)
         setPingsData(JSON.parse(data));
         setLoading(false);
       });
@@ -57,7 +42,7 @@ function PingsPage() {
 
   const visitToProfile = (user) => {
     router.push({
-      pathname: '/users/profile',
+      pathname: 'users/profile',
       query: { id: user.id },
     })
   }
@@ -74,11 +59,9 @@ function PingsPage() {
       .then(res => {
         setLoading(true);
       });
-    
   }
 
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
-    console.log(ping)
     if (ping.status == 0) {      
       return (
         <div className={styles.row}>
@@ -120,7 +103,7 @@ function PingsPage() {
           <link rel="icon" href="/favicon.ico" />
       </Head>
     
-      <Navbar logged={user !== undefined}/>
+      <Navbar logged={token !== null}/>
       <div>
         <h2>Pings que te han hecho:</h2>
         <div className={styles.column}>

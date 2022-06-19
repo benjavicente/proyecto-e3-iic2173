@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import { useAuth0 } from "@auth0/auth0-react";
+import React, { useState, useEffect } from 'react'
 
 import Head from 'next/head'
 
@@ -12,38 +11,23 @@ import { getApi } from '../../lib/api'
 import styles from '../../styles/Home.module.css'
 
 function UsersPage() {
-  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();    
-
   const [loading, setLoading] = useState(true);
   const [usersData, setUsersData] = useState(null);
   const [page, setPage] = useState(1);
-
   const [token, setToken] = useState('');
-  const [authLoading, setAuthLoading] = useState(true)  
 
-  const getToken = async () => {
-    if (isAuthenticated) {
-      const accessToken = await getAccessTokenSilently();
-      setToken(accessToken);
-    }
-    setAuthLoading(false)
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setToken(token);
+  }, []);
 
-  if (isLoading) {
-    return (
-      <div />
-    )
-  }
-
-  if (authLoading) {
-    getToken()
+  if (token === '') {
     return (
       <div />
     )
   }
   
-  if (loading && !authLoading) {
-    console.log("Cargando")
+  if (loading) {
     getApi(token, 'api/users', {'page': page}) 
       .then(data => {
         setUsersData(JSON.parse(data));
@@ -64,7 +48,6 @@ function UsersPage() {
     setLoading(true);
   }
 
-
   const Users = usersData.map((user) => {
     return (
       <UserInfo user={user} key={user.id} />     
@@ -79,7 +62,7 @@ function UsersPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
     
-      <Navbar logged={user !== undefined}/>
+      <Navbar logged={token !== null}/>
 
       <div className={styles.centerContainer}>
         <h1> Lista de usuarios </h1>
