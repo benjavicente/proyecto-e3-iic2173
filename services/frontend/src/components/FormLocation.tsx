@@ -14,7 +14,6 @@ const FormLocation = ({ token, setLoading, setInitialCoordinates }) => {
       lng: '',
     },
     onSubmit: values => {
-      console.log("V", values);
       if (!values.lat || !values.lng) {
         alert("Por favor, ingresa valores válidos");
       } else {

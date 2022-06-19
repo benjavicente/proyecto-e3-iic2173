@@ -12,10 +12,7 @@ export default function PostLogin() {
   const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0(); 
 
   const getToken = async () => {
-    const accessToken = await getAccessTokenSilently({
-      audience: process.env.AUTH0_AUDIENCE,
-      scope: process.env.AUTH0_SCOPE,
-    });
+    const accessToken = await getAccessTokenSilently();
     console.log(await accessToken);
     return await accessToken;
   }
@@ -35,7 +32,6 @@ export default function PostLogin() {
     }    
 
     getToken().then(token => {
-      console.log(token);
       postApi(token, 'api/authenticate', body)
       .then(res => {
         router.push("/");

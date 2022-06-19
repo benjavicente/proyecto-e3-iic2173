@@ -38,13 +38,11 @@ const Navbar = ({ logged }) => {
             <div className={styles.row}>
               <a className={styles.rowItemPress} href="/users/pings">Pings</a>
               <a className={styles.rowItemPress} onClick={() => press()}>Perfil</a>   
-              <a className={styles.rowItemPress} onClick={() => logout({ returnTo: window.location.origin })}>Cerrar Sesión</a>  
-              <a className={styles.rowItemPress} onClick={() => handleLogin()}>Iniciar Sesión</a>         
+              <a className={styles.rowItemPress} onClick={() => logout({ returnTo: window.location.origin })}>Cerrar Sesión</a>        
             </div>
             :
             <div className={styles.row}>
-              <a className={styles.rowItemPress} onClick={() => handleLogin()}>Iniciar Sesión</a>
-              <a className={styles.rowItemPress} onClick={() => logout({ returnTo: window.location.origin })}>Cerrar Sesión</a>    
+              <a className={styles.rowItemPress} onClick={() => handleLogin()}>Iniciar Sesión</a> 
             </div>            
           }          
         </div>

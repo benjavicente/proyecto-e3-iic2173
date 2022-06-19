@@ -19,7 +19,7 @@ export async function getApi(token, url, params) {
     }  
   }  
 
-  console.log(url + urlParams, token);
+  console.log(url + urlParams);
   const response = await fetch(url + urlParams, {
     method: 'GET',
     headers: {
@@ -36,6 +36,7 @@ export async function postApi(token, url, body) {
   console.log(token);
   console.log("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-TOKEN-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|");
   
+  console.log("Body", body)
   const response = await fetch(url, {
     method: 'POST',
     headers: {

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useUser } from '@auth0/nextjs-auth0';
 import { useAuth0 } from "@auth0/auth0-react";
 
 import Head from 'next/head'
@@ -11,6 +10,8 @@ import { getApi } from '../lib/api';
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import FormLocation from '../components/FormLocation'
+
+import useSWR from 'swr';
 
 import Form from '../components/FormMarker'
 
@@ -26,33 +27,36 @@ function HomePage() {
   const [initialCoordinates, setInitialCoordinates] = useState(null);
   const [tags, setTags] = useState([]);
   const [token, setToken] = useState('');
+  const [authLoading, setAuthLoading] = useState(true)
 
   const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0(); 
 
-  console.log("Status:", user, isAuthenticated, isLoading);
-
   const getToken = async () => {
-    const accessToken = await getAccessTokenSilently({
-      audience: process.env.AUTH0_AUDIENCE,
-      scope: process.env.AUTH0_SCOPE,
-    });
-    setToken(accessToken);
+    if (isAuthenticated) {
+      const accessToken = await getAccessTokenSilently();
+      setToken(accessToken);
+    }
+    setAuthLoading(false)
   }
 
-  if (isLoading) {    
+  if (isLoading) {
     return (
       <div />
     )
   }
 
-  if (!isLoading){
-    console.log("Cargó", isAuthenticated, user, token)
+  if (authLoading) {
+    getToken()
+    return (
+      <div />
+    )
   }
 
   if (loading) {
     if (user != undefined) {
       getApi(token, 'api/markers', {filteredIds: filteredId}) 
       .then(data => {
+        console.log(data);
         setMarkers(JSON.parse(data));
         setLoading(false);
       })
@@ -145,8 +149,6 @@ function HomePage() {
   });
 
   const Map = dynamic(() => import('../components/Map'))
-
-  console.log("User", user);
   
   return (
     <div className={styles.CenterContainer}>
@@ -183,7 +185,7 @@ function HomePage() {
       : null }      
 
       <Map markers={ markers } initialCoordinates={initialCoordinates} />
-      { user ? <Form setLoading={setLoading} tags={tags}/> : null }
+      { user ? <Form token={token} setLoading={setLoading} tags={tags}/> : null }
            
       <Footer />
     </div>

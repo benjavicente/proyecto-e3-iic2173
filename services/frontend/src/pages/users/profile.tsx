@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useAuth0 } from "@auth0/auth0-react";
 
 import { useRouter } from 'next/router';
-import { useUser } from '@auth0/nextjs-auth0';
 
 import { getApi, postApi } from '../../lib/api';
 
@@ -14,6 +14,8 @@ import { uploadApi } from '../../lib/api';
 import styles from '../../styles/Home.module.css'
 
 export default function Profile() {
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0(); 
+
   const router = useRouter()
   const { query } = useRouter();
 
@@ -22,7 +24,30 @@ export default function Profile() {
   const [error, setError] = useState(false);
   const [pingMessage, setPingMessage] = useState('');
   const [file, setFile] = useState(null);
-  const { user, isLoading } = useUser();
+
+  const [token, setToken] = useState('');
+  const [authLoading, setAuthLoading] = useState(true)  
+
+  const getToken = async () => {
+    if (isAuthenticated) {
+      const accessToken = await getAccessTokenSilently();
+      setToken(accessToken);
+    }
+    setAuthLoading(false)
+  }
+
+  if (isLoading) {
+    return (
+      <div />
+    )
+  }
+
+  if (authLoading) {
+    getToken()
+    return (
+      <div />
+    )
+  }
   
  
   if (query.reload == 'true') {    
@@ -36,23 +61,23 @@ export default function Profile() {
     )
   }  
 
-  if (user == undefined && query.id == 'me') {
+  if (!isAuthenticated && query.id == 'me') {
     router.push({
-      pathname: '/api/auth/login',
+      pathname: '/',
     })
     return (
       <div />
     )
   }
 
-  if (loading) {
-    getApi('api/users', {id: query.id}) 
+  if (loading && !authLoading) {
+    getApi(token, '/api/users', {id: query.id}) 
       .then(info => {
         if (info == '') {
           setError(true);
           setLoading(false);
         } else {
-          console.log("Profile:", info);
+          console.log("I:", info)
           setData(JSON.parse(info));
           setLoading(false);
         }
@@ -67,7 +92,7 @@ export default function Profile() {
     const body = {
       pingedUserId: data.id
     }    
-    postApi('api/pings/create', body)
+    postApi(token, '/api/pings/create', body)
       .then(res => {
         console.log(res);
         if (res == 'Created') {
@@ -96,7 +121,7 @@ export default function Profile() {
         file,
       ); 
 
-      uploadApi('api/users/upload/image', formData)
+      uploadApi(token, '/api/users/upload/image', formData)
         .then(res => {
           console.log(res);
           // Luego de la request se debe eliminar la imagen

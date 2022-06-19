@@ -14,6 +14,14 @@ const ICONPEOPLE = icon({
   iconSize: [36, 36],
 })
 
+const TagsToString = (tags) => {
+  let str = "";
+  tags.forEach(tag => {
+    str += tag.name + " "
+  })
+  return str;
+}
+
 const Map = ({ markers, initialCoordinates }) => {
   let userMarkers;
   let peopleMarkers;
@@ -24,20 +32,22 @@ const Map = ({ markers, initialCoordinates }) => {
 
   if (markers) {
     userMarkers = markers.userMarkers.map((marker) => {
+      const tags = TagsToString(marker.tags);
       return (
         <Marker position={[marker.position.coordinates[0], marker.position.coordinates[1]]} icon={ICON} key={marker.id}>
           <Popup>
-            {marker.name}
+            {marker.name} <br></br> {tags} 
           </Popup>
         </Marker>
       )
     });
 
     peopleMarkers = markers.peopleMarkers.map((marker) => {
+      const tags = TagsToString(marker.tags);
       return (
         <Marker position={[marker.position.coordinates[0], marker.position.coordinates[1]]} icon={ICONPEOPLE} key={marker.id}>
           <Popup>
-            {marker.name}
+            {marker.user.username} <br></br> {marker.name} <br></br> {tags} 
           </Popup>
         </Marker>
       )

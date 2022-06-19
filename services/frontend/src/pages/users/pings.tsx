@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
-import { useUser } from '@auth0/nextjs-auth0'
+import { useAuth0 } from "@auth0/auth0-react";
 
 import { getApi, patchApi } from '../../lib/api';
 
@@ -12,15 +12,40 @@ import Footer from '../../components/Footer'
 import styles from '../../styles/Home.module.css'
 
 function PingsPage() {
-  const { user } = useUser();  
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0(); 
   const router = useRouter()
 
   const [loading, setLoading] = useState(true);
   const [pingsData, setPingsData] = useState(null);
 
+  const [token, setToken] = useState('');
+  const [authLoading, setAuthLoading] = useState(true)  
+
+  const getToken = async () => {
+    if (isAuthenticated) {
+      const accessToken = await getAccessTokenSilently();
+      setToken(accessToken);
+    }
+    setAuthLoading(false)
+  }
+
+  if (isLoading) {
+    return (
+      <div />
+    )
+  }
+
+  if (authLoading) {
+    getToken()
+    return (
+      <div />
+    )
+  }
+
   if (loading) {
-    getApi('api/pings/all', null) 
+    getApi(token, '/api/pings/all', null) 
       .then(data => {
+        console.log(data)
         setPingsData(JSON.parse(data));
         setLoading(false);
       });
@@ -45,7 +70,7 @@ function PingsPage() {
   }
 
   const respondingPing = (answer, id) => {
-    patchApi(`api/pings/update/${id}`, { status: answer}) 
+    patchApi(token, `/api/pings/update/${id}`, { status: answer}) 
       .then(res => {
         setLoading(true);
       });
@@ -53,10 +78,13 @@ function PingsPage() {
   }
 
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
+    console.log(ping)
     if (ping.status == 0) {      
       return (
         <div className={styles.row}>
-          <p key={ping.id}>Te han hecho un ping, <a className={styles.rowItemPress} onClick={() => visitToProfile(ping.pingedFrom)}>Visitar perfil</a></p> 
+          <p key={ping.id}><a className={styles.rowItemPress} 
+            onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping
+          </p> 
           <button className={styles.button} onClick={() => respondingPing(1, ping.id)}> 
             Aceptar
           </button> 
@@ -69,7 +97,9 @@ function PingsPage() {
     } else {
       return (
         <div className={styles.row}>
-          <p key={ping.id}>Te han hecho un ping, <a className={styles.rowItemPress} onClick={() => visitToProfile(ping.pingedFrom)}> Visitar perfil</a> | {ping.status == 1 ? 'Aceptado' : 'Rechazado' }</p>
+          <p key={ping.id}><a className={styles.rowItemPress} 
+            onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado' }
+          </p>
         </div>
       ) 
     }
@@ -78,7 +108,7 @@ function PingsPage() {
 
   const pingsFromUser = pingsData.pingedUsers.map((ping) => {
     return (
-      <p key={ping.id}>Has hecho un ping, <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}> Visitar perfil</a></p>     
+      <p key={ping.id}><a className={styles.rowItemPress}></a>Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}</a></p>     
     )
   });
 

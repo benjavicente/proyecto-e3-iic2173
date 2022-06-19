@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAuth0 } from "@auth0/auth0-react";
+
 import Head from 'next/head'
 
 import Navbar from '../../components/Navbar'
@@ -11,12 +12,48 @@ import { getApi } from '../../lib/api'
 import styles from '../../styles/Home.module.css'
 
 function UsersPage() {
-  const { user } = useAuth0();   
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();    
 
   const [loading, setLoading] = useState(true);
   const [usersData, setUsersData] = useState(null);
-
   const [page, setPage] = useState(1);
+
+  const [token, setToken] = useState('');
+  const [authLoading, setAuthLoading] = useState(true)  
+
+  const getToken = async () => {
+    if (isAuthenticated) {
+      const accessToken = await getAccessTokenSilently();
+      setToken(accessToken);
+    }
+    setAuthLoading(false)
+  }
+
+  if (isLoading) {
+    return (
+      <div />
+    )
+  }
+
+  if (authLoading) {
+    getToken()
+    return (
+      <div />
+    )
+  }
+  
+  if (loading && !authLoading) {
+    console.log("Cargando")
+    getApi(token, 'api/users', {'page': page}) 
+      .then(data => {
+        setUsersData(JSON.parse(data));
+        setLoading(false);
+      });
+
+    return (
+      <h2>Cargando</h2>
+    )
+  }
 
   const prevPage = () => {
     setPage(page-1);
@@ -27,19 +64,6 @@ function UsersPage() {
     setLoading(true);
   }
 
-  if (loading) {
-    console.log("Cargando")
-    getApi('api/users', {'page': page}) 
-      .then(data => {
-        console.log(data);
-        setUsersData(JSON.parse(data));
-        setLoading(false);
-      });
-
-    return (
-      <h2>Cargando</h2>
-    )
-  }
 
   const Users = usersData.map((user) => {
     return (
