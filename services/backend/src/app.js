@@ -45,7 +45,7 @@ if (!testMode) {
   app.use(koaLogger());
 }
 
-app.use(cors({ origin: process.env.ORIGIN || 'http://localhost:3000' }));
+app.use(cors({ origin: process.env.ORIGIN || 'https://localhost' }));
 
 // webpack middleware for dev mode only
 if (developmentMode) {

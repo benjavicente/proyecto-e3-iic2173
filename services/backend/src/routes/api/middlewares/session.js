@@ -16,6 +16,7 @@ const jwtCheck = jwt({
 
 
 const setCurrentUser = async (ctx, next) => {
+  console.log("CTX:", ctx.request.body);
   const token = await decodeToken(ctx.request.header);
   const userEmail = token['https://email'];
 
@@ -53,7 +54,7 @@ const getUserByEmail = async (orm, email) => {
 const registerNewUser = async (ctx, email) => {
   const user = ctx.orm.user.build(ctx.request.body);
 
-  if (user.email !== email){
+  if (user.email !== email) {
     ctx.throw(400, 'El correo entregado no coincide con el del token');
   }
 

@@ -1,6 +1,7 @@
-FROM node:16
+FROM node:16-alpine
 WORKDIR /workspace
 
-# Install dependencies
-COPY package.json package-lock.json /workspace/
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .

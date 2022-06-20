@@ -1,0 +1,127 @@
+import React, { useState } from 'react';
+import { useFormik } from 'formik';
+import { postApi } from '../lib/api';
+
+import styles from '../styles/Home.module.css'
+ 
+const NewLocationForm = ({ token, setMarkers, tags }) => {
+  const [tagsSelected, setTagsSelected] = useState([]);
+  const [idSelected, setIdSelected] = useState([]);
+
+  const Create = (values) => {
+    if (idSelected.length == 0) {
+      alert("Por favor, escoge al menos un tag");
+    } else {
+      values.tagsIds = idSelected;    
+      postApi(token, 'api/markers/create', values)
+        .then(res => {
+          setMarkers(null);
+        });
+    }    
+  }
+
+  const removeTags = () => {
+    setIdSelected([]);
+    setTagsSelected([]);
+  }
+  
+  const selectedTag = (tag) => {   
+    const tagData = JSON.parse(tag);
+    if (!idSelected.includes(tag.id)) {
+      setTagsSelected([...tagsSelected, tagData]);
+      setIdSelected([...idSelected, tagData.id]);        
+    }    
+  }
+  
+  const selectedTags = tagsSelected.map((tag) => {
+    return (
+      <p className={styles.rowItem} key={tag.id}>{tag.name}</p>    
+    )
+  });
+  
+  const tagsOptions = tags.map((tag) => {
+    let exists = false;
+    for (var i = 0; i < tagsSelected.length; i++) {
+      if (tagsSelected[i].id == tag.id) {
+        exists = true;
+        break;
+      }
+    }
+    if (!exists) {
+      const value = `{"id":${tag.id},"name":"${tag.name}"}`;
+      return (
+        <option value={value} key={tag.id}>{tag.name}</option>
+      )
+    }    
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      lat: '',
+      lng: '',
+      tagsIds: [],
+    },
+    onSubmit: values => {
+      if (!values.name || !values.lat || !values.lng) {
+        alert("Por favor, ingresa valores válidos");
+      } else {
+        Create(values);
+      }    
+    },
+  });
+
+  return (
+    <div className={styles.flexContainer}>
+      <form onSubmit={formik.handleSubmit}>
+        <div className={styles.row}>
+            <div className={styles.rowItem}>
+              <label htmlFor="firstName">Nombre: </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+              />
+            </div>
+            <div className={styles.rowItem}>
+              <label htmlFor="firstName">Latitud: </label>
+              <input
+                id="lat"
+                name="lat"
+                type="text"
+                onChange={formik.handleChange}
+                value={formik.values.lat}
+              />
+            </div>
+            <div className={styles.rowItem}>
+              <label htmlFor="lastName">Longitud: </label>
+              <input
+                id="lng"
+                name="lng"
+                type="text"
+                onChange={formik.handleChange}
+                value={formik.values.lng}
+              /> 
+            </div> 
+          </div> 
+          <div className={styles.rowTags}>
+            {selectedTags}
+          </div>
+          <div className={styles.flexContainer}>
+            <select name="tags" id="tags" className={styles.selectDropdown} onChange={tag => selectedTag(tag.target.value)}>
+              <option value="">Seleccionar tag</option>
+              {tagsOptions}
+            </select>                    
+          </div>
+          <div className={styles.rowItem}>
+            <button className={styles.button}type="submit">Crear marcador</button>            
+            <a className={styles.button} onClick={removeTags}>Eliminar tags seleccionados</a>
+          </div>   
+      </form>
+    </div>     
+  );
+};
+
+export default NewLocationForm

@@ -1,13 +1,22 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
-import SuperTokensReact from 'supertokens-auth-react'
-import { authFrontendConfig } from '../config/authFront'
+import { Auth0Provider } from '@auth0/auth0-react';
+import '../styles/globals.css';
+import App from 'next/app';
 
-if (typeof window !== 'undefined') {
-  // we only want to call this init function on the frontend, so we check typeof window !== 'undefined'
-  SuperTokensReact.init(authFrontendConfig())
+class MyApp extends App {
+  render () {
+    const { Component, pageProps } = this.props;
+    return (
+      <Auth0Provider
+        domain='dev-7c2520d3.us.auth0.com'
+        clientId='sPhRhOKQW2cAkfimnKphjXAYSm18eOFa'
+        audience="https://PingTocAuth.com"
+        scope='openid profile email'
+        redirectUri='https://localhost/postLogin'
+      >
+        <Component {...pageProps} />
+      </Auth0Provider>
+    );
+  }
 }
 
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
-}
+export default MyApp;

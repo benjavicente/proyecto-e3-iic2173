@@ -1,6 +1,18 @@
 version: "3.7"
 
 services:
+  frontend:
+    build:
+      context: ./services/frontend/
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    volumes:
+       - ./services/frontend/src:/workspace/src
+       - /workspace/node_modules
+       - /workspace/.next
+    command: ["npm", "run", "dev", "--", "-H", "0.0.0.0"]
+
   backend:
     build:
       context: ./services/backend
@@ -50,5 +62,4 @@ services:
 
   nginx:
     environment:
-      STAGING: 1
-      DEBUG: 1
+      USE_LOCAL_CA: 1
