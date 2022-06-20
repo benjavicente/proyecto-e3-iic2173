@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^1.10.1",
-    "@auth0/nextjs-auth0": "^1.9.0",
     "@headlessui/react": "^1.6.2",
     "@heroicons/react": "^1.0.6",
     "@types/react": "^16.0.25",
@@ -24,6 +23,7 @@
     "react": "18.1.0",
     "react-dom": "^18.1.0",
     "react-leaflet": "^4.0.0",
+    "react-use-websocket": "^4.2.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {

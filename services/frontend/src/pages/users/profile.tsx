@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth0 } from "@auth0/auth0-react";
-
 import { useRouter } from 'next/router';
 
-import { getApi, postApi } from '../../lib/api';
+import { getApi, postApi } from '~/lib/api';
 
-import Navbar from '../../components/Navbar'
-import Footer from '../../components/Footer'
-import UserProfile from '../../components/UserProfile'
+import Navbar from '~/components/Navbar'
+import Footer from '~/components/Footer'
+import UserProfile from '~/components/UserProfile'
 
-import { uploadApi } from '../../lib/api';
+import { uploadApi } from '~/lib/api';
 
-import styles from '../../styles/Home.module.css'
+import styles from '~/styles/Home.module.css'
+import useLocalStorage from '~/hooks/useLocalStorage';
 
 export default function Profile() {
   const router = useRouter()
@@ -22,16 +21,10 @@ export default function Profile() {
   const [error, setError] = useState(false);
   const [pingMessage, setPingMessage] = useState('');
   const [file, setFile] = useState(null);
+  const [token, setToken] = useLocalStorage<string>('token');
 
-  const [token, setToken] = useState('');
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setToken(token);
-  }, []);
-  
- 
-  if (query.reload == 'true') {    
+  if (query.reload == 'true') {
     query.reload = 'false';
     setError(false);
     setLoading(true);
@@ -54,27 +47,27 @@ export default function Profile() {
   }
 
   if (loading) {
-    getApi(token, 'api/users', {id: query.id}) 
-    .then(info => {
-      console.log(info)
-      try {
-        setData(JSON.parse(info));
-        setLoading(false);
-      }
-      catch (err) {
-        setError(true);
-        setLoading(false);
-      }
-    })
+    getApi(token, 'api/users', { id: query.id })
+      .then(info => {
+        console.log(info)
+        try {
+          setData(JSON.parse(info));
+          setLoading(false);
+        }
+        catch (err) {
+          setError(true);
+          setLoading(false);
+        }
+      })
     return (
       <h2>Cargando</h2>
     )
-  }  
+  }
 
   const makePing = () => {
     const body = {
       pingedUserId: data.id
-    }    
+    }
     postApi(token, '/api/pings/create', body)
       .then(res => {
         if (res == 'Created') {
@@ -88,20 +81,20 @@ export default function Profile() {
       });
   }
 
-  const onFileChange = event => { 
-    setFile(event.target.files[0]); 
-  }; 
+  const onFileChange = event => {
+    setFile(event.target.files[0]);
+  };
 
   const uploadImage = () => {
     if (file == undefined) {
       alert("Por favor, escoge una imagen");
     } else {
-      const formData = new FormData(); 
-     
-      formData.append( 
-        "userImages", 
+      const formData = new FormData();
+
+      formData.append(
+        "userImages",
         file,
-      ); 
+      );
 
       uploadApi(token, '/api/users/upload/image', formData)
         .then(res => {
@@ -109,39 +102,39 @@ export default function Profile() {
           setFile(null);
           setLoading(true);
         });
-    }  
+    }
   }
 
   return (
     <div>
-      <Navbar logged={token !== null}/>
-      { error ? 
+      <Navbar logged={token !== null} />
+      {error ?
         <div className={styles.centerContainer}>
-            <h2>No sé encontró al usuario</h2>
-        </div> : 
+          <h2>No sé encontró al usuario</h2>
+        </div> :
         <UserProfile data={data} />
       }
-      
-      {query.id !== 'me' && !error ? 
+
+      {query.id !== 'me' && !error ?
         <div>
-          <div className={styles.row}> 
+          <div className={styles.row}>
             <button className={styles.button} onClick={makePing}>Hacer Ping</button>
-            <p className={styles.rowItem}>{pingMessage}</p> 
+            <p className={styles.rowItem}>{pingMessage}</p>
           </div>
-        </div>                    
-      : null }  
-      {query.id === 'me' ? 
-        <div> 
-          <h3 className={styles.rowItem}>¿Deseas subir imágenes de perfil?</h3>
-        <div>        
-          <input className={styles.button} type="file" onChange={onFileChange} />
-          <button className={styles.button} onClick={uploadImage}> 
-            Subir imagen 
-          </button> 
         </div>
-      </div>
-      : null }    
-        
+        : null}
+      {query.id === 'me' ?
+        <div>
+          <h3 className={styles.rowItem}>¿Deseas subir imágenes de perfil?</h3>
+          <div>
+            <input className={styles.button} type="file" onChange={onFileChange} />
+            <button className={styles.button} onClick={uploadImage}>
+              Subir imagen
+            </button>
+          </div>
+        </div>
+        : null}
+
       <Footer />
     </div>
   );
