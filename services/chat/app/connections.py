@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-from fastapi import WebSocket
+from starlette.websockets import WebSocket, WebSocketState
 
 
 class WSException(Exception):
@@ -25,5 +25,7 @@ class ConnectionManager:
         except WSException as ws_exception:
             error = ws_exception.message
         finally:
-            await websocket.send_json({"error": error})
+            if websocket.state == WebSocketState.CONNECTED:
+                await websocket.send_json({"error": error})
+                await websocket.close()
             self.connections.pop(user_id)

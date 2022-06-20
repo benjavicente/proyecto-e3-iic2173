@@ -20,12 +20,12 @@ class BaseMessageInput(BaseModel):
 
 class PrivateMessageInput(BaseMessageInput, MessageToUser):
     "WebSocket message for private messages"
-    type: Literal["private"] = Field("private", const=True, description="Message type")
+    type: Literal["private"] = Field(description="Message type")
 
 
 class PublicMessageInput(BaseMessageInput):
     "WebSocket message for public messages"
-    type: Literal["public"] = Field("public", const=True, description="Message type")
+    type: Literal["public"] = Field(description="Message type")
 
 
 MessageInput = Union[PublicMessageInput, PrivateMessageInput]
@@ -36,6 +36,7 @@ MessageInput = Union[PublicMessageInput, PrivateMessageInput]
 
 class BaseMessage(BaseMessageInput):
     "Base class for messages"
+    id: int = Field(..., description="Message ID")
     from_user_id: str = Field(..., description="User ID of the sender")
     created_at: datetime = Field(default_factory=datetime.now, description="Creation date")
 

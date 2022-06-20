@@ -2,10 +2,9 @@ from fastapi import APIRouter, Depends, WebSocket
 from pydantic import ValidationError, parse_obj_as
 from sqlmodel import Session, select
 
-from app import all_chats
-
+from .. import all_chats
 from ..auth import JWTValidationError, validate_token
-from ..connections import ConnectionManager
+from ..connections import ConnectionManager, WSException
 from ..dependencies import get_db_session, get_user_token
 from ..models.messages import (
     MessageInput,
@@ -71,8 +70,7 @@ async def chat_websocket(
         try:
             message_payload = parse_obj_as(MessageInput, message_received)
         except ValidationError as error:
-            await websocket.send_json({"error": str(error)})
-            await websocket.send_text(error.json())
+            await websocket.send_json({"error": error.errors()})
             continue
 
         # Send the message...
@@ -85,12 +83,17 @@ async def chat_websocket(
                 from_user_id=user_info.user_id,
             )
             db_session.add(public_msg_db)
+            db_session.commit()
 
             # Send the message to all connected users
-            public_ms = PublicMessage.construct(public_msg_db.__fields_set__)
+            assert public_msg_db.id
+            public_ms = PublicMessage(
+                id=public_msg_db.id,
+                message=message_payload.message,
+                from_user_id=user_info.user_id,
+                created_at=public_msg_db.created_at,
+            )
             for connection in connection_manager.connections.values():
-                if connection is websocket:
-                    continue
                 await connection.send_text(public_ms.json())
 
         elif isinstance(message_payload, PrivateMessageInput):
@@ -103,9 +106,18 @@ async def chat_websocket(
                 to_user_id=message_payload.to_user_id,
             )
             db_session.add(private_msg_db)
+            db_session.commit()
 
             # Send the message to the other user
-            private_ms = PrivateMessage.construct(private_msg_db.__fields_set__)
+            assert private_msg_db.id
+            private_ms = PrivateMessage(
+                message=private_msg_db.message,
+                id=private_msg_db.id,
+                from_user_id=private_msg_db.from_user_id,
+                to_user_id=private_msg_db.to_user_id,
+                created_at=private_msg_db.created_at,
+            )
             other_user_websocket = connection_manager.connections.get(message_payload.to_user_id)
             if other_user_websocket:
                 await other_user_websocket.send_text(private_ms.json())
+            await websocket.send_text(private_ms.json())

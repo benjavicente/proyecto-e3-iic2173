@@ -19,4 +19,3 @@ def get_user_token(token: HTTPAuthorizationCredentials = Depends(token_auth_sche
 def get_db_session():
     with Session(engine) as session:
         yield session
-        session.commit()
