@@ -4,12 +4,12 @@ DC-PROD = $(DC_BASE) -f docker-compose.prod.yml
 
 # TODO: solo build cuando ciertos archivos cambian
 .PHONY: build
-build: 
+build:
 	$(DC-DEV) build
 
 .PHONY: dev
 dev: build
-	$(DC-DEV) up
+	$(DC-DEV) up --build --abort-on-container-exit
 
 .PHONY: prod
 prod:

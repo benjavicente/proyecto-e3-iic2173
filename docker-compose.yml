@@ -70,6 +70,21 @@ services:
       interval: 1m30s
       start_period: 30s
 
+  chat:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AUTH0_DOMAIN: dev-7c2520d3.us.auth0.com
+      AUTH0_API_AUDIENCE: https://PingTocAuth.com
+      AUTH0_ISSUER: https://dev-7c2520d3.us.auth0.com/
+      DATABASE_URL: postgresql://user:password@postgres:5432/chat
+    healthcheck:
+      test: ["CMD", "curl", "-s", "http://chat:8000"]
+      interval: 60s
+      timeout: 5s
+      retries: 5
+
   indexes:
     depends_on:
       backend:

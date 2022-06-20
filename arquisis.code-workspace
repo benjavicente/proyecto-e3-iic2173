@@ -1,0 +1,35 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "root",
+    },
+    {
+      "path": "./services/frontend",
+      "name": "frontend",
+    },
+    {
+      "path": "./services/backend",
+      "name": "backend",
+    },
+    {
+      "path": "./services/chat",
+      "name": "chat",
+    },
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+  },
+  "extensions": {
+    "recommendations": [
+      "ahmadalli.vscode-nginx-conf",
+      "bradlc.vscode-tailwindcss",
+      "dbaeumer.vscode-eslint",
+      "editorconfig.editorconfig",
+      "esbenp.prettier-vscode",
+      "ms-azuretools.vscode-docker",
+      "ms-python.python",
+      "ms-python.isort"
+    ]
+  }
+}

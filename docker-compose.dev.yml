@@ -24,6 +24,18 @@ services:
       - /workspace/node_modules
     command: ["sh", "init-server.sh", "dev"]
 
+  chat:
+    build:
+      context: ./services/chat
+      dockerfile: Dockerfile.dev
+    ports:
+      - 8030:8030
+    volumes:
+      - ./services/chat/app:/workspace/app
+      - /workspace/.venv
+    command:
+      ["uvicorn", "--reload", "--port", "8030", "app:app", "--host", "0.0.0.0"]
+
   indexes:
     build:
       context: ./services/indexes
