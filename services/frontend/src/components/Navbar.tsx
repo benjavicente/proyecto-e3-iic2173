@@ -1,31 +1,15 @@
-import { useRouter } from 'next/router'
-
 import { useAuth0 } from '@auth0/auth0-react';
 
-import styles from '../styles/Home.module.css'
+import styles from '~/styles/Home.module.css'
+import useLocalStorage from '~/hooks/useLocalStorage';
 
-const Navbar = ({ logged }) => {
-  // Logged es un parámetro booleano que indica si existe un 
-  // usuario loggeado, este parámetro se le envía desde la vista a la 
-  // que se llama este componente
-  const router = useRouter()
-
+const Navbar = () => {
+  const [token, setToken] = useLocalStorage<string | null>('token');
   const { loginWithRedirect, logout } = useAuth0();
 
-  function handleLogin() {
-    loginWithRedirect();
-  }
-
   function handleLogout() {
-    localStorage.removeItem('token');
+    setToken(null)
     logout({ returnTo: window.location.origin })
-  }
-  
-  const press = () => {    
-    router.push({
-      pathname: '/users/profile',
-      query: { id: 'me', reload: 'true' },
-    })
   }
 
   return (
@@ -37,17 +21,17 @@ const Navbar = ({ logged }) => {
           <a className={styles.rowItem} href="/users">Usuarios</a>
         </div>
         <div>
-          {logged ? 
+          {token ?
             <div className={styles.row}>
               <a className={styles.rowItemPress} href="/users/pings">Pings</a>
-              <a className={styles.rowItemPress} onClick={() => press()}>Perfil</a>   
-              <a className={styles.rowItemPress} onClick={() => handleLogout()}>Cerrar Sesión</a>        
+              <a className={styles.rowItemPress} href="/users/profile?id=me">Perfil</a>
+              <button className={styles.rowItemPress} onClick={() => handleLogout()}>Cerrar Sesión</button>
             </div>
             :
             <div className={styles.row}>
-              <a className={styles.rowItemPress} onClick={() => handleLogin()}>Iniciar Sesión</a> 
-            </div>            
-          }          
+              <button className={styles.rowItemPress} onClick={() => loginWithRedirect()}>Iniciar Sesión</button>
+            </div>
+          }
         </div>
       </div>
     </header>

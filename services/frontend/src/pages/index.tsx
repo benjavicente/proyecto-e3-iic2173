@@ -32,7 +32,8 @@ function HomePage() {
   }
 
   if (markers === null) {
-    if (token !== null) {
+    if (token) {
+
       getApi(token, 'api/markers', { filteredIds: filteredId })
         .then(data => {
           console.log(data);
@@ -136,7 +137,7 @@ function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar logged={token !== null} />
+      <Navbar />
       {weatherData ?
         <div className={styles.centerContainer}>
           <h2>La temperatura actual es: {weatherData}°C</h2>

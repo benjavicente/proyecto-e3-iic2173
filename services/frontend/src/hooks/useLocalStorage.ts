@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const isInBrowser = typeof window === "undefined";
+const isInBrowser = typeof window !== "undefined";
 
 type JSONValue = string | number | boolean | null | undefined | JSONValue[] | { [key: string]: JSONValue };
 

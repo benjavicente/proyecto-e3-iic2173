@@ -4,6 +4,7 @@ from sqlmodel import Session, select
 
 from app import all_chats
 
+from ..auth import JWTValidationError, validate_token
 from ..connections import ConnectionManager
 from ..dependencies import get_db_session, get_user_token
 from ..models.messages import (
@@ -51,15 +52,26 @@ def chat_messages(
 @chat_router.websocket("/ws")
 async def chat_websocket(
     websocket: WebSocket,
-    user_token: UserToken = Depends(get_user_token),
+    token: str,
     db_session: Session = Depends(get_db_session),
 ):
     "Handle the chat websocket"
-    async for message_received in connection_manager.listen(user_token.user_id, websocket):
+    await websocket.accept()
+
+    try:
+        user_info = validate_token(token)
+        await websocket.send_json({"status": "ok"})
+    except JWTValidationError as jwt_validation_error:
+        await websocket.send_json({"error": jwt_validation_error.error})
+        await websocket.close(reason=jwt_validation_error.error)
+        return
+
+    async for message_received in connection_manager.listen(user_info.user_id, websocket):
         # Parse the actions from the message
         try:
             message_payload = parse_obj_as(MessageInput, message_received)
         except ValidationError as error:
+            await websocket.send_json({"error": str(error)})
             await websocket.send_text(error.json())
             continue
 
@@ -70,7 +82,7 @@ async def chat_websocket(
             # Save the message in the database
             public_msg_db = PublicMessageDB(
                 message=message_payload.message,
-                from_user_id=user_token.user_id,
+                from_user_id=user_info.user_id,
             )
             db_session.add(public_msg_db)
 
@@ -87,7 +99,7 @@ async def chat_websocket(
             # Save the message in the database
             private_msg_db = PrivateMessageDB(
                 message=message_payload.message,
-                from_user_id=user_token.user_id,
+                from_user_id=user_info.user_id,
                 to_user_id=message_payload.to_user_id,
             )
             db_session.add(private_msg_db)
