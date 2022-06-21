@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 import { getApi, patchApi } from '../../lib/api';
+import { useFormik } from 'formik';
 
 import Head from 'next/head'
 
@@ -16,6 +17,82 @@ function PingsPage() {
   const [loading, setLoading] = useState(true);
   const [pingsData, setPingsData] = useState(null);
   const [token, setToken] = useState('');
+
+  const formik = useFormik({
+    initialValues: {
+      day: '',
+      hour: '',
+      minute: '',
+    },
+    onSubmit: values => {
+      if (values.day === '' || values.hour === '' || values.minute === '') {
+        alert("Por favor, selecciona todos los campos para aprobar el ping");
+        return 
+      }
+      console.log(values);
+      // Formato {minuto|hora|díaMes|Mes|diaSemana}
+      const cronString = `${values.minute} ${values.hour} * * ${values.day}`;
+      console.log(cronString);
+    },
+  });
+
+  const weekData = [
+    {name: 'Todos los dias', value: '1-6'},
+    {name: 'Lunes', value: '1'},
+    {name: 'Martes', value: '2'},
+    {name: 'Miércoles',  value: '3'},
+    {name: 'Jueves', value: '4'},
+    {name: 'Viernes', value: '5'},
+    {name: 'Sabado', value: '6'},    
+  ];
+
+  const weekOptions = weekData.map((data, index) => {
+    return (
+      <option value={data.value} key={index}>{data.name}</option>
+    )
+  })
+
+  const hourOptions = Array.from(Array(24).keys()).map(data => {
+    return (
+      <option value={data} key={data}>{data}</option>
+    )
+  })
+
+  const minutesOptions = Array.from(Array(60).keys()).map(data => {
+    return (
+      <option value={data} key={data}>{data}</option>
+    )
+  })
+
+
+  const CronForm = (ping) => {
+    return (
+      <form onSubmit={formik.handleSubmit}>
+        <div className={styles.row}>
+          <button className={styles.buttonReject} onClick={() => respondingPing(-1, ping.id)}> 
+            Rechazar
+          </button> 
+          <select name="day" id="cronDay" className={styles.selectDropdown} onChange={formik.handleChange}>
+            <option value="">Seleccionar día de la semana </option>
+            {weekOptions}
+          </select> 
+
+          <select name="hour" id="cronHour" className={styles.selectDropdown} onChange={formik.handleChange}>
+            <option value="">Seleccionar hora </option>
+            {hourOptions}
+          </select>
+
+          <select name="minute" id="cronMinute" className={styles.selectDropdown} onChange={formik.handleChange}>
+            <option value="">Seleccionar minuto </option>
+            {minutesOptions} 
+          </select>          
+          <button className={styles.button} type="submit"> 
+            Aceptar
+          </button>
+        </div>
+      </form>
+    )
+  }
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -42,13 +119,6 @@ function PingsPage() {
 
   const visitToProfile = (user) => {
     router.push({
-      pathname: 'users/profile',
-      query: { id: user.id },
-    })
-  }
-
-  const visitFromProfile = (user) => {
-    router.push({
       pathname: '/users/profile',
       query: { id: user.id },
     })
@@ -64,16 +134,12 @@ function PingsPage() {
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
     if (ping.status == 0) {      
       return (
-        <div className={styles.row}>
+        <div>
           <p key={ping.id}><a className={styles.rowItemPress} 
-            onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping
+            onClick={() => visitToProfile(ping.pingedFrom)}>
+            {ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping
           </p> 
-          <button className={styles.button} onClick={() => respondingPing(1, ping.id)}> 
-            Aceptar
-          </button> 
-          <button className={styles.buttonReject} onClick={() => respondingPing(-1, ping.id)}> 
-            Rechazar
-          </button> 
+          {CronForm(ping)}
         </div>
         
       ) 
@@ -81,7 +147,8 @@ function PingsPage() {
       return (
         <div className={styles.row}>
           <p key={ping.id}><a className={styles.rowItemPress} 
-            onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado' }
+            onClick={() => visitToProfile(ping.pingedFrom)}>
+            {ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado' }
           </p>
         </div>
       ) 
@@ -91,7 +158,10 @@ function PingsPage() {
 
   const pingsFromUser = pingsData.pingedUsers.map((ping) => {
     return (
-      <p key={ping.id}><a className={styles.rowItemPress}></a>Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}</a></p>     
+      <p key={ping.id}>
+        <a className={styles.rowItemPress}></a>Has hecho un ping a <a className={styles.rowItemPress} 
+        onClick={() => visitToProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}</a>
+      </p>     
     )
   });
 
