@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 from app.auth import JWTValidationError, validate_token
 
-from .db import engine
+from .db import engine, redis
 
 token_auth_scheme = HTTPBearer()
 
@@ -19,3 +19,8 @@ def get_user_token(token: HTTPAuthorizationCredentials = Depends(token_auth_sche
 def get_db_session():
     with Session(engine) as session:
         yield session
+
+
+async def get_redis_client():
+    async with redis.client() as conn:
+        yield conn

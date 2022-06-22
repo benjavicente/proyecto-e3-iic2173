@@ -25,8 +25,8 @@ def validate_token(token: str):
             token,
             jwk.key,
             algorithms=[config.auth0_algorithms],
-            audience="https://PingTocAuth.com",  # config.auth0_api_audience,
-            issuer="https://dev-7c2520d3.us.auth0.com/",  # config.auth0_issuer,
+            audience=config.auth0_api_audience,
+            issuer=config.auth0_issuer,
         )
     except jwt.InvalidTokenError as error:
         raise JWTValidationError(error=str(error)) from None

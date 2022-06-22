@@ -1,9 +1,11 @@
+import aioredis
 from sqlalchemy_utils import create_database, database_exists
 from sqlmodel import SQLModel, create_engine
 
 from .config import config
 
 engine = create_engine(config.database_url, echo=True)
+redis = aioredis.from_url(config.redis_url)
 
 
 def init_db():

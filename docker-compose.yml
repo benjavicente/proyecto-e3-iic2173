@@ -68,6 +68,7 @@ services:
       AUTH0_API_AUDIENCE: https://PingTocAuth.com
       AUTH0_ISSUER: https://dev-7c2520d3.us.auth0.com/
       DATABASE_URL: postgresql://user:password@postgres:5432/chat
+      REDIS_URL: redis:redis:6379
     healthcheck:
       test: ["CMD", "curl", "-s", "http://chat:8000"]
       interval: 60s

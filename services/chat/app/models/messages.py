@@ -49,6 +49,9 @@ class PublicMessage(BaseMessage):
     "Public message"
 
 
+MessageOutput = Union[PrivateMessage, PublicMessage]
+
+
 # Database
 
 

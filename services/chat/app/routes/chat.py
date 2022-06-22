@@ -1,13 +1,17 @@
+import asyncio
+
+from aioredis import Redis
 from fastapi import APIRouter, Depends, WebSocket
 from pydantic import ValidationError, parse_obj_as
 from sqlmodel import Session, select
 
 from .. import all_chats
 from ..auth import JWTValidationError, validate_token
-from ..connections import ConnectionManager, WSException
-from ..dependencies import get_db_session, get_user_token
+from ..connections import ConnectionManager
+from ..dependencies import get_db_session, get_redis_client, get_user_token
 from ..models.messages import (
     MessageInput,
+    MessageOutput,
     PrivateMessage,
     PrivateMessageDB,
     PrivateMessageInput,
@@ -50,30 +54,61 @@ def chat_messages(
 
 @chat_router.websocket("/ws")
 async def chat_websocket(
-    websocket: WebSocket,
+    ws: WebSocket,
     token: str,
     db_session: Session = Depends(get_db_session),
+    redis: Redis = Depends(get_redis_client),
 ):
     "Handle the chat websocket"
-    await websocket.accept()
+    await ws.accept()
 
     try:
         user_info = validate_token(token)
-        await websocket.send_json({"status": "ok"})
+        await ws.send_json({"status": "ok"})
     except JWTValidationError as jwt_validation_error:
-        await websocket.send_json({"error": jwt_validation_error.error})
-        await websocket.close(reason=jwt_validation_error.error)
+        await ws.send_json({"error": jwt_validation_error.error})
+        await ws.close(reason=jwt_validation_error.error)
         return
 
-    async for message_received in connection_manager.listen(user_info.user_id, websocket):
+    redis_task = handle_redis_messages(redis, user_info, ws)
+    user_task = handle_user_messages(redis, db_session, user_info, ws)
+    _, pending = await asyncio.wait([redis_task, user_task], return_when=asyncio.FIRST_COMPLETED)
+
+    for task in pending:
+        task.cancel()
+
+
+async def handle_redis_messages(redis: Redis, user_info: UserToken, ws: WebSocket):
+    "Handles the messages received from redis Pub/Sub"
+    pubsub = redis.pubsub()
+    await pubsub.subscribe("chat")
+    async for message_received in pubsub.listen():
+        message = parse_obj_as(MessageOutput, message_received["data"])
+        if isinstance(message, PublicMessage):
+            await ws.send_json(message)
+        elif isinstance(message, PrivateMessage):
+            if message.from_user_id == user_info.user_id:
+                await ws.send_json(message)
+            elif message.to_user_id == user_info.user_id:
+                await ws.send_json(message)
+
+
+async def handle_user_messages(
+    redis: Redis, db_session: Session, user_info: UserToken, ws: WebSocket
+):
+    "Handles the incoming messages from the user, sending a message to redis Pub/Sub"
+    async for message_received in connection_manager.listen(user_info.user_id, ws):
         # Parse the actions from the message
         try:
             message_payload = parse_obj_as(MessageInput, message_received)
         except ValidationError as error:
-            await websocket.send_json({"error": error.errors()})
+            await ws.send_json({"error": error.errors()})
             continue
 
-        # Send the message...
+        # Send the message with redis
+        await redis.publish("chat", message_payload.json())
+
+        # Save it to the database
         if isinstance(message_payload, PublicMessageInput):
             # ...to the public chat
 
@@ -93,8 +128,7 @@ async def chat_websocket(
                 from_user_id=user_info.user_id,
                 created_at=public_msg_db.created_at,
             )
-            for connection in connection_manager.connections.values():
-                await connection.send_text(public_ms.json())
+            await redis.publish("chat", public_ms.json())
 
         elif isinstance(message_payload, PrivateMessageInput):
             # ...to a private chat
@@ -117,7 +151,4 @@ async def chat_websocket(
                 to_user_id=private_msg_db.to_user_id,
                 created_at=private_msg_db.created_at,
             )
-            other_user_websocket = connection_manager.connections.get(message_payload.to_user_id)
-            if other_user_websocket:
-                await other_user_websocket.send_text(private_ms.json())
-            await websocket.send_text(private_ms.json())
+            await redis.publish("chat", private_ms.json())

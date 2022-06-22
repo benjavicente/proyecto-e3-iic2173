@@ -88,3 +88,75 @@ export const ChatProvider = ({ children }) => {
       {children}
     </CommunicationContext.Provider>)
 }
+
+/***** */
+
+
+const ChatContext = createContext({})
+
+
+function ChatsProvider(props) {
+
+  const [chats, setChats] = useState([]);
+
+  const updateChats = useCallback((wsResponse) => {
+
+    // parsear wsResponse
+
+    setChats(parseado(wsResponse));
+
+  }, [setChats]);
+
+  useEffect(() => {
+    listener.listen(id);
+
+    listener.on('update', updateChats)
+    return () => {
+      listener.destroy(id);
+    }
+  }, [id, updateChats]);
+
+  const reload = useCallback(() => {
+    listener.reload();
+  }, [])
+
+
+
+  return (
+    <ChatContext.Provider value={{
+      chats,
+      reload
+    }} {...props} />
+    );
+}
+
+function useChats() {
+  const {chats, reload} = useContext(ChatsContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChatLoading, setChatLoading] = useState<{[id:string] : boolean}>({});
+
+  useEffect((async () => {
+    try {
+      setIsLoading(true);
+      await reload();
+    } catch(error) {
+
+    } finally {
+      setIsLoading(false)
+    }
+  })(), []);
+  
+  return [chats, isLoading]
+}
+
+function useMessagesOf(id) {
+  const [chats, isLoading, sender] = useChats();
+
+  const sendMessage = useCallback((...args) => sender(id, ...args), [id]);
+
+  return [chats.find(chat => chat.id === id)?.mesages, isChatLoading[id], sendMessage]
+}
+
+/** 
+ * const [messages, isloading, sendMessage] = useMessagesOf(id);
+ */
