@@ -168,6 +168,14 @@ function PingsPage() {
   const [loading, setLoading] = useState(true);
   const [pingsData, setPingsData] = useState(null);
   const [token, setToken] = useState('');
+  const [idPing, setIdPing] = useState(null);
+
+  const respondingPing = (answer, id) => {
+    patchApi(token, `/api/pings/update/${id}`, {status: answer}) 
+      .then(res => {
+        setLoading(true);
+      });
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -180,11 +188,14 @@ function PingsPage() {
         alert("Por favor, selecciona todos los campos para aprobar el ping");
         return 
       }
-      console.log(values);
-      // Formato {minuto|hora|díaMes|Mes|diaSemana}
+      
+      // Formato {minuto_hora_diaMes_Mes_diaSemana}
       const cronString = `${values.minute} ${values.hour} * * ${values.day}`;
-      console.log(cronString);
-    },
+      console.log(cronString)
+      // Aquí la consulta al back, se hace con patch que era como estaba antes.
+      
+      respondingPing(1, idPing);
+    }
   });
 
   const weekData = [
@@ -237,7 +248,7 @@ function PingsPage() {
             <option value="">Seleccionar minuto </option>
             {minutesOptions} 
           </select>          
-          <button className={styles.button} type="submit"> 
+          <button className={styles.button} type="submit" onClick={() => setIdPing(ping.id)}> 
             Aceptar
           </button>
         </div>
@@ -275,13 +286,6 @@ function PingsPage() {
     })
   }
 
-  const respondingPing = (answer, id) => {
-    patchApi(token, `/api/pings/update/${id}`, { status: answer}) 
-      .then(res => {
-        setLoading(true);
-      });
-  }
-
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
     if (ping.status == 0) {      
       return (
@@ -310,7 +314,7 @@ function PingsPage() {
   const pingsFromUser = pingsData.pingedUsers.map((ping) => {
     return (
       <p key={ping.id}>
-        <a className={styles.rowItemPress}></a>Has hecho un ping a <a className={styles.rowItemPress} 
+        <a className={styles.rowItemPress} />Has hecho un ping a <a className={styles.rowItemPress} 
         onClick={() => visitToProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}</a>
       </p>     
     )
