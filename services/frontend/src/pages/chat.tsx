@@ -1,9 +1,9 @@
 import ChatProvider, { useChat } from "~/contexts/Chat";
 
 function ChatList() {
-  const { chats, isFetching } = useChat();
+  const { chats, isLoading } = useChat();
 
-  if (isFetching) {
+  if (isLoading) {
     return <p>Loading...</p>;
   }
 

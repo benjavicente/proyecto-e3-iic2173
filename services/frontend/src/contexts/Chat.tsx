@@ -53,8 +53,8 @@ export default function ChatProvider(props) {
   // Create the websocket connection
   const ws = useMemo(() => {
     if (typeof window === "undefined") return
-    return new WebSocket(`${window.location.origin.replace(/^http(s?):/, 'ws$1:')}/api/chat/ws`)
-  }, [])
+    return new WebSocket(`${window.location.origin.replace(/^http(s?):/, 'ws$1:')}/api/chat/ws?token=${token}`)
+  }, [token])
 
   // Update the stream of messages
   const updateChatsFromWS = useCallback((wsResponse: MessageEvent) => {

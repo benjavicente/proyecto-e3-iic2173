@@ -21,6 +21,10 @@ services:
       - ./services/backend/src:/workspace/src
     command: ["sh", "init-server.sh", "dev"]
 
+  reverse-proxy:
+    environment:
+      SITE_ADDRESS: localhost
+
   chat:
     build:
       context: ./services/chat
@@ -54,7 +58,3 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-
-  nginx:
-    environment:
-      USE_LOCAL_CA: 1
