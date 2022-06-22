@@ -11,11 +11,8 @@ class WSException(Exception):
 
 @dataclass(frozen=True)
 class ConnectionManager:
-    connections: dict[str, WebSocket] = field(default_factory=dict)
-
-    async def listen(self, user_id: str, websocket: WebSocket):
+    async def listen(self, websocket: WebSocket):
         "Connects a websocket and yields json messages received from it"
-        self.connections[user_id] = websocket
         error = "???"
         try:
             while True:
@@ -28,4 +25,3 @@ class ConnectionManager:
             if websocket.state == WebSocketState.CONNECTED:
                 await websocket.send_json({"error": error})
                 await websocket.close()
-            self.connections.pop(user_id)

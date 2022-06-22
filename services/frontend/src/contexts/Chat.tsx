@@ -26,8 +26,8 @@ export default function ChatProvider(props) {
 
   // Load initial state
   useEffect(() => {
-    setIsLoading(true)
     if (!token) return
+    setIsLoading(true)
     Promise.all([
       axios.get<Message[]>("/api/chat/public"),
       axios.get<Chat[]>("/api/chat/", { headers: { Authorization: `Bearer ${token}` } }),
@@ -53,15 +53,27 @@ export default function ChatProvider(props) {
   // Create the websocket connection
   const ws = useMemo(() => {
     if (typeof window === "undefined") return
-    return new WebSocket(`${window.location.origin.replace(/^http(s?):/, 'ws$1:')}/api/chat/ws?token=${token}`)
+    const websocket = new WebSocket(`${window.location.origin.replace(/^http(s?):/, 'ws$1:')}/api/chat/ws?token=${token}`)
+    return websocket
   }, [token])
+
 
   // Update the stream of messages
   const updateChatsFromWS = useCallback((wsResponse: MessageEvent) => {
-    if (!isLoading) return
+    if (isLoading) return
     // TODO: parse the message and update the state
-    chats
-  }, [isLoading, chats])
+    const message = JSON.parse(wsResponse.data)
+    if (!("message" in message)) return
+    if ("to_user_id" in message) {
+      // Is a private message
+      setChats(chats.map(chat => (chat.id === message.from_user_id ? { ...chat, messages: [...chat.messages || [], message] } : chat)))
+    } else {
+      // Is a public message
+      setChats(chats.map(c => (c.id === "public" ? { ...c, amount: c.amount + 1, messages: [...c.messages || [], message] } : c)))
+    }
+  }, [isLoading, setChats, chats])
+
+  console.log(chats)
 
   // Listen to the websocket
   useEffect(() => {
@@ -72,9 +84,16 @@ export default function ChatProvider(props) {
 
 
   // Send message to the websocket
-  const sendMessage = useCallback(async (message: object) => {
+  const sendMessage = useCallback(async (payload: { chatId: string, message: string }) => {
     if (!ws) throw new Error("WebSocket is not initialized")  // This should never happen
-    ws.send(JSON.stringify(message))
+    // Transform the payload
+    const isToPublic = payload.chatId === "public"
+    console.log(payload)
+    if (isToPublic) {
+      ws.send(JSON.stringify({ message: payload.message, type: "public" }))
+    } else {
+      ws.send(JSON.stringify({ message: payload.message, type: "private", to_user_id: payload.chatId }))
+    }
   }, [ws])
 
   return <ChatContext.Provider value={{ chats, sendMessage, isLoading, loadChatById }} {...props} />

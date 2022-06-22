@@ -1,6 +1,5 @@
-import { FormEventHandler, useCallback, useState } from "react";
+import { FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import ChatProvider, { useChat, useMessagesOfChat } from "~/contexts/Chat";
-
 
 
 function ChatItem({ id, amount }) {
@@ -38,6 +37,12 @@ function Message({ id, message, created_at }: Message) {
 function MessagesPanel({ currentChatID }) {
   const [messageToSend, setMessageToSend] = useState("")
   const { messages, isLoading, sendMessage } = useMessagesOfChat(currentChatID);
+  const messagesContainerRef = useRef<HTMLOListElement>(null)
+
+  useEffect(() => {
+    const e = messagesContainerRef.current
+    if (e) e.children[e.childNodes.length - 1].scrollIntoView()
+  }, [messages])
 
   const handleSendMessage: FormEventHandler = useCallback((e) => {
     e.preventDefault();
@@ -51,7 +56,7 @@ function MessagesPanel({ currentChatID }) {
       {isLoading ? (
         <div className="flex-grow flex align-middle justify-center text-slate-300"> Loading...</div>
       ) : (
-        <ol className="flex flex-col flex-shrink overflow-y-scroll gap-2 p-2">
+        <ol className="flex flex-col flex-shrink overflow-y-scroll gap-2 p-2" ref={messagesContainerRef}>
           {messages.map(message => (<Message key={message.id} {...message} />))}
         </ol>
       )}

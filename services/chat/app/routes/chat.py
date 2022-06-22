@@ -2,7 +2,7 @@ import asyncio
 
 from aioredis import Redis
 from fastapi import APIRouter, Depends, WebSocket
-from pydantic import ValidationError, parse_obj_as
+from pydantic import ValidationError, parse_obj_as, parse_raw_as
 from sqlmodel import Session, select
 
 from .. import all_chats
@@ -82,31 +82,34 @@ async def handle_redis_messages(redis: Redis, user_info: UserToken, ws: WebSocke
     "Handles the messages received from redis Pub/Sub"
     pubsub = redis.pubsub()
     await pubsub.subscribe("chat")
-    async for message_received in pubsub.listen():
-        message = parse_obj_as(MessageOutput, message_received["data"])
+    while True:
+        message_received = await pubsub.get_message(ignore_subscribe_messages=True)
+        if not message_received:
+            await asyncio.sleep(0.1)
+            continue
+
+        message = parse_raw_as(MessageOutput, message_received["data"])
+
         if isinstance(message, PublicMessage):
-            await ws.send_json(message)
+            await ws.send_text(message.json())
         elif isinstance(message, PrivateMessage):
             if message.from_user_id == user_info.user_id:
-                await ws.send_json(message)
+                await ws.send_text(message.json())
             elif message.to_user_id == user_info.user_id:
-                await ws.send_json(message)
+                await ws.send_text(message.json())
 
 
 async def handle_user_messages(
     redis: Redis, db_session: Session, user_info: UserToken, ws: WebSocket
 ):
     "Handles the incoming messages from the user, sending a message to redis Pub/Sub"
-    async for message_received in connection_manager.listen(user_info.user_id, ws):
+    async for message_received in connection_manager.listen(ws):
         # Parse the actions from the message
         try:
             message_payload = parse_obj_as(MessageInput, message_received)
         except ValidationError as error:
             await ws.send_json({"error": error.errors()})
             continue
-
-        # Send the message with redis
-        await redis.publish("chat", message_payload.json())
 
         # Save it to the database
         if isinstance(message_payload, PublicMessageInput):
