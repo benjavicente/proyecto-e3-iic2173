@@ -2,6 +2,10 @@ DC_BASE = docker-compose -f docker-compose.yml
 DC-DEV = $(DC_BASE) -f docker-compose.dev.yml
 DC-PROD = $(DC_BASE) -f docker-compose.prod.yml
 
+.PHONY: build
+build:
+	$(DC-DEV) build
+
 .PHONY: dev
 dev:
 	$(DC-DEV) up --abort-on-container-exit
