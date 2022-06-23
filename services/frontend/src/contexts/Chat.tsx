@@ -1,6 +1,7 @@
 import axios from "axios"
 import { useState, createContext, useEffect, useCallback, useContext, useMemo } from "react"
 import useLocalStorage from "~/hooks/useLocalStorage"
+import useLocalStorageEmail from "~/hooks/useLocalStorageEmail"
 
 
 type IChat = {
@@ -19,10 +20,11 @@ type IChatState = {
 
 const ChatContext = createContext<IChatState | undefined>(undefined)
 
-export default function ChatProvider(props) {
-  const [token] = useLocalStorage<string | null>("token")
+export default function ChatProvider(props) {  
   const [isLoading, setIsLoading] = useState(true)
   const [chats, setChats] = useState<IChat[]>([])
+  const [token] = useLocalStorage<string | null>("token")
+  const [email] = useLocalStorageEmail<string | null>("email")
 
   // Load initial state
   useEffect(() => {
@@ -32,6 +34,7 @@ export default function ChatProvider(props) {
       axios.get<Message[]>("/api/chat/public"),
       axios.get<Chat[]>("/api/chat/", { headers: { Authorization: `Bearer ${token}` } }),
     ]).then(([publicChatFeed, chatList]) => {
+      console.log('Public', publicChatFeed)
       // Set the chats
       setChats([
         { id: "public", messages: publicChatFeed.data, amount: publicChatFeed.data.length },

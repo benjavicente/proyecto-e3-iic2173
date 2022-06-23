@@ -4,7 +4,7 @@ import styles from '~/styles/Home.module.css'
 import useLocalStorage from '~/hooks/useLocalStorage';
 
 const Navbar = () => {
-  const [token, setToken] = useLocalStorage<string | null>('token');
+  const [token, setToken] = useLocalStorage<string | null>("token")
   const { loginWithRedirect, logout } = useAuth0();
 
   function handleLogout() {

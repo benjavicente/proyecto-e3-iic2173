@@ -1,5 +1,6 @@
 import { FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import ChatProvider, { useChat, useMessagesOfChat } from "~/contexts/Chat";
+import useLocalStorageEmail from '~/hooks/useLocalStorageEmail';
 
 
 function ChatItem({ id, amount }) {
@@ -24,12 +25,15 @@ function ChatList() {
   )
 }
 
-function Message({ id, message, created_at }: Message) {
+function Message({ id, email, message, created_at }: Message) {
+  const [emailUser] = useLocalStorageEmail<string>('email');
+
   const timestamp = new Date(created_at).toLocaleString();
   return (
-    <li className="bg-slate-700 p-1 rounded flex-grow-0 self-left w-fit">
+    <li className={`bg-slate-700 p-3 rounded flex-grow-0 w-fit max-w-lg${email === emailUser ? " ml-auto bg-indigo-800" : ''}`}>
       <div className="text-slate-200">{message}</div>
-      <time className="text-slate-500">({timestamp})</time>
+      <time className="text-slate-400 text-xs">({timestamp})</time>
+      <div className="text-slate-400 text-xs">{email}</div>
     </li>
   )
 }
@@ -41,7 +45,8 @@ function MessagesPanel({ currentChatID }) {
 
   useEffect(() => {
     const e = messagesContainerRef.current
-    if (e) e.children[e.childNodes.length - 1].scrollIntoView()
+    if (e) console.log('e', e.children)
+    if (e && e.children.length != 0) e.children[e.childNodes.length - 1].scrollIntoView()
   }, [messages])
 
   const handleSendMessage: FormEventHandler = useCallback((e) => {
@@ -52,7 +57,7 @@ function MessagesPanel({ currentChatID }) {
 
   return (
     <div className="h-full flex flex-col">
-      <h2 className="p-2 text-slate-100 text-center">{currentChatID}</h2>
+      <h2 className="p-2 text-slate-800 text-center">{currentChatID === 'public' ? 'Chat Público' : null}</h2>
       {isLoading ? (
         <div className="flex-grow flex align-middle justify-center text-slate-300"> Loading...</div>
       ) : (
@@ -61,8 +66,8 @@ function MessagesPanel({ currentChatID }) {
         </ol>
       )}
       <form onSubmit={handleSendMessage} className="flex">
-        <input type="text" placeholder="Mensaje" className="flex-grow" value={messageToSend} onChange={(e) => setMessageToSend(e.target.value)} />
-        <button type="submit" className="bg-sky-300 p-2">Enviar</button>
+        <input type="text" placeholder="Mensaje" className="flex-grow bottom-0" value={messageToSend} onChange={(e) => setMessageToSend(e.target.value)} />
+        <button type="submit" className="bg-slate-700 text-slate-100 p-2">Enviar</button>
       </form>
     </div >
   )
@@ -73,7 +78,7 @@ export default function ChatPage() {
 
   return (
     <ChatProvider>
-      <div className="grid grid-cols-[250px_1fr] bg-slate-800 grid-rows-[100vh]">
+      <div className="grid grid-cols-[250px_1fr] bg-slate-300 grid-rows-[100vh]">
         <div className="flex flex-col bg-slate-700 h-full">
           <div className="px-2 py-4">
             <input type="text" placeholder="Escribir por id..." className="border-none w-full h-full grow-0 focus:ring-0 bg-slate-600 rounded text-slate-100 placeholder-slate-300" />

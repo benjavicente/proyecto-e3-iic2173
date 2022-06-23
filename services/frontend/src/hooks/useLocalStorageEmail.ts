@@ -11,7 +11,8 @@ type StoredMeta = { storedAt: number; isSetter: boolean };
  * Use local storage hook
  * ======================
  */
-export default function useLocalStorage<T extends JSONValue>(
+
+export default function useLocalStorageEmail<T extends JSONValue>(
   key: string,
   initialValue?: T
 ): [T, (value: T, shouldChangeSetter?: boolean) => void, StoredMeta] {
@@ -50,3 +51,4 @@ export default function useLocalStorage<T extends JSONValue>(
   // Return hook
   return [value ? value.data : null , setValueWrapper, { isSetter, storedAt: value ? value.at : null }];
 }
+

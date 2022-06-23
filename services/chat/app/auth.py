@@ -21,6 +21,7 @@ def validate_token(token: str):
         raise JWTValidationError(error=str(error)) from None
 
     try:
+        
         data = jwt.decode(
             token,
             jwk.key,
@@ -30,5 +31,7 @@ def validate_token(token: str):
         )
     except jwt.InvalidTokenError as error:
         raise JWTValidationError(error=str(error)) from None
+    # Se agrega un atributo para luego poder recuperar el email del mismo token
+    data['email']= data['https://email']
 
     return UserToken.parse_obj(data)

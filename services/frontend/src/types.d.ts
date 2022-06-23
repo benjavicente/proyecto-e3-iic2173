@@ -6,6 +6,7 @@ type Chat = {
 
 type Message = {
   id: number;
+  email: string;
   created_at: string;
   message: string;
 };

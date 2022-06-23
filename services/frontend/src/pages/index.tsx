@@ -23,20 +23,13 @@ function HomePage() {
   const [weatherData, setWeatherData] = useState(null);
   const [initialCoordinates, setInitialCoordinates] = useState(null);
 
-  const [token, setToken] = useLocalStorage<string>('token');
-
-  if (token === '') {
-    return (
-      <div />
-    )
-  }
+  const [token] = useLocalStorage<string>('token');
 
   if (markers === null) {
     if (token) {
 
       getApi(token, 'api/markers', { filteredIds: filteredId })
         .then(data => {
-          console.log(data);
           setMarkers(JSON.parse(data));
         })
     } else {

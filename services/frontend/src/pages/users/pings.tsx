@@ -16,12 +16,11 @@ function PingsPage() {
 
   const [loading, setLoading] = useState(true);
   const [pingsData, setPingsData] = useState(null);
-  const [token, setToken] = useLocalStorage<string>('token');
+  const [token] = useLocalStorage<string>('token');
 
-
-  if (token === '') {
+  if (token === undefined) {
     return (
-      <div />
+      <div/>
     )
   }
 
@@ -39,7 +38,7 @@ function PingsPage() {
 
   const visitToProfile = (user) => {
     router.push({
-      pathname: 'users/profile',
+      pathname: '/users/profile',
       query: { id: user.id },
     })
   }
@@ -61,7 +60,7 @@ function PingsPage() {
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
     if (ping.status == 0) {
       return (
-        <div className={styles.row}>
+        <div className={styles.row} key={ping.id}>
           <p key={ping.id}><a className={styles.rowItemPress}
             onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping
           </p>
@@ -76,7 +75,7 @@ function PingsPage() {
       )
     } else {
       return (
-        <div className={styles.row}>
+        <div className={styles.row} key={ping.id}>
           <p key={ping.id}><a className={styles.rowItemPress}
             onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado'}
           </p>

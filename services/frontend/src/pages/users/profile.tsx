@@ -21,7 +21,7 @@ export default function Profile() {
   const [error, setError] = useState(false);
   const [pingMessage, setPingMessage] = useState('');
   const [file, setFile] = useState(null);
-  const [token, setToken] = useLocalStorage<string>('token');
+  const [token] = useLocalStorage<string>('token');
 
 
   if (query.reload == 'true') {
@@ -30,7 +30,7 @@ export default function Profile() {
     setLoading(true);
   }
 
-  if (token === '') {
+  if (token === undefined) {
     return (
       <div />
     )
@@ -115,7 +115,7 @@ export default function Profile() {
         <UserProfile data={data} />
       }
 
-      {query.id !== 'me' && !error ?
+      {token !== null && query.id !== 'me' && !error ?
         <div>
           <div className={styles.row}>
             <button className={styles.button} onClick={makePing}>Hacer Ping</button>
@@ -123,7 +123,7 @@ export default function Profile() {
           </div>
         </div>
         : null}
-      {query.id === 'me' ?
+      {token !== null && query.id === 'me' ?
         <div>
           <h3 className={styles.rowItem}>¿Deseas subir imágenes de perfil?</h3>
           <div>

@@ -7,6 +7,9 @@ const fetcher = (url: string, token?: string) =>
 export const useFetch = <Data>(url: string, token?: string) => useSWR<Data>([url, token], fetcher);
 
 export async function getApi(token, path, params) {
+  if (typeof window === undefined){
+    return {message: 'server'} 
+  }
   let url = new URL(`${window.location.origin}/${path}`);
 
   if (params) {

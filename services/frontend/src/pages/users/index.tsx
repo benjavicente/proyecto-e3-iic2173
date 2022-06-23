@@ -15,9 +15,11 @@ function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [usersData, setUsersData] = useState(null);
   const [page, setPage] = useState(1);
-  const [token, setToken] = useLocalStorage<string>('token');
+  const [token] = useLocalStorage<string>("token");
 
-  if (token === '') {
+  console.log('Token', token)
+
+  if (token === undefined) {
     return (
       <div />
     )

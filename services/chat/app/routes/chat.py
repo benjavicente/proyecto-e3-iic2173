@@ -45,6 +45,7 @@ def chat_messages(
 ):
     "Get the messages of the chat with the other user"
     return db_session.exec(
+
         select(PrivateMessageDB).where(
             PrivateMessageDB.from_user_id == user_token.user_id,
             PrivateMessageDB.to_user_id == other_user_id,
@@ -119,6 +120,7 @@ async def handle_user_messages(
             public_msg_db = PublicMessageDB(
                 message=message_payload.message,
                 from_user_id=user_info.user_id,
+                email=user_info.email,
             )
             db_session.add(public_msg_db)
             db_session.commit()
@@ -129,6 +131,7 @@ async def handle_user_messages(
                 id=public_msg_db.id,
                 message=message_payload.message,
                 from_user_id=user_info.user_id,
+                email=user_info.email,
                 created_at=public_msg_db.created_at,
             )
             await redis.publish("chat", public_ms.json())
@@ -139,6 +142,7 @@ async def handle_user_messages(
             # Save the message in the database
             private_msg_db = PrivateMessageDB(
                 message=message_payload.message,
+                email=user_info.email,
                 from_user_id=user_info.user_id,
                 to_user_id=message_payload.to_user_id,
             )
@@ -151,6 +155,7 @@ async def handle_user_messages(
                 message=private_msg_db.message,
                 id=private_msg_db.id,
                 from_user_id=private_msg_db.from_user_id,
+                email=user_info.email,
                 to_user_id=private_msg_db.to_user_id,
                 created_at=private_msg_db.created_at,
             )

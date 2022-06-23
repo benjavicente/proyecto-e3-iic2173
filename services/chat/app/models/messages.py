@@ -37,6 +37,7 @@ MessageInput = Union[PublicMessageInput, PrivateMessageInput]
 class BaseMessage(BaseMessageInput):
     "Base class for messages"
     id: int = Field(..., description="Message ID")
+    email: str = Field(..., description="Email of the sender")
     from_user_id: str = Field(..., description="User ID of the sender")
     created_at: datetime = Field(default_factory=datetime.now, description="Creation date")
 
