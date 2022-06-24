@@ -28,8 +28,14 @@ connection_manager = ConnectionManager()
 @chat_router.get("/", response_model=list[all_chats.Chat])
 def get_all_private_chats(user_token: UserToken = Depends(get_user_token)):
     "Get all chats of the logged-in user"
-    # Aquí le cambie de all a first porque a veces retornaba muchos chats y no sabía que wea
-    return all_chats.Chat.all(user_id=user_token.email)
+    chats = all_chats.Chat.all(user_id=user_token.email)
+    users_ids = set()
+    rial_list = []
+    for chat in chats:
+        if chat.other_user_id not in users_ids:
+            users_ids.add(chat.other_user_id)
+            rial_list.append(chat)
+    return rial_list
 
 
 @chat_router.get("/public", response_model=list[PublicMessage])

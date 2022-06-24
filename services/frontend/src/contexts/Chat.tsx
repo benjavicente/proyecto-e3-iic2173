@@ -6,7 +6,6 @@ import useLocalStorage from "~/hooks/useLocalStorage"
 type IChat = {
   id: string,
   messages: Message[] | null,
-  amount: number,
 }
 
 type IChatState = {
@@ -34,12 +33,12 @@ export default function ChatProvider(props) {
       axios.get<Chat[]>("/api/chat/", { headers: { Authorization: `Bearer ${user.token}` } }),
     ]).then(([publicChatFeed, chatList]) => {
       setPrivateChats(
-        chatList.data.map(chat => ({ id: chat.other_user_id, messages: null, amount: chat.count }))
+        chatList.data.map(chat => ({ id: chat.other_user_id, messages: null }))
       )
       // Set the chats
       // We had to delete the other chats because their messages were null
       setChats([
-        { id: "public", messages: publicChatFeed.data, amount: publicChatFeed.data.length },
+        { id: "public", messages: publicChatFeed.data },
       ])
       setIsLoading(false)
     })
@@ -50,7 +49,7 @@ export default function ChatProvider(props) {
     if (chats.find(chat => chat.id === chatId)) return
     setIsLoading(true)
     const { data } = await axios.get<Message[]>(`/api/chat/${chatId}`, { headers: { Authorization: `Bearer ${user ? user.token : ''}` } })
-    setChats([...chats, { id: chatId, messages: data, amount: data.length }])
+    setChats([...chats, { id: chatId, messages: data }])
     setIsLoading(false)
   }, [chats])
 
@@ -72,7 +71,7 @@ export default function ChatProvider(props) {
       setChats(chats.map(chat => (chat.id === message.from_user_id || chat.id === message.to_user_id ? { ...chat, messages: [...chat.messages || [], message] } : chat)))
     } else {
       // Is a public message
-      setChats(chats.map(c => (c.id === "public" ? { ...c, amount: c.amount + 1, messages: [...c.messages || [], message] } : c)))
+      setChats(chats.map(c => (c.id === "public" ? { ...c, messages: [...c.messages || [], message] } : c)))
     }
   }, [isLoading, setChats, chats])
 
@@ -109,7 +108,7 @@ function useChatContext() {
 
 export function useChat() {
   const { chats, privateChats, isLoading } = useChatContext()
-  return { chats: chats.map(({ id, amount }) => ({ id, amount })), privateChats, isLoading }
+  return { chats: chats.map(({ id }) => ({ id })), privateChats, isLoading }
 }
 
 export function useMessagesOfChat(chatId: string) {

@@ -17,6 +17,7 @@ function PingsPage() {
   const [loading, setLoading] = useState(true);
   const [pingsData, setPingsData] = useState(null);
   const [user] = useLocalStorage<User>('user');
+  const [, setIdUserChat] = useLocalStorage<IdChat>('idChat');
 
   if (user === undefined) {
     return (
@@ -27,7 +28,12 @@ function PingsPage() {
   if (loading) {
     getApi(user.token, 'api/pings/all', null)
       .then(data => {
-        setPingsData(JSON.parse(data));
+        console.log('%c Pings', 'color: orange')
+        const jsonData = JSON.parse(data)
+        console.table(jsonData.pingedUsers)
+        console.table(jsonData.usersPingedBy)
+        setPingsData(jsonData);
+
         setLoading(false);
       });
 
@@ -50,17 +56,23 @@ function PingsPage() {
     })
   }
 
+  const goingToChat = (userEmail) => {
+    setIdUserChat(userEmail)
+    window.location.assign('/chat')
+  }
+
   const respondingPing = (answer, id) => {
-    patchApi(token, `/api/pings/update/${id}`, { status: answer })
+    patchApi(user.token, `/api/pings/update/${id}`, { status: answer })
       .then(res => {
         setLoading(true);
       });
   }
 
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
+    console.log(ping)
     if (ping.status == 0) {
       return (
-        <div className={styles.row}>
+        <div className={styles.row} key={ping.id}>
           <p key={ping.id}><a className={styles.rowItemPress}
             onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping
           </p>
@@ -75,9 +87,17 @@ function PingsPage() {
       )
     } else {
       return (
-        <div className={styles.row}>
-          <p key={ping.id}><a className={styles.rowItemPress}
-            onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado'}
+        <div className={styles.row} key={ping.id}>
+          <p key={ping.id}>
+            <a className={styles.rowItemPress}
+              onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}
+            </a> 
+            te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado'}
+            {ping.status === 1 ? 
+            <a className={styles.button} href="/chat" onClick={() => goingToChat(ping.pingedFrom.email)}>
+              Chatear con {ping.pingedFrom.firstname} {ping.pingedFrom.lastname}
+            </a>
+          : null}
           </p>
         </div>
       )
@@ -87,7 +107,18 @@ function PingsPage() {
 
   const pingsFromUser = pingsData.pingedUsers.map((ping) => {
     return (
-      <p key={ping.id}><a className={styles.rowItemPress} />Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}</a></p>
+      <div key={ping.id}>
+        <p> 
+          <a className={styles.rowItemPress} />
+            Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}
+          </a>
+        </p>
+        {ping.status === 1 ? 
+          <a className={styles.button} href="/chat" onClick={() => goingToChat(ping.pingedTo.email)}>
+            Chatear con {ping.pingedTo.firstname} {ping.pingedTo.lastname}
+          </a>
+        : null}
+      </div>
     )
   });
 

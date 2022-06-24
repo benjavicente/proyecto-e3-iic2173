@@ -4,6 +4,7 @@ import useLocalStorage from '~/hooks/useLocalStorage';
 
 const Navbar = () => {
   const [user, setUser] = useLocalStorage<User>('user');
+  const [, setIdChat] = useLocalStorage<IdChat>('idChat')
   const { loginWithRedirect, logout } = useAuth0();
 
   if (user === undefined) {
@@ -15,9 +16,12 @@ const Navbar = () => {
 
   function handleLogout() {
     setUser({token: null, email: null})
-    // setToken(null)
-    // setEmail(null)
     logout({ returnTo: window.location.origin })
+  }
+
+  function handleChat() {
+    setIdChat('public')
+    window.location.assign('/chat')
   }
 
   return (
@@ -26,7 +30,7 @@ const Navbar = () => {
         <div className="flex items-center gap-x-10 justify-between">
           <a href="/">Mapa</a>
           <a href="/users">Usuarios</a>
-          <a href="/chat">Chat General</a>
+          <button className="my-2" onClick={() => handleChat()}>Chat General</button>
         </div>
 
         <div>

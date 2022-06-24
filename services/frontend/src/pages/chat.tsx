@@ -3,29 +3,6 @@ import Navbar from "~/components/Navbar";
 import ChatProvider, { useChat, useMessagesOfChat } from "~/contexts/Chat";
 import useLocalStorage from "~/hooks/useLocalStorage";
 
-function ChatItem({ id, amount }) {
-  return (
-    <li className="bg-slate-600 text-slate-200 p-2" onClick={() => console.log("Hola")}>
-      {id} ({amount})
-    </li>
-  )
-}
-
-function ChatList() {
-  const { chats, privateChats, isLoading } = useChat();
-
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
-
-  return (
-    <ol className="flex flex-col">
-      {chats.map(chat => (<ChatItem key={chat.id} {...chat} />))}
-      {privateChats.map(chat => (<ChatItem key={chat.id} {...chat} />))}
-    </ol>
-  )
-}
-
 function Message({ id, from_user_id, message, created_at }: Message) {
   const [user] = useLocalStorage<User>('user');
 
@@ -86,14 +63,41 @@ function MessagesPanel({ currentChatID }) {
 }
 
 export default function ChatPage() {
-  const [currentChatID, setCurrentChatID] = useState("public")
+  const [idChat, setIdChat] = useLocalStorage<IdChat>('idChat')
+  let currentChatID = 'public'
 
-  function changeId(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const formProps = Object.fromEntries(formData);
-    console.log(formProps.email)
-    setCurrentChatID(formProps.email)
+  const ChatItem = ({ id }) => {
+    return (
+      <li className="bg-slate-600 text-slate-200 p-2" onClick={() => {
+        if (id !== 'Lista de chats disponibles') {
+          setIdChat(id); 
+        }
+      }}>
+        {id}
+      </li>
+    )
+  }
+  
+  const ChatList = () => {
+    const { chats, privateChats, isLoading } = useChat();
+  
+    if (isLoading) {
+      return <p>Loading...</p>;
+    }
+    return (
+      <ol className="flex flex-col">
+        <ChatItem key={0} id={'Lista de chats disponibles'} />
+        {chats.map(chat => (<ChatItem key={chat.id} {...chat} />))}
+        {privateChats.map(chat => {
+          return <ChatItem key={chat.id} {...chat} />
+        })}
+      </ol>
+    )
+  }
+
+  
+  if (idChat !== undefined) {
+    currentChatID = idChat
   }
 
   return (
@@ -102,12 +106,6 @@ export default function ChatPage() {
       <Navbar />
         <div className="grid grid-cols-[250px_1fr] bg-slate-300 grid-rows-[100vh]">
           <div className="flex flex-col bg-slate-700 h-full">
-            <div className="px-2 py-4">
-            <form onSubmit={changeId} className="flex">
-              <input name="email" type="text" placeholder="Escribir por email..." className="border-none w-full h-full grow-0 focus:ring-0 bg-slate-600 rounded text-slate-100 placeholder-slate-300" />
-              <button className="bg-slate-700 text-slate-100 p-2">Enviar</button>
-            </form>              
-            </div>
             <ChatList />
           </div>
           <MessagesPanel currentChatID={currentChatID} />

@@ -1,5 +1,4 @@
 type Chat = {
-  count: number;
   other_user_id: string;
   last_at: string;
 };
@@ -18,4 +17,8 @@ type PrivateMessage = Message & {
 type User = {
   email: string,
   token: string,
+}
+
+type IdChat = {
+  id: string,
 }
