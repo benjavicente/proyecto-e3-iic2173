@@ -35,7 +35,9 @@ const NewLocationForm = ({ token, setMarkers, tags }) => {
   
   const selectedTags = tagsSelected.map((tag) => {
     return (
-      <p className="px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease" key={tag.id}>{tag.name}</p>    
+      <p className="px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease" key={tag.id}>
+        {tag.name}
+      </p>    
     )
   });
   
@@ -73,7 +75,7 @@ const NewLocationForm = ({ token, setMarkers, tags }) => {
 
   return (
     <div className="flex flex-col gap-y-5 my-5 items-center">
-      <h2 className="font-semibold text-2xl">
+      <h2 className="font-semibold text-xl">
         ¡Ingresa un lugar en el que estuviste y compártelo con los demás!
       </h2>
 
@@ -85,6 +87,7 @@ const NewLocationForm = ({ token, setMarkers, tags }) => {
               name="name"
               type="text"
               placeholder="Descripción"
+              className="shadow-lg border-slate-100"
               onChange={formik.handleChange}
               value={formik.values.name}
             />
@@ -96,6 +99,7 @@ const NewLocationForm = ({ token, setMarkers, tags }) => {
               name="lat"
               type="text"
               placeholder="Latitud"
+              className="shadow-lg border-slate-100"
               onChange={formik.handleChange}
               value={formik.values.lat}
             />
@@ -107,13 +111,14 @@ const NewLocationForm = ({ token, setMarkers, tags }) => {
               name="lng"
               type="text"
               placeholder="Longitud"
+              className="shadow-lg border-slate-100"
               onChange={formik.handleChange}
               value={formik.values.lng}
             /> 
           </div> 
         </div>
 
-        <h3 className="font-semibold text-lg">
+        <h3 className="text-lg">
           Añade tags a tu ubicación
         </h3>
 
@@ -121,25 +126,28 @@ const NewLocationForm = ({ token, setMarkers, tags }) => {
           {selectedTags}
         </div>
 
-        <div className="flex justify-center items-center m-0 w-3/4">
-          <select name="tags" id="tags" className="text-center m-0 w-3/4" onChange={tag => selectedTag(tag.target.value)}>
-            <option value="">Seleccionar tag</option>
+        <div className="flex justify-center items-center m-0 w-full gap-x-5">
+          <select
+            name="tags"
+            id="tags"
+            className="text-center m-0 w-2/4 shadow-lg border-slate-100 "
+            onChange={tag => selectedTag(tag.target.value)}
+          >
+            <option value="">Añadir tag</option>
             {tagsOptions}
-          </select>                    
-        </div>
+          </select>
 
-        <div className="flex gap-x-5 justify-center">
+          <button className="bg-sky-600 hover:bg-sky-700 p-3 rounded-md text-slate-100 text-base" type="submit">
+            Crear marcador
+          </button>   
+
           <div 
             className="bg-gray-400 hover:bg-gray-500 p-3 rounded-md text-slate-100 text-base cursor-pointer"
             onClick={removeTags}
           >
-            Eliminar tags seleccionados
-          </div>
-
-          <button className="bg-sky-600 hover:bg-sky-700 p-3 rounded-md text-slate-100 text-base" type="submit">
-            Crear marcador
-          </button>        
-        </div>   
+            Eliminar tags
+          </div>              
+        </div>
       </form>
     </div>     
   );

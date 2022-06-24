@@ -100,7 +100,9 @@ function HomePage() {
 
   const selectedUsers = usersSelected.map((user) => {
     return (
-      <p className={styles.rowItem} key={user.id}>{user.name} {user.lastname}</p>
+      <p className="px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease" key={user.id}>
+        {user.name} {user.lastname}
+      </p>
     )
   });
 
@@ -131,41 +133,74 @@ function HomePage() {
       </Head>
 
       <Navbar />
-      {weatherData ?
-        <div className={styles.centerContainer}>
-          <h2>La temperatura actual es: {weatherData}°C</h2>
-        </div>
-        : <FormLocation
-          token={token}
-          setInitialCoordinates={setInitialCoordinates}
-          temperature={temperature}
-          setTemperature={setTemperature}
-        />
-      }
 
-      {token ?
-        <div>
-          <h3 className={styles.centerContainer}>Usuarios seleccionados:</h3>
-          <div className={styles.rowUsers}>
-            {selectedUsers}
+      <div className="flex justify-center items-center w-full h-screen">
+        <div className="w-2/4 h-screen">
+          {weatherData ?
+            <div className={styles.centerContainer}>
+              <h2 className="font-semibold text-2xl">
+                La temperatura actual en la zona es: {weatherData}°C
+              </h2>
+            </div>
+            : 
+            <FormLocation
+              token={token}
+              setInitialCoordinates={setInitialCoordinates}
+              temperature={temperature}
+              setTemperature={setTemperature}
+            />
+          }
+          
+          <div className="flex justify-center">
+            <img 
+              src={'https://media.istockphoto.com/vectors/friends-vector-id1173780314?k=20&m=1173780314&s=612x612&w=0&h=m2ShqqBZkuQXSFDnHJA0gciFO8fWqG3Q9PqfphFQ0wI='}
+              className="h-60 m-0"
+            >
+            </img>
           </div>
 
-          <div className={styles.flexContainer}>
-            <select name="users" id="users" className={styles.selectDropdown} onChange={user => selectedUser(user.target.value)}>
-              <option value="">Seleccionar usuario</option>
-              {usersOptions}
-            </select>
-
-            <button className={styles.button} onClick={filter}>Filtrar</button>
-            <button className={styles.button} onClick={removeFilter}>Eliminar filtros</button>
-          </div>
+          {token !== null ? <Form token={token} setMarkers={setMarkers} tags={tags} /> : null}
         </div>
-        : null}
 
-      <Map markers={markers} initialCoordinates={initialCoordinates} />
-      {token !== null ? <Form token={token} setMarkers={setMarkers} tags={tags} /> : null}
+        <div className="w-2/4 h-screen shadow-lg">
+          <Map markers={markers} initialCoordinates={initialCoordinates} />
+          {token ?
+            <div className="flex flex-col gap-y-5 mt-5 items-center bottom-0 w-full rounded">
+              <div className="flex flex-wrap justify-center space-x-2">
+                {selectedUsers}
+              </div>
 
-      <Footer />
+              <div className="flex justify-center items-center m-0 w-full gap-x-5">
+                <select 
+                  name="users" 
+                  id="users" 
+                  className="shadow-lg w-2/5 border-slate-100" 
+                  onChange={user => selectedUser(user.target.value)}
+                >
+                  <option value="">Filtrar por usuario</option>
+                  {usersOptions}
+                </select>
+
+                <button 
+                  className="bg-sky-600 hover:bg-sky-700 p-3 rounded-md text-slate-100 text-base"
+                  onClick={filter}
+                >
+                  Aplicar filtro
+                </button>
+
+                <button 
+                  className="bg-gray-400 hover:bg-gray-500 p-3 rounded-md text-slate-100 text-base cursor-pointer"
+                  onClick={removeFilter}
+                >
+                  Eliminar filtros
+                </button>
+              </div>
+            </div>
+            : null  
+          }
+        </div>
+      </div>
+
     </div>
   )
 }

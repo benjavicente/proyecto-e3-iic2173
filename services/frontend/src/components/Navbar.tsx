@@ -17,22 +17,22 @@ const Navbar = () => {
 
   return (
     <header>
-      <div className="flex items-center justify-between bg-slate-800 text-slate-100 px-5 py-2">
+      <div className="shadow-lg flex items-center justify-between bg-slate-800 text-slate-100 px-5 py-2">
         <div className="flex items-center gap-x-10 justify-between">
-          <a href="/">Pingtoc</a>
           <a href="/">Mapa</a>
           <a href="/users">Usuarios</a>
           <a href="/chat">Chat General</a>
         </div>
+
         <div>
           {token ?
             <div className="flex gap-x-10 items-center justify-between">
               <a href="/users/pings">Pings</a>
               <a href="/users/profile?id=me">Perfil</a>
-              <button className="" onClick={() => handleLogout()}>Cerrar Sesión</button>
+              <button className="my-2" onClick={() => handleLogout()}>Cerrar Sesión</button>
             </div>
             :
-            <div className={styles.row}>
+            <div className="my-2">
               <button onClick={() => loginWithRedirect()}>Iniciar Sesión</button>
             </div>
           }

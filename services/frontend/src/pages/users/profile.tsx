@@ -117,23 +117,46 @@ export default function Profile() {
 
       {token !== null && query.id !== 'me' && !error ?
         <div>
-          <div className={styles.row}>
-            <button className={styles.button} onClick={makePing}>Hacer Ping</button>
-            <p className={styles.rowItem}>{pingMessage}</p>
+          <div className="flex flex-col items-center justify-center gap-x-10 my-10">
+            <button
+              className="bg-sky-600 hover:bg-sky-700 py-3 px-5 rounded-md text-slate-100 text-base"
+              onClick={makePing}
+            >
+              Enviar Ping
+            </button>
+            <p className="m-0">{pingMessage}</p>
           </div>
         </div>
         : null}
       {token !== null && query.id === 'me' ?
-        <div>
-          <h3 className={styles.rowItem}>¿Deseas subir imágenes de perfil?</h3>
-          <div>
-            <input className={styles.button} type="file" onChange={onFileChange} />
-            <button className={styles.button} onClick={uploadImage}>
+        <div className="flex flex-col gap-5 items-center justify-center my-10">
+          <h3 className="">Sube imágenes a tu perfil</h3>
+
+          <div className="flex justify-center gap-5">
+            <div className="mb-3 w-96">
+              <input 
+                className=" form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" 
+                type="file"
+                onChange={onFileChange}
+              />
+            </div>
+
+            <button
+              className="bg-sky-600 hover:bg-sky-700 p-3 rounded-md text-slate-100 text-base"
+              onClick={uploadImage}
+            >
               Subir imagen
             </button>
           </div>
         </div>
         : null}
+
+                  {/* <div>
+            <input className={styles.button} type="file" onChange={onFileChange} />
+            <button className={styles.button} onClick={uploadImage}>
+              Subir imagen
+            </button>
+          </div> */}
 
       <Footer />
     </div>

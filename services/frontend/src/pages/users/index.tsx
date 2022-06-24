@@ -61,22 +61,33 @@ function UsersPage() {
       </Head>
 
       <Navbar logged={token !== null} />
-
-      <div className={styles.centerContainer}>
-        <h1> Lista de usuarios </h1>
-        <p> Página {page} </p>
-        <button className={styles.button} onClick={prevPage} disabled={page == 1}>Página anterior</button>
-        <button className={styles.button} onClick={nextPage} disabled={usersData.length == 0}>Siguiente página</button>
+      
+      <div className="flex flex-col justify-center items-center mt-10">
+        <h2 className="font-semibold text-xl">Lista de usuarios</h2>
+        <p>Página {page}</p>
       </div>
 
-      <div className={styles.flexWrapContainer}>
+      <div className="grid grid-cols-3 gap-10 w-4/6 ml-auto mr-auto my-10">
         {usersData.length !== 0 ? Users : <h2> No hay más usuarios</h2>}
       </div>
 
       {usersData.length !== 0 ?
-        <div className={styles.centerContainer}>
-          <button className={styles.button} onClick={prevPage} disabled={page == 1}>Página anterior</button>
-          <button className={styles.button} onClick={nextPage} disabled={usersData.length == 0}>Siguiente página</button>
+        <div className="flex gap-10 justify-center mb-10">
+          <button 
+            className="bg-sky-600 hover:bg-sky-700 p-3 rounded-md text-slate-100 text-base"
+            onClick={prevPage} 
+            disabled={page == 1}
+          >
+            {'< Página anterior'}
+          </button>
+
+          <button 
+            className="bg-sky-600 hover:bg-sky-700 p-3 rounded-md text-slate-100 text-base"
+            onClick={nextPage} 
+            disabled={usersData.length == 0}
+          >
+            {'Página siguiente >'}
+          </button>
         </div>
         : null}
 
