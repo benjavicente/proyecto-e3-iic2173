@@ -6,15 +6,16 @@ import useLocalStorageEmail from '~/hooks/useLocalStorageEmail';
 
 
 function ChatItem({ id, amount }) {
+  // Idea de colocar el setCurrentChatID en el onClick de aquí
   return (
-    <li className="bg-slate-600 text-slate-200 p-2">
+    <li className="bg-slate-600 text-slate-200 p-2" onClick={() => console.log("Hola")}>
       {id} ({amount})
     </li>
   )
 }
 
 function ChatList() {
-  const { chats, isLoading } = useChat();
+  const { chats, privateChats, isLoading } = useChat();
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -23,6 +24,7 @@ function ChatList() {
   return (
     <ol className="flex flex-col">
       {chats.map(chat => (<ChatItem key={chat.id} {...chat} />))}
+      {privateChats.map(chat => (<ChatItem key={chat.id} {...chat} />))}
     </ol>
   )
 }
@@ -101,7 +103,7 @@ export default function ChatPage() {
               <button className="bg-slate-700 text-slate-100 p-2">Enviar</button>
             </form>              
             </div>
-            <ChatList />
+            <ChatList setCurrentChatID={setCurrentChatID}/>
           </div>
           <MessagesPanel currentChatID={currentChatID} />
         </div>

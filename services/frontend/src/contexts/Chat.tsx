@@ -22,6 +22,7 @@ const ChatContext = createContext<IChatState | undefined>(undefined)
 export default function ChatProvider(props) {  
   const [isLoading, setIsLoading] = useState(true)
   const [chats, setChats] = useState<IChat[]>([])
+  const [privateChats, setPrivateChats] = useState<IChat[]>([])
   const [token] = useLocalStorage<string | null>("token")
 
   // Load initial state
@@ -32,6 +33,9 @@ export default function ChatProvider(props) {
       axios.get<Message[]>("/api/chat/public"),
       axios.get<Chat[]>("/api/chat/", { headers: { Authorization: `Bearer ${token}` } }),
     ]).then(([publicChatFeed, chatList]) => {
+      setPrivateChats(
+        chatList.data.map(chat => ({ id: chat.other_user_id, messages: null, amount: chat.count }))
+      )
       // Set the chats
       // We had to delete the other chats because their messages were null
       setChats([
@@ -43,15 +47,9 @@ export default function ChatProvider(props) {
 
   // Load chat by id if it's not loaded
   const loadChatById = useCallback(async (chatId: string) => {
-    // console.log(chatId, chats)
-    // console.log('=====>', chats.find(chat => chat.id === chatId))
-    const chad = chats.find(chat => chat.id === chatId)
-    const hasMessages = chad ? chad.messages : false
-    console.log(hasMessages)
     if (chats.find(chat => chat.id === chatId)) return
     setIsLoading(true)
     const { data } = await axios.get<Message[]>(`/api/chat/${chatId}`, { headers: { Authorization: `Bearer ${token}` } })
-    console.log('DDDDDDD', data)
     setChats([...chats, { id: chatId, messages: data, amount: data.length }])
     setIsLoading(false)
   }, [chats])
@@ -67,12 +65,11 @@ export default function ChatProvider(props) {
   // Update the stream of messages
   const updateChatsFromWS = useCallback((wsResponse: MessageEvent) => {
     if (isLoading) return
-    // TODO: parse the message and update the state
     const message = JSON.parse(wsResponse.data)
     if (!("message" in message)) return
     if ("to_user_id" in message) {
       // Is a private message
-      setChats(chats.map(chat => (chat.id === message.from_user_id ? { ...chat, messages: [...chat.messages || [], message] } : chat)))
+      setChats(chats.map(chat => (chat.id === message.from_user_id || chat.id === message.to_user_id ? { ...chat, messages: [...chat.messages || [], message] } : chat)))
     } else {
       // Is a public message
       setChats(chats.map(c => (c.id === "public" ? { ...c, amount: c.amount + 1, messages: [...c.messages || [], message] } : c)))
@@ -100,7 +97,7 @@ export default function ChatProvider(props) {
     }
   }, [ws])
 
-  return <ChatContext.Provider value={{ chats, sendMessage, isLoading, loadChatById }} {...props} />
+  return <ChatContext.Provider value={{ chats, privateChats, sendMessage, isLoading, loadChatById }} {...props} />
 }
 
 
@@ -111,8 +108,8 @@ function useChatContext() {
 }
 
 export function useChat() {
-  const { chats, isLoading } = useChatContext()
-  return { chats: chats.map(({ id, amount }) => ({ id, amount })), isLoading }
+  const { chats, privateChats, isLoading } = useChatContext()
+  return { chats: chats.map(({ id, amount }) => ({ id, amount })), privateChats, isLoading }
 }
 
 export function useMessagesOfChat(chatId: string) {

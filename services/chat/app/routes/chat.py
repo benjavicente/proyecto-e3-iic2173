@@ -28,6 +28,7 @@ connection_manager = ConnectionManager()
 @chat_router.get("/", response_model=list[all_chats.Chat])
 def get_all_private_chats(user_token: UserToken = Depends(get_user_token)):
     "Get all chats of the logged-in user"
+    # Aquí le cambie de all a first porque a veces retornaba muchos chats y no sabía que wea
     return all_chats.Chat.all(user_id=user_token.email)
 
 
@@ -44,13 +45,23 @@ def chat_messages(
     db_session: Session = Depends(get_db_session),
 ):
     "Get the messages of the chat with the other user"
-    print("Entramossss", other_user_id, user_token.email)
-    return db_session.exec(
+    my_messages = db_session.exec(
         select(PrivateMessageDB).where(
             PrivateMessageDB.from_user_id == user_token.email,
             PrivateMessageDB.to_user_id == other_user_id,
         )
     ).all()
+
+    recieved_messages = db_session.exec(
+        select(PrivateMessageDB).where(
+            PrivateMessageDB.from_user_id == other_user_id,
+            PrivateMessageDB.to_user_id == user_token.email,
+        )
+    ).all()
+
+    all_messages = my_messages + recieved_messages
+    
+    return sorted(all_messages, key=lambda x: x.created_at)
 
 
 @chat_router.websocket("/ws")
@@ -90,11 +101,11 @@ async def handle_redis_messages(redis: Redis, user_info: UserToken, ws: WebSocke
             continue
 
         message = parse_raw_as(MessageOutput, message_received["data"])
-
+        
         if isinstance(message, PublicMessage):
             await ws.send_text(message.json())
         elif isinstance(message, PrivateMessage):
-            if message.from_user_id == user_info.user_id:
+            if message.from_user_id == user_info.email:
                 await ws.send_text(message.json())
             elif message.to_user_id == user_info.email:
                 await ws.send_text(message.json())
