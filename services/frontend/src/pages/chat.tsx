@@ -27,15 +27,15 @@ function ChatList() {
   )
 }
 
-function Message({ id, email, message, created_at }: Message) {
+function Message({ id, from_user_id, message, created_at }: Message) {
   const [emailUser] = useLocalStorageEmail<string>('email');
 
   const timestamp = new Date(created_at).toLocaleString();
   return (
-    <li className={`bg-slate-700 p-3 rounded flex-grow-0 w-fit max-w-lg${email === emailUser ? " ml-auto bg-indigo-800" : ''}`}>
+    <li className={`bg-slate-700 p-3 rounded flex-grow-0 w-fit max-w-lg${from_user_id === emailUser ? " ml-auto bg-indigo-800" : ''}`}>
       <div className="text-slate-200">{message}</div>
       <time className="text-slate-400 text-xs">({timestamp})</time>
-      <div className="text-slate-400 text-xs">{email}</div>
+      <div className="text-slate-400 text-xs">{from_user_id}</div>
     </li>
   )
 }

@@ -28,7 +28,7 @@ connection_manager = ConnectionManager()
 @chat_router.get("/", response_model=list[all_chats.Chat])
 def get_all_private_chats(user_token: UserToken = Depends(get_user_token)):
     "Get all chats of the logged-in user"
-    return all_chats.Chat.all(user_id=user_token.user_id)
+    return all_chats.Chat.all(user_id=user_token.email)
 
 
 @chat_router.get("/public", response_model=list[PublicMessage])
@@ -37,18 +37,18 @@ def public_chat_history(db_session: Session = Depends(get_db_session)):
     return db_session.exec(select(PublicMessageDB)).all()
 
 
-@chat_router.get("/{other_user_email}", response_model=list[PrivateMessage])
+@chat_router.get("/{other_user_id}", response_model=list[PrivateMessage])
 def chat_messages(
-    other_user_email: str,
+    other_user_id: str,
     user_token: UserToken = Depends(get_user_token),
     db_session: Session = Depends(get_db_session),
 ):
     "Get the messages of the chat with the other user"
+    print("Entramossss", other_user_id, user_token.email)
     return db_session.exec(
-
         select(PrivateMessageDB).where(
-            PrivateMessageDB.from_user_id == user_token.user_id,
-            PrivateMessageDB.email == other_user_email,
+            PrivateMessageDB.from_user_id == user_token.email,
+            PrivateMessageDB.to_user_id == other_user_id,
         )
     ).all()
 
@@ -96,7 +96,7 @@ async def handle_redis_messages(redis: Redis, user_info: UserToken, ws: WebSocke
         elif isinstance(message, PrivateMessage):
             if message.from_user_id == user_info.user_id:
                 await ws.send_text(message.json())
-            elif message.to_user_id == user_info.user_id:
+            elif message.to_user_id == user_info.email:
                 await ws.send_text(message.json())
 
 
@@ -119,8 +119,7 @@ async def handle_user_messages(
             # Save the message in the database
             public_msg_db = PublicMessageDB(
                 message=message_payload.message,
-                from_user_id=user_info.user_id,
-                email=user_info.email,
+                from_user_id=user_info.email,
             )
             db_session.add(public_msg_db)
             db_session.commit()
@@ -130,8 +129,7 @@ async def handle_user_messages(
             public_ms = PublicMessage(
                 id=public_msg_db.id,
                 message=message_payload.message,
-                from_user_id=user_info.user_id,
-                email=user_info.email,
+                from_user_id=user_info.email,
                 created_at=public_msg_db.created_at,
             )
             await redis.publish("chat", public_ms.json())
@@ -142,8 +140,7 @@ async def handle_user_messages(
             # Save the message in the database
             private_msg_db = PrivateMessageDB(
                 message=message_payload.message,
-                email=user_info.email,
-                from_user_id=user_info.user_id,
+                from_user_id=user_info.email,
                 to_user_id=message_payload.to_user_id,
             )
             db_session.add(private_msg_db)
@@ -155,7 +152,6 @@ async def handle_user_messages(
                 message=private_msg_db.message,
                 id=private_msg_db.id,
                 from_user_id=private_msg_db.from_user_id,
-                email=user_info.email,
                 to_user_id=private_msg_db.to_user_id,
                 created_at=private_msg_db.created_at,
             )
