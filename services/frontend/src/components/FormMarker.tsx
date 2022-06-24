@@ -35,7 +35,7 @@ const NewLocationForm = ({ token, setMarkers, tags }) => {
   
   const selectedTags = tagsSelected.map((tag) => {
     return (
-      <p className={styles.rowItem} key={tag.id}>{tag.name}</p>    
+      <p className="px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease" key={tag.id}>{tag.name}</p>    
     )
   });
   
@@ -72,53 +72,74 @@ const NewLocationForm = ({ token, setMarkers, tags }) => {
   });
 
   return (
-    <div className={styles.flexContainer}>
-      <form onSubmit={formik.handleSubmit}>
-        <div className={styles.row}>
-            <div className={styles.rowItem}>
-              <label htmlFor="firstName">Nombre: </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values.name}
-              />
-            </div>
-            <div className={styles.rowItem}>
-              <label htmlFor="firstName">Latitud: </label>
-              <input
-                id="lat"
-                name="lat"
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values.lat}
-              />
-            </div>
-            <div className={styles.rowItem}>
-              <label htmlFor="lastName">Longitud: </label>
-              <input
-                id="lng"
-                name="lng"
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values.lng}
-              /> 
-            </div> 
+    <div className="flex flex-col gap-y-5 my-5 items-center">
+      <h2 className="font-semibold text-2xl">
+        ¡Ingresa un lugar en el que estuviste y compártelo con los demás!
+      </h2>
+
+      <form className="flex flex-col gap-y-5 items-center my-5" onSubmit={formik.handleSubmit}>
+        <div className="flex gap-x-5 justify-center">
+          <div>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Descripción"
+              onChange={formik.handleChange}
+              value={formik.values.name}
+            />
+          </div>
+
+          <div className="text-center">
+            <input
+              id="lat"
+              name="lat"
+              type="text"
+              placeholder="Latitud"
+              onChange={formik.handleChange}
+              value={formik.values.lat}
+            />
+          </div>
+
+          <div className="text-center">
+            <input
+              id="lng"
+              name="lng"
+              type="text"
+              placeholder="Longitud"
+              onChange={formik.handleChange}
+              value={formik.values.lng}
+            /> 
           </div> 
-          <div className={styles.rowTags}>
-            {selectedTags}
+        </div>
+
+        <h3 className="font-semibold text-lg">
+          Añade tags a tu ubicación
+        </h3>
+
+        <div className="flex flex-wrap justify-center space-x-2">
+          {selectedTags}
+        </div>
+
+        <div className="flex justify-center items-center m-0 w-3/4">
+          <select name="tags" id="tags" className="text-center m-0 w-3/4" onChange={tag => selectedTag(tag.target.value)}>
+            <option value="">Seleccionar tag</option>
+            {tagsOptions}
+          </select>                    
+        </div>
+
+        <div className="flex gap-x-5 justify-center">
+          <div 
+            className="bg-gray-400 hover:bg-gray-500 p-3 rounded-md text-slate-100 text-base cursor-pointer"
+            onClick={removeTags}
+          >
+            Eliminar tags seleccionados
           </div>
-          <div className={styles.flexContainer}>
-            <select name="tags" id="tags" className={styles.selectDropdown} onChange={tag => selectedTag(tag.target.value)}>
-              <option value="">Seleccionar tag</option>
-              {tagsOptions}
-            </select>                    
-          </div>
-          <div className={styles.rowItem}>
-            <button className={styles.button}type="submit">Crear marcador</button>            
-            <a className={styles.button} onClick={removeTags}>Eliminar tags seleccionados</a>
-          </div>   
+
+          <button className="bg-sky-600 hover:bg-sky-700 p-3 rounded-md text-slate-100 text-base" type="submit">
+            Crear marcador
+          </button>        
+        </div>   
       </form>
     </div>     
   );

@@ -6,7 +6,7 @@ import useLocalStorageEmail from '~/hooks/useLocalStorageEmail';
 
 const Navbar = () => {
   const [token, setToken] = useLocalStorage<string | null>("token")
-  const [setEmail] = useLocalStorageEmail<string | null>("token")[1]
+  const setEmail = useLocalStorageEmail<string | null>("token")[1]
   const { loginWithRedirect, logout } = useAuth0();
 
   function handleLogout() {
@@ -17,23 +17,23 @@ const Navbar = () => {
 
   return (
     <header>
-      <div className={styles.navbarContainer}>
-        <div className={styles.row}>
-          <a className={styles.rowItem} href="/">Pingtoc</a>
-          <a className={styles.rowItem} href="/">Mapa</a>
-          <a className={styles.rowItem} href="/users">Usuarios</a>
-          <a className={styles.rowItem} href="/chat">Chat</a>
+      <div className="flex items-center justify-between bg-slate-800 text-slate-100 px-5 py-2">
+        <div className="flex items-center gap-x-10 justify-between">
+          <a href="/">Pingtoc</a>
+          <a href="/">Mapa</a>
+          <a href="/users">Usuarios</a>
+          <a href="/chat">Chat General</a>
         </div>
         <div>
           {token ?
-            <div className={styles.row}>
-              <a className={styles.rowItemPress} href="/users/pings">Pings</a>
-              <a className={styles.rowItemPress} href="/users/profile?id=me">Perfil</a>
-              <button className={styles.rowItemPress} onClick={() => handleLogout()}>Cerrar Sesión</button>
+            <div className="flex gap-x-10 items-center justify-between">
+              <a href="/users/pings">Pings</a>
+              <a href="/users/profile?id=me">Perfil</a>
+              <button className="" onClick={() => handleLogout()}>Cerrar Sesión</button>
             </div>
             :
             <div className={styles.row}>
-              <button className={styles.rowItemPress} onClick={() => loginWithRedirect()}>Iniciar Sesión</button>
+              <button onClick={() => loginWithRedirect()}>Iniciar Sesión</button>
             </div>
           }
         </div>

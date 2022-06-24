@@ -1,7 +1,6 @@
 import axios from "axios"
 import { useState, createContext, useEffect, useCallback, useContext, useMemo } from "react"
 import useLocalStorage from "~/hooks/useLocalStorage"
-import useLocalStorageEmail from "~/hooks/useLocalStorageEmail"
 
 
 type IChat = {
@@ -24,7 +23,6 @@ export default function ChatProvider(props) {
   const [isLoading, setIsLoading] = useState(true)
   const [chats, setChats] = useState<IChat[]>([])
   const [token] = useLocalStorage<string | null>("token")
-  const [email] = useLocalStorageEmail<string | null>("email")
 
   // Load initial state
   useEffect(() => {
@@ -34,7 +32,7 @@ export default function ChatProvider(props) {
       axios.get<Message[]>("/api/chat/public"),
       axios.get<Chat[]>("/api/chat/", { headers: { Authorization: `Bearer ${token}` } }),
     ]).then(([publicChatFeed, chatList]) => {
-      console.log('Public', publicChatFeed)
+      // console.log(chatList)
       // Set the chats
       setChats([
         { id: "public", messages: publicChatFeed.data, amount: publicChatFeed.data.length },
@@ -48,7 +46,8 @@ export default function ChatProvider(props) {
   const loadChatById = useCallback(async (chatId: string) => {
     if (chats.find(chat => chat.id === chatId)) return
     setIsLoading(true)
-    const { data } = await axios.get<Message[]>(`/api/chat/${chatId}`)
+    const { data } = await axios.get<Message[]>(`/api/chat/${chatId}`, { headers: { Authorization: `Bearer ${token}` } })
+    console.log(data)
     setChats([...chats, { id: chatId, messages: data, amount: data.length }])
     setIsLoading(false)
   }, [chats])
@@ -125,3 +124,4 @@ export function useMessagesOfChat(chatId: string) {
 
   return { messages, isLoading, sendMessage: sendMessageWithID }
 }
+

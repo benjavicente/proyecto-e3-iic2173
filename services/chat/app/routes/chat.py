@@ -37,9 +37,9 @@ def public_chat_history(db_session: Session = Depends(get_db_session)):
     return db_session.exec(select(PublicMessageDB)).all()
 
 
-@chat_router.get("/u/{other_user_id}", response_model=list[PrivateMessage])
+@chat_router.get("/{other_user_email}", response_model=list[PrivateMessage])
 def chat_messages(
-    other_user_id: str,
+    other_user_email: str,
     user_token: UserToken = Depends(get_user_token),
     db_session: Session = Depends(get_db_session),
 ):
@@ -48,7 +48,7 @@ def chat_messages(
 
         select(PrivateMessageDB).where(
             PrivateMessageDB.from_user_id == user_token.user_id,
-            PrivateMessageDB.to_user_id == other_user_id,
+            PrivateMessageDB.email == other_user_email,
         )
     ).all()
 

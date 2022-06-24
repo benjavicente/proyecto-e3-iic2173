@@ -1,5 +1,7 @@
 import { FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
+import Navbar from "~/components/Navbar";
 import ChatProvider, { useChat, useMessagesOfChat } from "~/contexts/Chat";
+import useLocalStorage from "~/hooks/useLocalStorage";
 import useLocalStorageEmail from '~/hooks/useLocalStorageEmail';
 
 
@@ -42,10 +44,10 @@ function MessagesPanel({ currentChatID }) {
   const [messageToSend, setMessageToSend] = useState("")
   const { messages, isLoading, sendMessage } = useMessagesOfChat(currentChatID);
   const messagesContainerRef = useRef<HTMLOListElement>(null)
+  const [token] = useLocalStorage<string>('token');
 
   useEffect(() => {
     const e = messagesContainerRef.current
-    if (e) console.log('e', e.children)
     if (e && e.children.length != 0) e.children[e.childNodes.length - 1].scrollIntoView()
   }, [messages])
 
@@ -57,7 +59,7 @@ function MessagesPanel({ currentChatID }) {
 
   return (
     <div className="h-full flex flex-col">
-      <h2 className="p-2 text-slate-800 text-center">{currentChatID === 'public' ? 'Chat Público' : null}</h2>
+      <h2 className="p-2 text-slate-800 text-center">{currentChatID === 'public' ? 'Chat Público' : currentChatID}</h2>
       {isLoading ? (
         <div className="flex-grow flex align-middle justify-center text-slate-300"> Loading...</div>
       ) : (
@@ -65,10 +67,13 @@ function MessagesPanel({ currentChatID }) {
           {messages.map(message => (<Message key={message.id} {...message} />))}
         </ol>
       )}
-      <form onSubmit={handleSendMessage} className="flex">
-        <input type="text" placeholder="Mensaje" className="flex-grow bottom-0" value={messageToSend} onChange={(e) => setMessageToSend(e.target.value)} />
-        <button type="submit" className="bg-slate-700 text-slate-100 p-2">Enviar</button>
-      </form>
+      {token ? 
+        <form onSubmit={handleSendMessage} className="flex">
+          <input type="text" placeholder="Mensaje" className="flex-grow bottom-0" value={messageToSend} onChange={(e) => setMessageToSend(e.target.value)} />
+          <button type="submit" className="bg-slate-700 text-slate-100 p-2">Enviar</button>
+        </form>
+      : null}
+      
     </div >
   )
 }
@@ -76,17 +81,31 @@ function MessagesPanel({ currentChatID }) {
 export default function ChatPage() {
   const [currentChatID, setCurrentChatID] = useState("public")
 
+  function changeId(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const formProps = Object.fromEntries(formData);
+    console.log(formProps.email)
+    setCurrentChatID(formProps.email)
+  }
+
   return (
-    <ChatProvider>
-      <div className="grid grid-cols-[250px_1fr] bg-slate-300 grid-rows-[100vh]">
-        <div className="flex flex-col bg-slate-700 h-full">
-          <div className="px-2 py-4">
-            <input type="text" placeholder="Escribir por id..." className="border-none w-full h-full grow-0 focus:ring-0 bg-slate-600 rounded text-slate-100 placeholder-slate-300" />
+    <>
+      <ChatProvider>
+      <Navbar />
+        <div className="grid grid-cols-[250px_1fr] bg-slate-300 grid-rows-[100vh]">
+          <div className="flex flex-col bg-slate-700 h-full">
+            <div className="px-2 py-4">
+            <form onSubmit={changeId} className="flex">
+              <input name="email" type="text" placeholder="Escribir por email..." className="border-none w-full h-full grow-0 focus:ring-0 bg-slate-600 rounded text-slate-100 placeholder-slate-300" />
+              <button className="bg-slate-700 text-slate-100 p-2">Enviar</button>
+            </form>              
+            </div>
+            <ChatList />
           </div>
-          <ChatList />
+          <MessagesPanel currentChatID={currentChatID} />
         </div>
-        <MessagesPanel currentChatID={currentChatID} />
-      </div>
-    </ChatProvider>
+      </ChatProvider>
+    </>
   )
 }

@@ -26,37 +26,31 @@ const FormLocation = ({ token, setInitialCoordinates, temperature, setTemperatur
   });
 
   return (
-    <div className={styles.flexContainer}>
-      <div className={styles.centerContainer}>
-        <h2>La temperatura actual es: {temperature}°C</h2>
+    <div className="flex flex-col gap-y-5 my-5">
+      <div className="flex justify-center">
+        <h2 className="font-semibold text-lg">La temperatura actual en la zona es: {temperature}°C</h2>
       </div>
 
-      <form onSubmit={formik.handleSubmit}>
-        <div className={styles.row}>
-          <div className={styles.rowItem}>
-            <label htmlFor="firstName">Latitud:</label>
-            <input
-              id="lat"
-              name="lat"
-              type="text"
-              onChange={formik.handleChange}
-              value={formik.values.lat}
-            />
-          </div>
+      <form onSubmit={formik.handleSubmit} className="flex gap-x-5 justify-center">
+        <input
+          id="lat"
+          name="lat"
+          type="text"
+          placeholder="Latitud"
+          onChange={formik.handleChange}
+          value={formik.values.lat}
+        />
 
-          <div className={styles.rowItem}>
-            <label htmlFor="lastName">Longitud: </label>
-            <input
-              id="lng"
-              name="lng"
-              type="text"
-              onChange={formik.handleChange}
-              value={formik.values.lng}
-            /> 
-          </div> 
-        </div> 
-        <div className={styles.rowItem}>
-          <button className={styles.button}type="submit">Encontrar temperatura</button>            
+        <input
+          id="lng"
+          name="lng"
+          type="text"
+          placeholder="Longitud"
+          onChange={formik.handleChange}
+          value={formik.values.lng}
+        /> 
+        <div>
+          <button className="bg-sky-600 hover:bg-sky-700 p-3 rounded-md text-slate-100 text-base" type="submit">Encontrar temperatura</button>            
         </div>   
       </form>
     </div>     
