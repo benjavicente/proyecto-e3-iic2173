@@ -7,26 +7,22 @@ import Footer from '~/components/Footer'
 import UserInfo from '~/components/UserInfo'
 
 import { getApi } from '~/lib/api'
-
-import styles from '~/styles/Home.module.css'
 import useLocalStorage from '~/hooks/useLocalStorage'
 
 function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [usersData, setUsersData] = useState(null);
   const [page, setPage] = useState(1);
-  const [token] = useLocalStorage<string>("token");
+  const [user] = useLocalStorage<User>("user");
 
-  console.log('Token', token)
-
-  if (token === undefined) {
+  if (user === undefined) {
     return (
       <div />
     )
   }
 
   if (loading) {
-    getApi(token, 'api/users', { 'page': page })
+    getApi(user.token, 'api/users', { 'page': page })
       .then(data => {
         setUsersData(JSON.parse(data));
         setLoading(false);
@@ -46,9 +42,9 @@ function UsersPage() {
     setLoading(true);
   }
 
-  const Users = usersData.map((user) => {
+  const Users = usersData.map((userS) => {
     return (
-      <UserInfo user={user} key={user.id} />
+      <UserInfo user={userS} key={userS.id} />
     )
   });
 
@@ -60,7 +56,7 @@ function UsersPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar logged={token !== null} />
+      <Navbar logged={user.token !== null} />
       
       <div className="flex flex-col justify-center items-center mt-10">
         <h2 className="font-semibold text-xl">Lista de usuarios</h2>

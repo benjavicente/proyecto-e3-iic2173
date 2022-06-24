@@ -21,7 +21,7 @@ export default function Profile() {
   const [error, setError] = useState(false);
   const [pingMessage, setPingMessage] = useState('');
   const [file, setFile] = useState(null);
-  const [token] = useLocalStorage<string>('token');
+  const [user] = useLocalStorage<User>('user');
 
 
   if (query.reload == 'true') {
@@ -30,14 +30,14 @@ export default function Profile() {
     setLoading(true);
   }
 
-  if (token === undefined) {
+  if (user === undefined) {
     return (
       <div />
     )
   }
 
   // Caso cuando se intenta acceder al perfil sin haber iniciado sesión
-  if (query.id === 'me' && token === null) {
+  if (query.id === 'me' && user === null) {
     router.push({
       pathname: '/',
     })
@@ -47,7 +47,7 @@ export default function Profile() {
   }
 
   if (loading) {
-    getApi(token, 'api/users', { id: query.id })
+    getApi(user.token, 'api/users', { id: query.id })
       .then(info => {
         console.log(info)
         try {
@@ -68,7 +68,7 @@ export default function Profile() {
     const body = {
       pingedUserId: data.id
     }
-    postApi(token, '/api/pings/create', body)
+    postApi(user.token, '/api/pings/create', body)
       .then(res => {
         if (res == 'Created') {
           setPingMessage('Ping hecho con éxito');
@@ -96,7 +96,7 @@ export default function Profile() {
         file,
       );
 
-      uploadApi(token, '/api/users/upload/image', formData)
+      uploadApi(user.token, '/api/users/upload/image', formData)
         .then(res => {
           // Luego de la request se debe eliminar la imagen
           setFile(null);
@@ -107,7 +107,7 @@ export default function Profile() {
 
   return (
     <div>
-      <Navbar logged={token !== null} />
+      <Navbar logged={user !== null} />
       {error ?
         <div className={styles.centerContainer}>
           <h2>No sé encontró al usuario</h2>
@@ -115,7 +115,7 @@ export default function Profile() {
         <UserProfile data={data} />
       }
 
-      {token !== null && query.id !== 'me' && !error ?
+      {user.token !== null && query.id !== 'me' && !error ?
         <div>
           <div className="flex flex-col items-center justify-center gap-x-10 my-10">
             <button
@@ -128,7 +128,7 @@ export default function Profile() {
           </div>
         </div>
         : null}
-      {token !== null && query.id === 'me' ?
+      {user !== null && query.id === 'me' ?
         <div className="flex flex-col gap-5 items-center justify-center my-10">
           <h3 className="">Sube imágenes a tu perfil</h3>
 
@@ -150,14 +150,6 @@ export default function Profile() {
           </div>
         </div>
         : null}
-
-                  {/* <div>
-            <input className={styles.button} type="file" onChange={onFileChange} />
-            <button className={styles.button} onClick={uploadImage}>
-              Subir imagen
-            </button>
-          </div> */}
-
       <Footer />
     </div>
   );

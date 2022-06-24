@@ -22,7 +22,12 @@ export default function useLocalStorage<T extends JSONValue>(
   // Load inicial state with local-storage
   useEffect(() => {
     const storageValue = window.localStorage.getItem(key);
-    if (storageValue) setValue(JSON.parse(storageValue));
+    if (storageValue === null) {
+      // Tuve que definir un valor por defecto del local storage, que sería este
+      setValue({data: {token: null, email: null}, at: 0})
+    } else {
+      setValue(JSON.parse(storageValue))
+    }
   }, [key]);
 
   // Wrap the setter to set the value to local storage

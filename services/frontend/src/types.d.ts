@@ -14,3 +14,8 @@ type Message = {
 type PrivateMessage = Message & {
   to_user_id: string;
 };
+
+type User = {
+  email: string,
+  token: string,
+}

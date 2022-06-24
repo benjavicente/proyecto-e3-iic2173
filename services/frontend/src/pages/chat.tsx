@@ -2,11 +2,8 @@ import { FormEventHandler, useCallback, useEffect, useRef, useState } from "reac
 import Navbar from "~/components/Navbar";
 import ChatProvider, { useChat, useMessagesOfChat } from "~/contexts/Chat";
 import useLocalStorage from "~/hooks/useLocalStorage";
-import useLocalStorageEmail from '~/hooks/useLocalStorageEmail';
-
 
 function ChatItem({ id, amount }) {
-  // Idea de colocar el setCurrentChatID en el onClick de aquí
   return (
     <li className="bg-slate-600 text-slate-200 p-2" onClick={() => console.log("Hola")}>
       {id} ({amount})
@@ -30,11 +27,11 @@ function ChatList() {
 }
 
 function Message({ id, from_user_id, message, created_at }: Message) {
-  const [emailUser] = useLocalStorageEmail<string>('email');
+  const [user] = useLocalStorage<User>('user');
 
   const timestamp = new Date(created_at).toLocaleString();
   return (
-    <li className={`bg-slate-700 p-3 rounded flex-grow-0 w-fit max-w-lg${from_user_id === emailUser ? " ml-auto bg-indigo-800" : ''}`}>
+    <li className={`bg-slate-700 p-3 rounded flex-grow-0 w-fit max-w-lg${user ? (from_user_id === user.email ? " ml-auto bg-indigo-800" : '') : ''}`}>
       <div className="text-slate-200">{message}</div>
       <time className="text-slate-400 text-xs">({timestamp})</time>
       <div className="text-slate-400 text-xs">{from_user_id}</div>
@@ -46,7 +43,9 @@ function MessagesPanel({ currentChatID }) {
   const [messageToSend, setMessageToSend] = useState("")
   const { messages, isLoading, sendMessage } = useMessagesOfChat(currentChatID);
   const messagesContainerRef = useRef<HTMLOListElement>(null)
-  const [token] = useLocalStorage<string>('token');
+  const [user] = useLocalStorage<User>('user')
+
+  
 
   useEffect(() => {
     const e = messagesContainerRef.current
@@ -59,6 +58,12 @@ function MessagesPanel({ currentChatID }) {
     setMessageToSend("");
   }, [messageToSend, sendMessage])
 
+  if (user === undefined) {
+    return (
+      <div/>
+    )
+  }
+
   return (
     <div className="h-full flex flex-col">
       <h2 className="p-2 text-slate-800 text-center">{currentChatID === 'public' ? 'Chat Público' : currentChatID}</h2>
@@ -69,7 +74,7 @@ function MessagesPanel({ currentChatID }) {
           {messages.map(message => (<Message key={message.id} {...message} />))}
         </ol>
       )}
-      {token ? 
+      {user.token ? 
         <form onSubmit={handleSendMessage} className="flex">
           <input type="text" placeholder="Mensaje" className="flex-grow bottom-0" value={messageToSend} onChange={(e) => setMessageToSend(e.target.value)} />
           <button type="submit" className="bg-slate-700 text-slate-100 p-2">Enviar</button>
@@ -103,7 +108,7 @@ export default function ChatPage() {
               <button className="bg-slate-700 text-slate-100 p-2">Enviar</button>
             </form>              
             </div>
-            <ChatList setCurrentChatID={setCurrentChatID}/>
+            <ChatList />
           </div>
           <MessagesPanel currentChatID={currentChatID} />
         </div>

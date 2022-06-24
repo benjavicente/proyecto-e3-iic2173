@@ -1,17 +1,22 @@
 import { useAuth0 } from '@auth0/auth0-react';
 
-import styles from '~/styles/Home.module.css'
 import useLocalStorage from '~/hooks/useLocalStorage';
-import useLocalStorageEmail from '~/hooks/useLocalStorageEmail';
 
 const Navbar = () => {
-  const [token, setToken] = useLocalStorage<string | null>("token")
-  const setEmail = useLocalStorageEmail<string | null>("token")[1]
+  const [user, setUser] = useLocalStorage<User>('user');
   const { loginWithRedirect, logout } = useAuth0();
 
+  if (user === undefined) {
+    return (
+      <div/>
+    )
+  }
+
+
   function handleLogout() {
-    setToken(null)
-    setEmail(null)
+    setUser({token: null, email: null})
+    // setToken(null)
+    // setEmail(null)
     logout({ returnTo: window.location.origin })
   }
 
@@ -25,7 +30,7 @@ const Navbar = () => {
         </div>
 
         <div>
-          {token ?
+          {user.token ?
             <div className="flex gap-x-10 items-center justify-between">
               <a href="/users/pings">Pings</a>
               <a href="/users/profile?id=me">Perfil</a>

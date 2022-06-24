@@ -7,7 +7,6 @@ import dynamic from 'next/dynamic'
 import { getApi } from '~/lib/api';
 
 import Navbar from '~/components/Navbar'
-import Footer from '~/components/Footer'
 import FormLocation from '~/components/FormLocation'
 import Form from '~/components/FormMarker'
 import useLocalStorage from '~/hooks/useLocalStorage';
@@ -23,12 +22,19 @@ function HomePage() {
   const [weatherData, setWeatherData] = useState(null);
   const [initialCoordinates, setInitialCoordinates] = useState(null);
 
-  const [token] = useLocalStorage<string>('token');
+  const [user] = useLocalStorage<User>('user');
+
+  if (user === undefined) {
+    return (
+      <div />
+    )
+  }
 
   if (markers === null) {
-    if (token) {
-
-      getApi(token, 'api/markers', { filteredIds: filteredId })
+    console.log(user)
+    if (user.token) {
+      console.log('User', user)
+      getApi(user.token, 'api/markers', { filteredIds: filteredId })
         .then(data => {
           setMarkers(JSON.parse(data));
         })
@@ -43,7 +49,7 @@ function HomePage() {
   }
 
   if (users === null) {
-    getApi(token, 'api/users/all', null)
+    getApi(user.token, 'api/users/all', null)
       .then(data => {
         setUsers(JSON.parse(data));
       })
@@ -61,7 +67,7 @@ function HomePage() {
   });
 
   if (weatherData === null) {
-    getApi(token, 'api/weather', coordinates)
+    getApi(user.token, 'api/weather', coordinates)
       .then(data => {
         const jsonData = JSON.parse(data);
         setWeatherData(jsonData["temp_c"]);
@@ -70,7 +76,7 @@ function HomePage() {
 
   // Se cargan los tags
   if (tags.length == 0) {
-    getApi(token, 'api/tags/all', null)
+    getApi(user.token, 'api/tags/all', null)
       .then(data => {
         setTags(JSON.parse(data));
       })
@@ -88,8 +94,8 @@ function HomePage() {
     setMarkers(null);
   }
 
-  const selectedUser = (user) => {
-    const userData = JSON.parse(user);
+  const selectedUser = (userSel) => {
+    const userData = JSON.parse(userSel);
     if (idSelected.length < 5) {
       if (!idSelected.includes(userData.id)) {
         setUsersSelected([...usersSelected, userData]);
@@ -98,26 +104,26 @@ function HomePage() {
     }
   }
 
-  const selectedUsers = usersSelected.map((user) => {
+  const selectedUsers = usersSelected.map((userSel) => {
     return (
-      <p className="px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease" key={user.id}>
-        {user.name} {user.lastname}
+      <p className="px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease" key={userSel.id}>
+        {userSel.name} {userSel.lastname}
       </p>
     )
   });
 
-  const usersOptions = users.map((user) => {
+  const usersOptions = users.map((userOp) => {
     let exists = false;
     for (var i = 0; i < usersSelected.length; i++) {
-      if (usersSelected[i].id == user.id) {
+      if (usersSelected[i].id == userOp.id) {
         exists = true;
         break;
       }
     }
     if (!exists) {
-      const value = `{"id":${user.id},"name":"${user.firstname}","lastname":"${user.lastname}"}`;
+      const value = `{"id":${userOp.id},"name":"${userOp.firstname}","lastname":"${userOp.lastname}"}`;
       return (
-        <option value={value} key={user.id}>{user.firstname} {user.lastname}</option>
+        <option value={value} key={userOp.id}>{userOp.firstname} {userOp.lastname}</option>
       )
     }
   });
@@ -144,7 +150,7 @@ function HomePage() {
             </div>
             : 
             <FormLocation
-              token={token}
+              token={user.token}
               setInitialCoordinates={setInitialCoordinates}
               temperature={temperature}
               setTemperature={setTemperature}
@@ -153,18 +159,18 @@ function HomePage() {
           
           <div className="flex justify-center">
             <img 
+              alt=""
               src={'https://media.istockphoto.com/vectors/friends-vector-id1173780314?k=20&m=1173780314&s=612x612&w=0&h=m2ShqqBZkuQXSFDnHJA0gciFO8fWqG3Q9PqfphFQ0wI='}
               className="h-60 m-0"
-            >
-            </img>
+             />
           </div>
 
-          {token !== null ? <Form token={token} setMarkers={setMarkers} tags={tags} /> : null}
+          {user.token !== null ? <Form token={user.token} setMarkers={setMarkers} tags={tags} /> : null}
         </div>
 
         <div className="w-2/4 h-screen shadow-lg">
           <Map markers={markers} initialCoordinates={initialCoordinates} />
-          {token ?
+          {user.token ?
             <div className="flex flex-col gap-y-5 mt-5 items-center bottom-0 w-full rounded">
               <div className="flex flex-wrap justify-center space-x-2">
                 {selectedUsers}

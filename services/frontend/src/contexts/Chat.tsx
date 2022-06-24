@@ -23,15 +23,15 @@ export default function ChatProvider(props) {
   const [isLoading, setIsLoading] = useState(true)
   const [chats, setChats] = useState<IChat[]>([])
   const [privateChats, setPrivateChats] = useState<IChat[]>([])
-  const [token] = useLocalStorage<string | null>("token")
+  const [user] = useLocalStorage<User>('user');
 
   // Load initial state
   useEffect(() => {
-    if (!token) return
+    if (!user) return
     setIsLoading(true)
     Promise.all([
       axios.get<Message[]>("/api/chat/public"),
-      axios.get<Chat[]>("/api/chat/", { headers: { Authorization: `Bearer ${token}` } }),
+      axios.get<Chat[]>("/api/chat/", { headers: { Authorization: `Bearer ${user.token}` } }),
     ]).then(([publicChatFeed, chatList]) => {
       setPrivateChats(
         chatList.data.map(chat => ({ id: chat.other_user_id, messages: null, amount: chat.count }))
@@ -43,13 +43,13 @@ export default function ChatProvider(props) {
       ])
       setIsLoading(false)
     })
-  }, [token])
+  }, [user])
 
   // Load chat by id if it's not loaded
   const loadChatById = useCallback(async (chatId: string) => {
     if (chats.find(chat => chat.id === chatId)) return
     setIsLoading(true)
-    const { data } = await axios.get<Message[]>(`/api/chat/${chatId}`, { headers: { Authorization: `Bearer ${token}` } })
+    const { data } = await axios.get<Message[]>(`/api/chat/${chatId}`, { headers: { Authorization: `Bearer ${user ? user.token : ''}` } })
     setChats([...chats, { id: chatId, messages: data, amount: data.length }])
     setIsLoading(false)
   }, [chats])
@@ -57,9 +57,9 @@ export default function ChatProvider(props) {
   // Create the websocket connection
   const ws = useMemo(() => {
     if (typeof window === "undefined") return
-    const websocket = new WebSocket(`${window.location.origin.replace(/^http(s?):/, 'ws$1:')}/api/chat/ws?token=${token}`)
+    const websocket = new WebSocket(`${window.location.origin.replace(/^http(s?):/, 'ws$1:')}/api/chat/ws?token=${user ? user.token: ''}`)
     return websocket
-  }, [token])
+  }, [user])
 
 
   // Update the stream of messages

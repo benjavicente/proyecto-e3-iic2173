@@ -16,16 +16,16 @@ function PingsPage() {
 
   const [loading, setLoading] = useState(true);
   const [pingsData, setPingsData] = useState(null);
-  const [token] = useLocalStorage<string>('token');
+  const [user] = useLocalStorage<User>('user');
 
-  if (token === undefined) {
+  if (user === undefined) {
     return (
       <div/>
     )
   }
 
   if (loading) {
-    getApi(token, 'api/pings/all', null)
+    getApi(user.token, 'api/pings/all', null)
       .then(data => {
         setPingsData(JSON.parse(data));
         setLoading(false);
@@ -60,7 +60,7 @@ function PingsPage() {
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
     if (ping.status == 0) {
       return (
-        <div className={styles.row} key={ping.id}>
+        <div className={styles.row}>
           <p key={ping.id}><a className={styles.rowItemPress}
             onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping
           </p>
@@ -75,7 +75,7 @@ function PingsPage() {
       )
     } else {
       return (
-        <div className={styles.row} key={ping.id}>
+        <div className={styles.row}>
           <p key={ping.id}><a className={styles.rowItemPress}
             onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado'}
           </p>
@@ -87,7 +87,7 @@ function PingsPage() {
 
   const pingsFromUser = pingsData.pingedUsers.map((ping) => {
     return (
-      <p key={ping.id}><a className={styles.rowItemPress}></a>Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}</a></p>
+      <p key={ping.id}><a className={styles.rowItemPress} />Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}</a></p>
     )
   });
 
@@ -99,7 +99,7 @@ function PingsPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar logged={token !== null} />
+      <Navbar logged={user.token !== null} />
       <div>
         <h2>Pings que te han hecho:</h2>
         <div className={styles.column}>
