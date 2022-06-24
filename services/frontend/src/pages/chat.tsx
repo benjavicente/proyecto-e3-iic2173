@@ -6,15 +6,16 @@ import useLocalStorageEmail from '~/hooks/useLocalStorageEmail';
 
 
 function ChatItem({ id, amount }) {
+  // Idea de colocar el setCurrentChatID en el onClick de aquí
   return (
-    <li className="bg-slate-600 text-slate-200 p-2">
+    <li className="bg-slate-600 text-slate-200 p-2" onClick={() => console.log("Hola")}>
       {id} ({amount})
     </li>
   )
 }
 
 function ChatList() {
-  const { chats, isLoading } = useChat();
+  const { chats, privateChats, isLoading } = useChat();
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -23,19 +24,20 @@ function ChatList() {
   return (
     <ol className="flex flex-col">
       {chats.map(chat => (<ChatItem key={chat.id} {...chat} />))}
+      {privateChats.map(chat => (<ChatItem key={chat.id} {...chat} />))}
     </ol>
   )
 }
 
-function Message({ id, email, message, created_at }: Message) {
+function Message({ id, from_user_id, message, created_at }: Message) {
   const [emailUser] = useLocalStorageEmail<string>('email');
 
   const timestamp = new Date(created_at).toLocaleString();
   return (
-    <li className={`bg-slate-700 p-3 rounded flex-grow-0 w-fit max-w-lg${email === emailUser ? " ml-auto bg-indigo-800" : ''}`}>
+    <li className={`bg-slate-700 p-3 rounded flex-grow-0 w-fit max-w-lg${from_user_id === emailUser ? " ml-auto bg-indigo-800" : ''}`}>
       <div className="text-slate-200">{message}</div>
       <time className="text-slate-400 text-xs">({timestamp})</time>
-      <div className="text-slate-400 text-xs">{email}</div>
+      <div className="text-slate-400 text-xs">{from_user_id}</div>
     </li>
   )
 }
@@ -101,7 +103,7 @@ export default function ChatPage() {
               <button className="bg-slate-700 text-slate-100 p-2">Enviar</button>
             </form>              
             </div>
-            <ChatList />
+            <ChatList setCurrentChatID={setCurrentChatID}/>
           </div>
           <MessagesPanel currentChatID={currentChatID} />
         </div>
