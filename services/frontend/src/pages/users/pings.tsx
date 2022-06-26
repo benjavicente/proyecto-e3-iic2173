@@ -22,6 +22,7 @@ function PingsPage() {
   const [, setIdUserChat] = useLocalStorage<IdChat>('idChat');
   const [idPing, setIdPing] = useState(null);
 
+
   const respondingPing = (status_answer, id, cronTime) => {
     patchApi(user.token, `/api/pings/update/${id}`, {status: status_answer, cronTime: cronTime}) 
       .then(res => {
@@ -33,10 +34,13 @@ function PingsPage() {
       day: '',
       hour: '',
       minute: '',
-      status: '1',
-      id: '',
+      status: '',
     },
     onSubmit: values => {
+      const data = JSON.parse(values.status)
+      const rialStatus = data.status
+      const idPing = data.id
+
       if (values.day === '' || values.hour === '' || values.minute === '') {
         alert("Por favor, selecciona todos los campos para aprobar el ping");
         return 
@@ -48,7 +52,7 @@ function PingsPage() {
       // Aquí la consulta al back, se hace con patch que era como estaba antes.
       // passs ping id to respondingPing
       console.log("values", values)
-      respondingPing(values.status, values.id, cronString);
+      respondingPing(rialStatus, idPing, cronString);
     }
   });
 
@@ -87,8 +91,9 @@ function PingsPage() {
         <div className={styles.row} key={ping.id}>
           
           <select name="status" onChange={formik.handleChange} value={formik.values.status}>
-            <option value="-1">Rechazar</option>
-            <option value="1">Aprobar</option>
+          <option value="">Escoge una opción por favor</option>
+            <option value={`{"status": -1, "id": ${ping.ping.id}}`}>Rechazar</option>
+            <option value={`{"status": 1, "id": ${ping.ping.id}}`}>Aprobar</option>
           </select>
           <select name="day" id="cronDay" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.day}>
             <option value="">Seleccionar día de la semana </option>
@@ -104,8 +109,6 @@ function PingsPage() {
             <option value="">Seleccionar minuto </option>
             {minutesOptions} 
           </select>
-          <input type="hidden" name="id" value={ping.id} />
-
           <button type="submit" className={styles.button}>Submit</button>
         </div>
       </form>
