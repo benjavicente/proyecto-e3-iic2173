@@ -9,13 +9,20 @@ function Message({ id, from_user_id, message, created_at }: Message) {
   const Sentiment = async (message) => {
     const url = 'https://51zr7rl1u3.execute-api.us-east-1.amazonaws.com/serverless_lambda_stage/sentiment-analysis'
     const body = { message }
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body)
-    });
+    let response;
+
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body)
+      });
+    } catch (err) {
+      response = 'Sin respuesta'
+      console.log('Error de cors')
+    }    
     
     alert(`El resultado del sentimiento es: ${response}`)
   }
