@@ -18,7 +18,7 @@ const analyticsJob = (data) => {
   if (data.cronTime) {
     const uuid = uuid_gen.v1();
     return indexQueue.add(data, {
-      repeat: { cronTime: data.cronTime },
+      repeat: { cron: data.cronTime },
       jobId: uuid,
     });
   } else {
@@ -27,6 +27,11 @@ const analyticsJob = (data) => {
 };
 
 const calculateAnalytics = async (job) => {
+  console.log("calculateAnalytics");
+  if (job.opts.repeat.count == 1) {
+    console.log("calculateAnalytics - first time");
+  }
+
   const { senderMarkers, recipientMarkers } = job.data;
   const siin = await calculateSiinIndex(senderMarkers, recipientMarkers);
 
@@ -87,11 +92,15 @@ router.post("api.pings.calculateAnalytics", "/indexes", async (ctx) => {
       ctx.throw(400, ValidationError);
     }
 
-    requestData.results = { siin: siin, sidi: sidi, dindin: dindin };
-    await sendAnalyticsSuccessEmail(ctx, senderUser.email, requestData);
+    if (job.opts.repeat.count == 1) {
+      requestData.results = { siin: siin, sidi: sidi, dindin: dindin };
+      await sendAnalyticsSuccessEmail(ctx, senderUser.email, requestData);
+    }
   });
 
   indexQueue.on("failed", async (job) => {
+    console.log("job failed");
+
     try {
       await ctx.orm.ping.update(
         { analyticStatus: -1 },
