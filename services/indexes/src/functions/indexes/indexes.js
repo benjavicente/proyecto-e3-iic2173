@@ -26,7 +26,6 @@ const getCentroidOfUserMarkers = async (userId, orm) => {
     include: [{ model: orm.mark, attributes: [] }],
     raw: true,
   });
-
   const centroidCoordinates = {
     lat: centroid.coordinates[0],
     lng: centroid.coordinates[1],
@@ -44,6 +43,9 @@ const getRequiredDataForIndexes = async (
   const senderMarkers = await getMarkersOfUser(senderUserId, orm);
   const recipientMarkers = await getMarkersOfUser(recipientUserId, orm);
 
+  if (senderMarkers.length === 0 || recipientMarkers.length === 0) {
+    return null;
+  }
   const senderCentroid = await getCentroidOfUserMarkers(senderUserId, orm);
   const recipientCentroid = await getCentroidOfUserMarkers(
     recipientUserId,

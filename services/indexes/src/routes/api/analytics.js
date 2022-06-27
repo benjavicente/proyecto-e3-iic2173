@@ -62,6 +62,9 @@ router.post("api.pings.calculateAnalytics", "/indexes", async (ctx) => {
     cronTime,
     ctx.orm
   );
+  if (!requiredData) {
+    ctx.throw(400, "No se pudo calcular el índice");
+  }
   analyticsJob(requiredData);
   const senderUser = await ctx.orm.user.findByPk(userIdFrom);
   const recipientUser = await ctx.orm.user.findByPk(userIdTo);
@@ -94,7 +97,18 @@ router.post("api.pings.calculateAnalytics", "/indexes", async (ctx) => {
 
     if (job.opts.repeat.count == 1) {
       requestData.results = { siin: siin, sidi: sidi, dindin: dindin };
-      await sendAnalyticsSuccessEmail(ctx, senderUser.email, requestData);
+      await sendAnalyticsSuccessEmail(
+        ctx,
+        senderUser.email,
+        requestData,
+        "sender"
+      );
+      await sendAnalyticsSuccessEmail(
+        ctx,
+        recipientUser.email,
+        requestData,
+        "recipient"
+      );
     }
   });
 
@@ -107,7 +121,19 @@ router.post("api.pings.calculateAnalytics", "/indexes", async (ctx) => {
         { where: { id: pingId } }
       );
 
-      await sendAnalyticsFailEmail(ctx, senderUser.email, requestData);
+      await sendAnalyticsFailEmail(
+        ctx,
+        senderUser.email,
+        requestData,
+        "sender"
+      );
+      await sendAnalyticsFailEmail(
+        ctx,
+        recipientUser.email,
+        requestData,
+        "recipient"
+      );
+
       ctx.status = 204;
     } catch (ValidationError) {
       ctx.body = ValidationError;
