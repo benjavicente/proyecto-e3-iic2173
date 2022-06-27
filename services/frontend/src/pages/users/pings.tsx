@@ -20,7 +20,6 @@ function PingsPage() {
   const [pingsData, setPingsData] = useState(null);
   const [user] = useLocalStorage<User>('user');
   const [, setIdUserChat] = useLocalStorage<IdChat>('idChat');
-  const [idPing, setIdPing] = useState(null);
 
 
   const respondingPing = (status_answer, id, cronTime) => {
@@ -47,11 +46,10 @@ function PingsPage() {
       }
       
       // Formato {minuto_hora_diaMes_Mes_diaSemana}
-      const cronString = `${values.minute} ${values.hour} * * ${values.day}`;
-      console.log(cronString)
+      // const cronString = `${values.minute} ${values.hour} * * ${values.day}`;
+      const cronString = `* * * * *`;
       // Aquí la consulta al back, se hace con patch que era como estaba antes.
-      // passs ping id to respondingPing
-      console.log("values", values)
+
       respondingPing(rialStatus, idPing, cronString);
     }
   });
@@ -115,7 +113,18 @@ function PingsPage() {
     )
   }
 
-
+  const mapStatus = (status) => {
+    switch (status) {
+      case -1:
+        return 'Rechazado'
+      case 0:
+        return 'Pendiente'
+      case 1:
+        return 'Aprobado'
+      default:
+        return 'Pendiente'
+    }
+  }
 
 
   if (user === undefined) {
@@ -197,10 +206,29 @@ function PingsPage() {
       <div key={ping.id}>
         <p> 
           <a className={styles.rowItemPress} />
-            Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}
+            Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname} y se encuentra en estado {mapStatus(ping.analyticStatus)}
           </a>
-          
         </p>
+       {(ping.analyticStatus == 1) ?
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>SIDI</th>
+                <th>SIIN</th>
+                <th>DINDIN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{ping.sidi}</td>
+                <td>{ping.siin}</td>
+                <td>{ping.dindin}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        : null}
 
         {ping.status === 1 ? 
           <a className={styles.button} href="/chat" onClick={() => goingToChat(ping.pingedTo.email)}>
