@@ -6,9 +6,26 @@ import useLocalStorage from "~/hooks/useLocalStorage";
 function Message({ id, from_user_id, message, created_at }: Message) {
   const [user] = useLocalStorage<User>('user');
 
+  const Sentiment = async (message) => {
+    const url = 'https://51zr7rl1u3.execute-api.us-east-1.amazonaws.com/serverless_lambda_stage/sentiment-analysis'
+    const body = { message }
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body)
+    });
+    
+    alert(`El resultado del sentimiento es: ${response}`)
+  }
+
   const timestamp = new Date(created_at).toLocaleString();
   return (
-    <li className={`bg-slate-700 p-3 rounded flex-grow-0 w-fit max-w-lg${user ? (from_user_id === user.email ? " ml-auto bg-indigo-800" : '') : ''}`}>
+    <li 
+      onClick={() => Sentiment(message)}
+      className={`bg-slate-700 p-3 rounded flex-grow-0 w-fit max-w-lg${user ? (from_user_id === user.email ? " ml-auto bg-indigo-800" : '') : ''}`}
+    >
       <div className="text-slate-200">{message}</div>
       <time className="text-slate-400 text-xs">({timestamp})</time>
       <div className="text-slate-400 text-xs">{from_user_id}</div>
