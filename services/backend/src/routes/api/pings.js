@@ -69,31 +69,11 @@ router.post("api.pings.new", "/create", async (ctx) => {
   const { id: pingId } = await ctx.orm.ping.findOne({
     where: { userIdFrom: currentUserId, userIdTo: pingedUserId },
   });
-
-  const analyticsBody = {
-    userIdFrom: currentUserId,
-    userIdTo: pingedUserId,
-    pingId: pingId,
-  };
-
-  try {
-    await fetch(`${process.env.INDEX_HOST}/api/analytics/indexes`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(analyticsBody),
-    });
-  } catch (error) {
-    ctx.body = error;
-    ctx.throw(400, error);
-  }
 });
 
 router.patch("api.pings.updateStatus", "/update/:id", async (ctx) => {
   const { currentUserId } = ctx.state;
-  const { status } = ctx.request.body;
+  const { status, cronTime } = ctx.request.body;
 
   const ping = await ctx.orm.ping.findByPk(ctx.params.id);
 
@@ -120,7 +100,7 @@ router.patch("api.pings.updateStatus", "/update/:id", async (ctx) => {
     ctx.throw(400, ValidationError);
   }
   // aqui se debe enviar una solicitud a la api de analytics para actualizar los indexes
-  if (status === 1) {
+  if (status == 1) {
     const analyticsBody = {
       userIdFrom: ping.userIdFrom,
       userIdTo: ping.userIdTo,
@@ -136,6 +116,9 @@ router.patch("api.pings.updateStatus", "/update/:id", async (ctx) => {
         },
         body: JSON.stringify(analyticsBody),
       });
+      ctx.body = {
+        message: "Ping status changed and indexes updating",
+      };
     } catch (error) {
       ctx.body = error;
       ctx.throw(400, error);
