@@ -109,7 +109,7 @@ router.patch("api.pings.updateStatus", "/update/:id", async (ctx) => {
     };
     try {
       await fetch(`${process.env.INDEX_HOST}/api/analytics/indexes`, {
-        method: "PUT",
+        method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
