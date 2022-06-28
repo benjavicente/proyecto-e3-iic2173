@@ -1,12 +1,11 @@
 version: "3.7"
 
 services:
-  # El frontend no funciona en modo de desarrollo
   frontend:
     build:
       context: ./services/frontend/
-      dockerfile: Dockerfile.dev
-    command: ["npm", "run", "dev", "--", "-H", "0.0.0.0"]
+      dockerfile: Dockerfile.prod
+    command: ["node", "server.js"]
 
   backend:
     build:

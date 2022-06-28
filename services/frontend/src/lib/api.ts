@@ -1,14 +1,6 @@
-import axios from "axios";
-import useSWR from "swr";
-
-const fetcher = (url: string, token?: string) =>
-  axios.get(url, { headers: { Authorization: `Bearer ${token}` } }).then((res) => res.data);
-
-export const useFetch = <Data>(url: string, token?: string) => useSWR<Data>([url, token], fetcher);
-
 export async function getApi(token, path, params) {
-  if (typeof window === undefined){
-    return {message: 'server'} 
+  if (typeof window === "undefined") {
+    return { message: "server" };
   }
   let url = new URL(`${window.location.origin}/${path}`);
 

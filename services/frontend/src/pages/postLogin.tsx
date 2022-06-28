@@ -13,9 +13,10 @@ export default function PostLogin() {
   const { user, isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
     if (isLoading && !isAuthenticated) return
     getAccessTokenSilently().then(token => {
-      
+
       // Se envía la información del login/sigup a la API
       // username no puede contener espacios
       const body = {
@@ -29,7 +30,7 @@ export default function PostLogin() {
         router.push('/');
       })
 
-      setUserLogged({email: user.email, token})
+      setUserLogged({ email: user.email, token })
       // setToken(token)
       // setEmail(user.email);
     })

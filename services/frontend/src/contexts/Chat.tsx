@@ -18,7 +18,7 @@ type IChatState = {
 
 const ChatContext = createContext<IChatState | undefined>(undefined)
 
-export default function ChatProvider(props) {  
+export default function ChatProvider(props) {
   const [isLoading, setIsLoading] = useState(true)
   const [chats, setChats] = useState<IChat[]>([])
   const [privateChats, setPrivateChats] = useState<IChat[]>([])
@@ -26,11 +26,13 @@ export default function ChatProvider(props) {
 
   // Load initial state
   useEffect(() => {
+    if (typeof window === 'undefined') return
+
     if (!user) return
     setIsLoading(true)
     Promise.all([
       axios.get<Message[]>("/api/chat/public"),
-      axios.get<Chat[]>("/api/chat/", { headers: { Authorization: `Bearer ${user.token}` } }),
+      axios.get<Chat[]>("/api/chat/", { headers: { Authorization: `Bearer ${user.token}`, Test: "a" }, }),
     ]).then(([publicChatFeed, chatList]) => {
       setPrivateChats(
         chatList.data.map(chat => ({ id: chat.other_user_id, messages: null }))
@@ -46,6 +48,7 @@ export default function ChatProvider(props) {
 
   // Load chat by id if it's not loaded
   const loadChatById = useCallback(async (chatId: string) => {
+    if (typeof window === "undefined") return
     if (chats.find(chat => chat.id === chatId)) return
     setIsLoading(true)
     const { data } = await axios.get<Message[]>(`/api/chat/${chatId}`, { headers: { Authorization: `Bearer ${user ? user.token : ''}` } })
@@ -56,7 +59,7 @@ export default function ChatProvider(props) {
   // Create the websocket connection
   const ws = useMemo(() => {
     if (typeof window === "undefined") return
-    const websocket = new WebSocket(`${window.location.origin.replace(/^http(s?):/, 'ws$1:')}/api/chat/ws?token=${user ? user.token: ''}`)
+    const websocket = new WebSocket(`${window.location.origin.replace(/^http(s?):/, 'ws$1:')}/api/chat/ws?token=${user ? user.token : ''}`)
     return websocket
   }, [user])
 

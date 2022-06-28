@@ -12,7 +12,7 @@ dev:
 
 .PHONY: prod
 prod:
-	$(DC-PROD) up --build -d
+	$(DC-PROD) up --build -d --no-color --remove-orphans --quiet-pull
 
 .PHONY: prod-stop
 prod-stop:
