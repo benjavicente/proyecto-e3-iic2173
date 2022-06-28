@@ -46,7 +46,9 @@ jobs:
           --update --delete --recursive --itemize-changes --delete-after
 
       - name: Run docker compose in the server
-        run: ssh ubuntu@${{ secrets.DEPLOY_HOST }} 'cd app; make prod'
+        run: |
+          sudo service docker start
+          ssh ubuntu@${{ secrets.DEPLOY_HOST }} 'cd app; make prod'
 
       - name: Update deployment status
         uses: bobheadxi/deployments@v1
