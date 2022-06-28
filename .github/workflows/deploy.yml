@@ -3,7 +3,7 @@ name: Deploy
 # Para que esto funcione, se necesita añadir 2 secretos a GitHub Actions
 # - SSH_PRIVATE_KEY: La llave para conectarse a la instancia
 # - DEPLOY_HOST: El host de ls instancia ("ssh://user@ip:port")
-# NO ESTÄ PROBADA
+# NO ESTÁ PROBADA
 
 on:
   workflow_dispatch:
@@ -37,11 +37,12 @@ jobs:
 
       - name: Upload changes to instance
         run: >
-          rsync . ${{ secrets.DEPLOY_HOST }}:/app --exclude=".git"
+          rsync . ${{ secrets.DEPLOY_HOST }}:/app
+          --exclude=".git" --filter=':- .gitignore'
           --update --delete --recursive --itemize-changes --delete-after
 
       - name: Run docker compose in the server
-        run: ssh 'make prod'
+        run: ssh ${{ secrets.DEPLOY_HOST }} 'make prod'
 
       - name: Update deployment status
         uses: bobheadxi/deployments@v1
