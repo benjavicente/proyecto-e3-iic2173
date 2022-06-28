@@ -48,6 +48,7 @@ jobs:
       - name: Run docker compose in the server
         run: |
           sudo service docker start
+          sudo chmod 666 /var/run/docker.sock
           ssh ubuntu@${{ secrets.DEPLOY_HOST }} 'cd app; make prod'
 
       - name: Update deployment status
