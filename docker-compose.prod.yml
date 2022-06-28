@@ -30,4 +30,4 @@ services:
 
   reverse-proxy:
     environment:
-      SITE_ADDRESS: e3-pingtoc.tk
+      SITE_ADDRESS: e3-arqui-pingtoc.tk
