@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/router'
 
 import { getApi, patchApi } from '~/lib/api';
 import { useFormik } from 'formik';
 
 import Head from 'next/head'
-
 
 import Navbar from '~/components/Navbar'
 import Footer from '~/components/Footer'
@@ -50,34 +49,10 @@ function PingsPage() {
       } else {
         cronString = `*/${values.minute} * * * *`;
       }
-      // const cronString = `* * * * *`;
-      // Aquí la consulta al back, se hace con patch que era como estaba antes.
 
       respondingPing(rialStatus, idPing, cronString);
     }
   });
-
-  // const weekData = [
-  //   {name: 'Todos los dias', value: '1-6'},
-  //   {name: 'Lunes', value: '1'},
-  //   {name: 'Martes', value: '2'},
-  //   {name: 'Miércoles',  value: '3'},
-  //   {name: 'Jueves', value: '4'},
-  //   {name: 'Viernes', value: '5'},
-  //   {name: 'Sabado', value: '6'},    
-  // ];
-
-  // const weekOptions = weekData.map((data, index) => {
-  //   return (
-  //     <option value={data.value} key={index}>{data.name}</option>
-  //   )
-  // })
-
-  // const hourOptions = Array.from(Array(24).keys()).map(data => {
-  //   return (
-  //     <option value={data} key={data}>{data}</option>
-  //   )
-  // })
 
   const minutesOptions = Array.from(Array(60).keys()).map(data => {
     return (
@@ -96,15 +71,6 @@ function PingsPage() {
             <option value={`{"status": -1, "id": ${ping.ping.id}}`}>Rechazar</option>
             <option value={`{"status": 1, "id": ${ping.ping.id}}`}>Aprobar</option>
           </select>
-          {/* <select name="day" id="cronDay" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.day}>
-            <option value="">Seleccionar día de la semana </option>
-            {weekOptions}
-          </select> 
-
-          <select name="hour" id="cronHour" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.hour}>
-            <option value="">Seleccionar hora </option>
-            {hourOptions}
-          </select> */}
 
           <select name="minute" id="cronMinute" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.minute}>
             <option value="">Seleccionar minuto </option>
@@ -231,7 +197,7 @@ function PingsPage() {
       <div key={ping.id}>
         <p> 
           <a className={styles.rowItemPress} />
-            Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname} y se encuentra en estado {mapStatus(ping.analyticStatus)}
+            Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname} y se encuentra en estado {mapStatus(ping.status)}
           </a>
         </p>
        {(ping.analyticStatus == 1) ?
@@ -278,8 +244,7 @@ function PingsPage() {
         <div className={styles.column}>
           {pingsToUser}
         </div>
-        <div>
-        </div>
+        <div />
         <h2>Pings que has hecho:</h2>
         <div className={styles.column}>
           {pingsFromUser}
