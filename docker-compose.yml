@@ -1,8 +1,9 @@
 version: "3.7"
 
 volumes:
-  nginx_secrets:
   postgres_data:
+  caddy_data:
+  caddy_config:
 
 services:
   postgres:
@@ -48,27 +49,15 @@ services:
     environment:
       PORT: 3000
 
-  nginx:
-    image: jonasal/nginx-certbot:3
-    environment:
-      CERTBOT_EMAIL: mtoyxmfl6@mozmail.com
-      RENEWAL_INTERVAL: 1h
-      HOST: arqui-de-software-2022-1-primera-entre.ga
-    depends_on:
-      backend:
-        condition: service_healthy
-      frontend:
-        condition: service_started
+  reverse-proxy:
+    image: caddy:2-alpine
     ports:
       - 80:80
       - 443:443
     volumes:
-      - ./services/nginx/nginx.conf:/etc/nginx/templates/default.conf.template
-      - nginx_secrets:/etc/letsencrypt
-    healthcheck:
-      test: ["CMD", "curl", "-s", "http://nginx:80"]
-      interval: 1m30s
-      start_period: 30s
+      - ./services/reverse-proxy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
 
   chat:
     depends_on:
@@ -79,6 +68,7 @@ services:
       AUTH0_API_AUDIENCE: https://PingTocAuth.com
       AUTH0_ISSUER: https://dev-7c2520d3.us.auth0.com/
       DATABASE_URL: postgresql://user:password@postgres:5432/chat
+      REDIS_URL: redis://redis:6379
     healthcheck:
       test: ["CMD", "curl", "-s", "http://chat:8000"]
       interval: 60s

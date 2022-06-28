@@ -1,5 +1,15 @@
-<h1>Hola <%= data.sender.firstname %> <%= data.sender.lastname %>:</h1>
-<p>
-  Hemos tenido un problema al calcular tus índices con <%= data.recipient.firstname %> 
-  <%= data.recipient.lastname %>. Lamentamos los inconvenientes.
-</p>
+<% if (userType === "sender") { %>
+  <h1>Hola <%= data.sender.firstname %> <%= data.sender.lastname %>:</h1>
+  <p>
+    Hemos tenido un problema al calcular tus índices con <%= data.recipient.firstname %> 
+    <%= data.recipient.lastname %>. Lamentamos los inconvenientes.
+  </p>
+<% } %>
+
+<% if (userType === "recipient") { %>
+  <h1>Hola <%= data.recipient.firstname %> <%= data.recipient.lastname %>:</h1>
+  <p>
+    Hemos tenido un problema al calcular tus índices con <%= data.sender.firstname %> 
+    <%= data.sender.lastname %>. Lamentamos los inconvenientes.
+  </p>
+<% } %>

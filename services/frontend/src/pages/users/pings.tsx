@@ -1,37 +1,150 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { getApi, patchApi } from '../../lib/api';
+import { getApi, patchApi } from '~/lib/api';
+import { useFormik } from 'formik';
 
 import Head from 'next/head'
 
-import Navbar from '../../components/Navbar'
-import Footer from '../../components/Footer'
 
-import styles from '../../styles/Home.module.css'
+import Navbar from '~/components/Navbar'
+import Footer from '~/components/Footer'
+
+import styles from '~/styles/Home.module.css'
+import useLocalStorage from '~/hooks/useLocalStorage';
 
 function PingsPage() {
   const router = useRouter()
 
   const [loading, setLoading] = useState(true);
   const [pingsData, setPingsData] = useState(null);
-  const [token, setToken] = useState('');
+  const [user] = useLocalStorage<User>('user');
+  const [, setIdUserChat] = useLocalStorage<IdChat>('idChat');
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setToken(token);
-  }, []);
 
-  if (token === '') {
+  const respondingPing = (status_answer, id, cronTime) => {
+    patchApi(user.token, `/api/pings/update/${id}`, {status: status_answer, cronTime: cronTime}) 
+      .then(res => {
+        setLoading(true);
+      });
+  }
+  const formik = useFormik({
+    initialValues: {
+      minute: '',
+      status: '',
+    },
+    onSubmit: values => {
+      const data = JSON.parse(values.status)
+      const rialStatus = data.status
+      const idPing = data.id
+
+      if (values.day === '' || values.hour === '' || values.minute === '') {
+        alert("Por favor, selecciona todos los campos para aprobar el ping");
+        return 
+      }
+      
+      // Formato {minuto_hora_diaMes_Mes_diaSemana}
+      let cronString;
+      if (values.minute == 1 || values.minute == 0) {
+        cronString = `* * * * *`;
+      } else {
+        cronString = `*/${values.minute} * * * *`;
+      }
+      // const cronString = `* * * * *`;
+      // Aquí la consulta al back, se hace con patch que era como estaba antes.
+
+      respondingPing(rialStatus, idPing, cronString);
+    }
+  });
+
+  // const weekData = [
+  //   {name: 'Todos los dias', value: '1-6'},
+  //   {name: 'Lunes', value: '1'},
+  //   {name: 'Martes', value: '2'},
+  //   {name: 'Miércoles',  value: '3'},
+  //   {name: 'Jueves', value: '4'},
+  //   {name: 'Viernes', value: '5'},
+  //   {name: 'Sabado', value: '6'},    
+  // ];
+
+  // const weekOptions = weekData.map((data, index) => {
+  //   return (
+  //     <option value={data.value} key={index}>{data.name}</option>
+  //   )
+  // })
+
+  // const hourOptions = Array.from(Array(24).keys()).map(data => {
+  //   return (
+  //     <option value={data} key={data}>{data}</option>
+  //   )
+  // })
+
+  const minutesOptions = Array.from(Array(60).keys()).map(data => {
     return (
-      <div />
+      <option value={data} key={data}>{data}</option>
+    )
+  })
+
+
+  const CronForm = (ping) => {
+    return (
+      <form onSubmit={formik.handleSubmit}>
+        <div className={styles.row} key={ping.id}>
+          
+          <select name="status" onChange={formik.handleChange} value={formik.values.status}>
+          <option value="">Escoge una opción por favor</option>
+            <option value={`{"status": -1, "id": ${ping.ping.id}}`}>Rechazar</option>
+            <option value={`{"status": 1, "id": ${ping.ping.id}}`}>Aprobar</option>
+          </select>
+          {/* <select name="day" id="cronDay" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.day}>
+            <option value="">Seleccionar día de la semana </option>
+            {weekOptions}
+          </select> 
+
+          <select name="hour" id="cronHour" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.hour}>
+            <option value="">Seleccionar hora </option>
+            {hourOptions}
+          </select> */}
+
+          <select name="minute" id="cronMinute" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.minute}>
+            <option value="">Seleccionar minuto </option>
+            {minutesOptions} 
+          </select>
+          <button type="submit" className={styles.button}>Submit</button>
+        </div>
+      </form>
+    )
+  }
+
+  const mapStatus = (status) => {
+    switch (status) {
+      case -1:
+        return 'Rechazado'
+      case 0:
+        return 'Pendiente'
+      case 1:
+        return 'Aprobado'
+      default:
+        return 'Pendiente'
+    }
+  }
+
+
+  if (user === undefined) {
+    return (
+      <div/>
     )
   }
 
   if (loading) {
-    getApi(token, 'api/pings/all', null) 
+    getApi(user.token, 'api/pings/all', null)
       .then(data => {
-        setPingsData(JSON.parse(data));
+        console.log('%c Pings', 'color: orange')
+        const jsonData = JSON.parse(data)
+        console.table(jsonData.pingedUsers)
+        console.table(jsonData.usersPingedBy)
+        setPingsData(jsonData);
+
         setLoading(false);
       });
 
@@ -42,7 +155,7 @@ function PingsPage() {
 
   const visitToProfile = (user) => {
     router.push({
-      pathname: 'users/profile',
+      pathname: '/users/profile',
       query: { id: user.id },
     })
   }
@@ -54,68 +167,125 @@ function PingsPage() {
     })
   }
 
-  const respondingPing = (answer, id) => {
-    patchApi(token, `/api/pings/update/${id}`, { status: answer}) 
-      .then(res => {
-        setLoading(true);
-      });
+  const goingToChat = (userEmail) => {
+    setIdUserChat(userEmail)
+    window.location.assign('/chat')
   }
 
+
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
-    if (ping.status == 0) {      
+    if (ping.status == 0) {
       return (
-        <div className={styles.row}>
-          <p key={ping.id}><a className={styles.rowItemPress} 
+        <div className={styles.row} key={ping.id}>
+          <p key={ping.id}><a className={styles.rowItemPress}
             onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping
-          </p> 
-          <button className={styles.button} onClick={() => respondingPing(1, ping.id)}> 
-            Aceptar
-          </button> 
-          <button className={styles.buttonReject} onClick={() => respondingPing(-1, ping.id)}> 
-            Rechazar
-          </button> 
+          </p>
+          <CronForm ping={ping}/>
         </div>
-        
-      ) 
+
+      )
     } else {
       return (
-        <div className={styles.row}>
-          <p key={ping.id}><a className={styles.rowItemPress} 
-            onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado' }
+        <div className={styles.row} key={ping.id}>
+          <p key={ping.id}>
+            <a className={styles.rowItemPress}
+              onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}
+            </a> 
+            te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado'}
+
+            {ping.status === 1 ? 
+            <a className={styles.button} href="/chat" onClick={() => goingToChat(ping.pingedFrom.email)}>
+              Chatear con {ping.pingedFrom.firstname} {ping.pingedFrom.lastname}
+            </a>
+          : null}
+
+        {(ping.analyticStatus == 1) ?
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>SIDI</th>
+                <th>SIIN</th>
+                <th>DINDIN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{ping.sidi}</td>
+                <td>{ping.siin}</td>
+                <td>{ping.dindin}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        : null}
           </p>
         </div>
-      ) 
+      )
     }
-    
+
   });
 
   const pingsFromUser = pingsData.pingedUsers.map((ping) => {
     return (
-      <p key={ping.id}><a className={styles.rowItemPress}></a>Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname}</a></p>     
+      <div key={ping.id}>
+        <p> 
+          <a className={styles.rowItemPress} />
+            Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname} y se encuentra en estado {mapStatus(ping.analyticStatus)}
+          </a>
+        </p>
+       {(ping.analyticStatus == 1) ?
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>SIDI</th>
+                <th>SIIN</th>
+                <th>DINDIN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{ping.sidi}</td>
+                <td>{ping.siin}</td>
+                <td>{ping.dindin}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        : null}
+
+        {ping.status === 1 ? 
+          <a className={styles.button} href="/chat" onClick={() => goingToChat(ping.pingedTo.email)}>
+            Chatear con {ping.pingedTo.firstname} {ping.pingedTo.lastname}
+          </a>
+        : null}
+      </div>
     )
   });
 
   return (
     <div>
       <Head>
-          <title>PingToc</title>
-          <meta name="description" content="Generated by create next app" />
-          <link rel="icon" href="/favicon.ico" />
+        <title>PingToc</title>
+        <meta name="description" content="Generated by create next app" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
-    
-      <Navbar logged={token !== null}/>
+
+      <Navbar logged={user.token !== null} />
       <div>
         <h2>Pings que te han hecho:</h2>
         <div className={styles.column}>
           {pingsToUser}
         </div>
-        
+        <div>
+        </div>
         <h2>Pings que has hecho:</h2>
         <div className={styles.column}>
           {pingsFromUser}
         </div>
-      </div>      
-      
+      </div>
+
       <Footer />
     </div>
   )
