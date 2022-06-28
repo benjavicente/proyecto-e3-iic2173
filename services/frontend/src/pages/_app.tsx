@@ -11,7 +11,7 @@ class MyApp extends App {
         clientId='sPhRhOKQW2cAkfimnKphjXAYSm18eOFa'
         audience="https://PingTocAuth.com"
         scope='openid profile email'
-        redirectUri='https://localhost/postLogin'
+        redirectUri='https://e3-pingtoc.tk/postLogin'
       >
         <Component {...pageProps} />
       </Auth0Provider>

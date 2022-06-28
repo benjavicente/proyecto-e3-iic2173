@@ -36,6 +36,7 @@ function HomePage() {
       console.log('User', user)
       getApi(user.token, 'api/markers', { filteredIds: filteredId })
         .then(data => {
+          console.log('Marker:', data)
           setMarkers(JSON.parse(data));
         })
     } else {
@@ -69,6 +70,7 @@ function HomePage() {
   if (weatherData === null) {
     getApi(user.token, 'api/weather', coordinates)
       .then(data => {
+        console.log('Tiempo:', data)
         const jsonData = JSON.parse(data);
         setWeatherData(jsonData["temp_c"]);
       })
@@ -78,6 +80,7 @@ function HomePage() {
   if (tags.length == 0) {
     getApi(user.token, 'api/tags/all', null)
       .then(data => {
+        console.log('Tags:', data)
         setTags(JSON.parse(data));
       })
   }
