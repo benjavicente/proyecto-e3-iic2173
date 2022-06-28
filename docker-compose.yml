@@ -48,6 +48,8 @@ services:
   frontend:
     environment:
       PORT: 3000
+    env_file:
+      - .env.frontend
 
   reverse-proxy:
     image: caddy:2-alpine
