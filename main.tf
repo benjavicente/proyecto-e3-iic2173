@@ -40,13 +40,18 @@ resource "aws_security_group" "app_server" {
     description = "HTTPS"
   }
 
-  ingress {
+  egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
     description = "All Ports Egress"
   }
+}
+
+resource "aws_eip" "instance_ip" {
+  vpc      = true
+  instance = aws_instance.app_server.id
 }
 
 resource "aws_instance" "app_server" {
@@ -59,10 +64,19 @@ resource "aws_instance" "app_server" {
     Name = "Backend"
   }
 
-  # Install docker
+  # Install docker, docker-compose, and make
   user_data = <<-EOF
-    sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+    #!/bin/bash
+    sudo apt-get update
+    sudo apt-get -y install build-essential
+    curl -fsSL --connect-timeout 5 https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get update
+    sudo apt-get install -y docker-ce
+    sudo service docker start
+    sudo curl --connect-timeout 5 -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
+    sudo chmod 666 /var/run/docker.sock
   EOF
 }
 
@@ -84,13 +98,24 @@ resource "aws_key_pair" "kp" {
 
   provisioner "local-exec" {
     command = <<-EOF
+      rm ./${var.ssh_key_name}.pem || true
       echo '${tls_private_key.pk.private_key_pem}' > ./${var.ssh_key_name}.pem
       chmod 400 ./${var.ssh_key_name}.pem
     EOF
   }
 }
 
-output "instance_ssh_address" {
-  value       = "ubuntu@${aws_instance.app_server.public_dns}"
-  description = "SSH Address to the EC2 Instance"
+
+# Outputs
+
+# ssh -i ssh-aws-ass.pem ubuntu@$(terraform output -raw instance_ssh_address)
+
+output "instance_ssh_dns_address" {
+  value       = aws_instance.app_server.public_dns
+  description = "SSH DNS address to the EC2 instance"
+}
+
+output "static_ip" {
+  value       = aws_eip.instance_ip.public_ip
+  description = "Static IP Address of the EC2 Instance"
 }

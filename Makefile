@@ -13,3 +13,7 @@ dev:
 .PHONY: prod
 prod:
 	$(DC-PROD) up --build -d
+
+.PHONY: prod-stop
+prod-stop:
+	$(DC-PROD) stop
