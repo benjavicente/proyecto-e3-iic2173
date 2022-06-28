@@ -28,4 +28,4 @@ services:
 
   reverse-proxy:
     environment:
-      SITE_ADDRESS: localhost?
+      SITE_ADDRESS: front-e2-arqui.tk
