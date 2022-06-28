@@ -1,6 +1,13 @@
 version: "3.7"
 
 services:
+  # El frontend no funciona en modo de desarrollo
+  frontend:
+    build:
+      context: ./services/frontend/
+      dockerfile: Dockerfile.dev
+    command: ["npm", "run", "dev", "--", "-H", "0.0.0.0"]
+
   backend:
     build:
       context: ./services/backend
@@ -23,4 +30,4 @@ services:
 
   reverse-proxy:
     environment:
-      SITE_ADDRESS: localhost?
+      SITE_ADDRESS: front-e2-arqui.tk
