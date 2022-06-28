@@ -44,12 +44,12 @@ services:
       test: ["CMD", "curl", "-s", "http://backend:8000"]
       interval: 15s
       start_period: 15s
+    env_file:
+      - .env.backend
 
   frontend:
     environment:
       PORT: 3000
-    env_file:
-      - .env.frontend
 
   reverse-proxy:
     image: caddy:2-alpine

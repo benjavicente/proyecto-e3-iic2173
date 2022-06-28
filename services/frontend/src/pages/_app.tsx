@@ -3,7 +3,7 @@ import '../styles/globals.css';
 import App from 'next/app';
 
 class MyApp extends App {
-  render () {
+  render() {
     const { Component, pageProps } = this.props;
     return (
       <Auth0Provider
@@ -11,7 +11,7 @@ class MyApp extends App {
         clientId='sPhRhOKQW2cAkfimnKphjXAYSm18eOFa'
         audience="https://PingTocAuth.com"
         scope='openid profile email'
-        redirectUri='https://e3-pingtoc.tk/postLogin'
+        redirectUri='https://e3-arqui-pingtoc.tk/postLogin'
       >
         <Component {...pageProps} />
       </Auth0Provider>
