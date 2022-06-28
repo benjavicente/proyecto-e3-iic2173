@@ -37,12 +37,12 @@ jobs:
 
       - name: Upload changes to instance
         run: >
-          rsync . ubuntu@${{ secrets.DEPLOY_HOST }}:/app
+          rsync . ubuntu@${{ secrets.DEPLOY_HOST }}:~/app
           --exclude=".git" --filter=':- .gitignore'
           --update --delete --recursive --itemize-changes --delete-after
 
       - name: Run docker compose in the server
-        run: ssh ubuntu@${{ secrets.DEPLOY_HOST }} 'make prod'
+        run: ssh ubuntu@${{ secrets.DEPLOY_HOST }} 'cd app; make prod'
 
       - name: Update deployment status
         uses: bobheadxi/deployments@v1
