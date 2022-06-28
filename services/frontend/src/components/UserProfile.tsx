@@ -11,45 +11,42 @@ const UserProfile = ({ data }) => {
   
   const userImages = data.images.map((image) => {
     return (
-      <img key={image.id} className={styles.imgUser} src={image.imageUrl} alt={data.email} />
+      <div class="flex flex-wrap w-1/4">
+        <div className="w-full p-1 md:p-2">
+          <img 
+            key={image.id}
+            alt="gallery" 
+            class="block object-cover object-center w-full h-full rounded-lg border-2 border-slate-100 shadow-md"
+            src={image.imageUrl}
+          />
+        </div>
+      </div>
     )
   });
   
   return (
-    <div className={styles.container}>
-      <h3 className={styles.rowItem}>Datos del perfil</h3>
+    <div>
+      <div className="flex flex-col items-center justify-center mt-10">
+        <h2 className="font-bold text-2xl">
+          {data.firstname} {data.lastname}
+        </h2>
 
-      <div className={styles.row}>
-        <h4 className={styles.rowItem}>Email:</h4>
-        <p className={styles.rowItemNB}>{data.email}</p>
+        <p>
+          ({data.email}  {data.phone ? `+56${data.phone}` : 'Teléfono no disponible'})
+        </p>
       </div>
 
-      <div className={styles.row}>
-        <h4 className={styles.rowItem}>Nombre:</h4>
-        <p className={styles.rowItemNB}>{data.firstname}</p>
-      </div>
-
-      <div className={styles.row}>
-        <h4 className={styles.rowItem}>Apellido:</h4>
-        <p className={styles.rowItemNB}>{data.lastname}</p>
-      </div>
-
-      <div className={styles.row}>
-        <h4 className={styles.rowItem}>Teléfono:</h4>
-        <p className={styles.rowItemNB}>{data.phone}</p>
-      </div>
-
-      { !noImage ? 
-      <div> 
-         <h3 className={styles.rowItem}>Imágenes del perfil</h3>
-        <div>
-          { data.images.length != 0 ? userImages 
-          : <img className={styles.imgUser} src={'https://pbs.twimg.com/profile_images/1117986986508394496/bq8RcTlm_400x400.png'} alt={data.email} />   
-          }             
+      <div className="overflow-hidden w-9/12 mx-auto text-gray-700 ">
+        <div className="container px-5 py-2 mx-auto lg:pt-12 lg:px-32">
+          <div className="flex justify-between flex-wrap -m-1 md:-m-2">
+            { data.images.length != 0 ? userImages 
+            : 
+            null
+            }             
+          </div>
         </div>
-      </div>       
-      : null }    
-    </div>    
+      </div>
+    </div> 
   )
 }
 

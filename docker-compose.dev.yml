@@ -8,9 +8,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-       - ./services/frontend/src:/workspace/src
-       - /workspace/node_modules
-       - /workspace/.next
+      - ./services/frontend/src:/workspace/src
     command: ["npm", "run", "dev", "--", "-H", "0.0.0.0"]
 
   backend:
@@ -21,8 +19,11 @@ services:
       - 8000:8000
     volumes:
       - ./services/backend/src:/workspace/src
-      - /workspace/node_modules
     command: ["sh", "init-server.sh", "dev"]
+
+  reverse-proxy:
+    environment:
+      SITE_ADDRESS: localhost
 
   chat:
     build:
@@ -32,7 +33,6 @@ services:
       - 8030:8030
     volumes:
       - ./services/chat/app:/workspace/app
-      - /workspace/.venv
     command:
       ["uvicorn", "--reload", "--port", "8030", "app:app", "--host", "0.0.0.0"]
 
@@ -42,7 +42,6 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./services/indexes/src:/workspace/src
-      - /workspace/node_modules
     ports:
       - 8080:8080
     environment:
@@ -59,7 +58,3 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-
-  nginx:
-    environment:
-      USE_LOCAL_CA: 1

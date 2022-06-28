@@ -20,3 +20,7 @@ services:
       context: ./services/indexes
       dockerfile: Dockerfile.prod
     command: ["yarn", "dev"]
+
+  reverse-proxy:
+    environment:
+      SITE_ADDRESS: localhost?

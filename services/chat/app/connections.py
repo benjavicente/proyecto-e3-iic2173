@@ -1,20 +1,27 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-from fastapi import WebSocket
+from starlette.websockets import WebSocket, WebSocketState
+
+
+class WSException(Exception):
+    def __init__(self, message: str):
+        self.message = message
 
 
 @dataclass(frozen=True)
 class ConnectionManager:
-    connections: dict[str, WebSocket] = field(default_factory=dict)
-
-    async def listen(self, user_id: str, websocket: WebSocket):
+    async def listen(self, websocket: WebSocket):
         "Connects a websocket and yields json messages received from it"
-        await websocket.accept()
-        self.connections[user_id] = websocket
+        error = "???"
         try:
             while True:
                 data: dict[str, Any] = await websocket.receive_json()
+                await websocket.send_json({"status": "ok", "data": data})
                 yield data
+        except WSException as ws_exception:
+            error = ws_exception.message
         finally:
-            self.connections.pop(user_id)
+            if websocket.state == WebSocketState.CONNECTED:
+                await websocket.send_json({"error": error})
+                await websocket.close()

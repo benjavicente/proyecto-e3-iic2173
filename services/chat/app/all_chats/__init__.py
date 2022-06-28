@@ -11,7 +11,6 @@ SQL_QUERY = Path(__file__).parent.joinpath("query.sql").read_text()
 
 class Chat(SQLModel):
     "'Virtual table' that represents all chats of a user"
-    count: int = Field(..., description="Number of messages of a chat")
     other_user_id: str = Field(..., primary_key=True, description="User ID of the other user")
     last_at: datetime = Field(..., description="Last message date")
 
