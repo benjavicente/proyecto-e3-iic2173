@@ -4,3 +4,8 @@
 .data/
 .vscode/
 \node_modules
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.pem
