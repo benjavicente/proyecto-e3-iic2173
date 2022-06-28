@@ -3,6 +3,9 @@
 		rewrite * /chat{path}
 		reverse_proxy chat:8030
 	}
+	handle /prometheus/* {
+		reverse_proxy metrics:9090
+	}
 	handle /api/* {
 		reverse_proxy backend:8000
 	}
