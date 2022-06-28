@@ -6,7 +6,6 @@ import { useFormik } from 'formik';
 
 import Head from 'next/head'
 
-
 import Navbar from '~/components/Navbar'
 import Footer from '~/components/Footer'
 
@@ -20,7 +19,6 @@ function PingsPage() {
   const [pingsData, setPingsData] = useState(null);
   const [user] = useLocalStorage<User>('user');
   const [, setIdUserChat] = useLocalStorage<IdChat>('idChat');
-
 
   const respondingPing = (status_answer, id, cronTime) => {
     patchApi(user.token, `/api/pings/update/${id}`, {status: status_answer, cronTime: cronTime}) 
@@ -50,34 +48,9 @@ function PingsPage() {
       } else {
         cronString = `*/${values.minute} * * * *`;
       }
-      // const cronString = `* * * * *`;
-      // Aquí la consulta al back, se hace con patch que era como estaba antes.
-
       respondingPing(rialStatus, idPing, cronString);
     }
   });
-
-  // const weekData = [
-  //   {name: 'Todos los dias', value: '1-6'},
-  //   {name: 'Lunes', value: '1'},
-  //   {name: 'Martes', value: '2'},
-  //   {name: 'Miércoles',  value: '3'},
-  //   {name: 'Jueves', value: '4'},
-  //   {name: 'Viernes', value: '5'},
-  //   {name: 'Sabado', value: '6'},    
-  // ];
-
-  // const weekOptions = weekData.map((data, index) => {
-  //   return (
-  //     <option value={data.value} key={index}>{data.name}</option>
-  //   )
-  // })
-
-  // const hourOptions = Array.from(Array(24).keys()).map(data => {
-  //   return (
-  //     <option value={data} key={data}>{data}</option>
-  //   )
-  // })
 
   const minutesOptions = Array.from(Array(60).keys()).map(data => {
     return (
@@ -85,32 +58,31 @@ function PingsPage() {
     )
   })
 
-
   const CronForm = (ping) => {
     return (
       <form onSubmit={formik.handleSubmit}>
-        <div className={styles.row} key={ping.id}>
+        <div className="flex gap-5 my-2" key={ping.id}>
           
-          <select name="status" onChange={formik.handleChange} value={formik.values.status}>
-          <option value="">Escoge una opción por favor</option>
-            <option value={`{"status": -1, "id": ${ping.ping.id}}`}>Rechazar</option>
-            <option value={`{"status": 1, "id": ${ping.ping.id}}`}>Aprobar</option>
+          <select name="status" className="shadow-lg border-slate-50" onChange={formik.handleChange} value={formik.values.status}>
+            <option value="">Escoge una opción, por favor</option>
+            <option value={`{"status": -1, "id": ${ping.ping.id}}`}>
+              Rechazar
+            </option>
+            <option value={`{"status": 1, "id": ${ping.ping.id}}`}>
+              Aceptar
+            </option>
           </select>
-          {/* <select name="day" id="cronDay" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.day}>
-            <option value="">Seleccionar día de la semana </option>
-            {weekOptions}
-          </select> 
 
-          <select name="hour" id="cronHour" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.hour}>
-            <option value="">Seleccionar hora </option>
-            {hourOptions}
-          </select> */}
-
-          <select name="minute" id="cronMinute" className={styles.selectDropdown} onChange={formik.handleChange} value={formik.values.minute}>
-            <option value="">Seleccionar minuto </option>
+          <select name="minute" id="cronMinute" className="shadow-lg border-slate-50" onChange={formik.handleChange} value={formik.values.minute}>
+            <option value="">Selecciona el tiempo renovación del LikeTracker (minutos) </option>
             {minutesOptions} 
           </select>
-          <button type="submit" className={styles.button}>Submit</button>
+          <button 
+            type="submit" 
+            className="bg-sky-600 hover:bg-sky-700 py-1 px-3 rounded-md text-slate-100 text-base"
+          >
+            Guardar
+          </button>
         </div>
       </form>
     )
@@ -129,7 +101,6 @@ function PingsPage() {
     }
   }
 
-
   if (user === undefined) {
     return (
       <div/>
@@ -139,12 +110,8 @@ function PingsPage() {
   if (loading) {
     getApi(user.token, 'api/pings/all', null)
       .then(data => {
-        console.log('%c Pings', 'color: orange')
         const jsonData = JSON.parse(data)
-        console.table(jsonData.pingedUsers)
-        console.table(jsonData.usersPingedBy)
         setPingsData(jsonData);
-
         setLoading(false);
       });
 
@@ -153,14 +120,7 @@ function PingsPage() {
     )
   }
 
-  const visitToProfile = (user) => {
-    router.push({
-      pathname: '/users/profile',
-      query: { id: user.id },
-    })
-  }
-
-  const visitFromProfile = (user) => {
+  const visitProfile = (user) => {
     router.push({
       pathname: '/users/profile',
       query: { id: user.id },
@@ -176,9 +136,12 @@ function PingsPage() {
   const pingsToUser = pingsData.usersPingedBy.map((ping) => {
     if (ping.status == 0) {
       return (
-        <div className={styles.row} key={ping.id}>
-          <p key={ping.id}><a className={styles.rowItemPress}
-            onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}</a> te ha hecho un ping
+        <div className="rounder bg-slate-100 p-2 my-2" key={ping.id}>
+          <p key={ping.id}>
+            <a 
+              className="font-semibold cursor text-sky-500 hover:text-sky-600 cursor-pointer"
+              onClick={() => visitProfile(ping.pingedFrom)} > {`${ping.pingedFrom.firstname} ${ping.pingedFrom.lastname} `}
+            </a> te ha hecho un ping
           </p>
           <CronForm ping={ping}/>
         </div>
@@ -186,16 +149,21 @@ function PingsPage() {
       )
     } else {
       return (
-        <div className={styles.row} key={ping.id}>
+        <div className="rounder bg-slate-100 p-2 my-2" key={ping.id}>
           <p key={ping.id}>
-            <a className={styles.rowItemPress}
-              onClick={() => visitToProfile(ping.pingedFrom)}>{ping.pingedFrom.firstname} {ping.pingedFrom.lastname}
+            <a 
+            className="font-semibold cursor text-sky-500 hover:text-sky-600 cursor-pointer"
+            onClick={() => visitProfile(ping.pingedFrom)} > {`${ping.pingedFrom.firstname} ${ping.pingedFrom.lastname} `}
             </a> 
             te ha hecho un ping | {ping.status == 1 ? 'Aceptado' : 'Rechazado'}
 
             {ping.status === 1 ? 
-            <a className={styles.button} href="/chat" onClick={() => goingToChat(ping.pingedFrom.email)}>
-              Chatear con {ping.pingedFrom.firstname} {ping.pingedFrom.lastname}
+            <a 
+              className="font-semibold cursor underline underline-offset-1 text-sky-500 hover:text-sky-600 cursor-pointer mx-5"
+              href="/chat" 
+              onClick={() => goingToChat(ping.pingedFrom.email)}
+            >
+              Ir al chat
             </a>
           : null}
 
@@ -204,16 +172,16 @@ function PingsPage() {
           <table>
             <thead>
               <tr>
-                <th>SIDI</th>
-                <th>SIIN</th>
-                <th>DINDIN</th>
+                <th className="text-center">SIDI</th>
+                <th className="text-center">SIIN</th>
+                <th className="text-center">DINDIN</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>{ping.sidi}</td>
-                <td>{ping.siin}</td>
-                <td>{ping.dindin}</td>
+                <td className="text-center">{ping.sidi ? ping.sidi : "-"}</td>
+                <td className="text-center">{ping.siin ? ping.siin : "-"}</td>
+                <td className="text-center">{ping.dindin ? ping.dindin : "-"}</td>
               </tr>
             </tbody>
           </table>
@@ -228,27 +196,32 @@ function PingsPage() {
 
   const pingsFromUser = pingsData.pingedUsers.map((ping) => {
     return (
-      <div key={ping.id}>
+      <div key={ping.id} className="rounder bg-slate-100 p-2 my-2">
         <p> 
-          <a className={styles.rowItemPress} />
-            Has hecho un ping a <a className={styles.rowItemPress} onClick={() => visitFromProfile(ping.pingedTo)}>{ping.pingedTo.firstname} {ping.pingedTo.lastname} y se encuentra en estado {mapStatus(ping.analyticStatus)}
-          </a>
+          Has hecho un ping a
+          <a className="font-semibold cursor text-sky-500 hover:text-sky-600 cursor-pointer" 
+            onClick={() => visitProfile(ping.pingedTo)} > {`${ping.pingedTo.firstname} ${ping.pingedTo.lastname} `} 
+          </a> 
+        </p>
+
+        <p>
+          <span className="font-semibold">Estado:</span> { mapStatus(ping.status) }
         </p>
        {(ping.analyticStatus == 1) ?
         <div>
           <table>
             <thead>
               <tr>
-                <th>SIDI</th>
-                <th>SIIN</th>
-                <th>DINDIN</th>
+                <th className="text-center">SIDI</th>
+                <th className="text-center">SIIN</th>
+                <th className="text-center">DINDIN</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>{ping.sidi}</td>
-                <td>{ping.siin}</td>
-                <td>{ping.dindin}</td>
+                <td className="text-center">{ping.sidi ? ping.sidi : "-"}</td>
+                <td className="text-center">{ping.siin ? ping.siin : "-"}</td>
+                <td className="text-center">{ping.dindin ? ping.dindin : "-"}</td>
               </tr>
             </tbody>
           </table>
@@ -256,8 +229,11 @@ function PingsPage() {
         : null}
 
         {ping.status === 1 ? 
-          <a className={styles.button} href="/chat" onClick={() => goingToChat(ping.pingedTo.email)}>
-            Chatear con {ping.pingedTo.firstname} {ping.pingedTo.lastname}
+          <a 
+            className="font-semibold cursor underline underline-offset-1 text-sky-500 hover:text-sky-600 cursor-pointer mx-5" 
+            href="/chat" onClick={() => goingToChat(ping.pingedTo.email)}
+          >
+            Ir al chat
           </a>
         : null}
       </div>
@@ -273,15 +249,15 @@ function PingsPage() {
       </Head>
 
       <Navbar logged={user.token !== null} />
-      <div>
-        <h2>Pings que te han hecho:</h2>
+      <div className="w-3/4 mx-auto rounded p-5 my-10 shadow-lg">
+
+        <h2 className="font-semibold text-xl">Pings que te han hecho:</h2>
         <div className={styles.column}>
           {pingsToUser}
         </div>
-        <div>
-        </div>
-        <h2>Pings que has hecho:</h2>
-        <div className={styles.column}>
+
+        <h2 className="font-semibold text-xl">Pings que has hecho:</h2>
+        <div className="">
           {pingsFromUser}
         </div>
       </div>
