@@ -40,7 +40,7 @@ resource "aws_security_group" "app_server" {
     description = "HTTPS"
   }
 
-  ingress {
+  egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -61,8 +61,9 @@ resource "aws_instance" "app_server" {
 
   # Install docker
   user_data = <<-EOF
-    sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
+     #!/bin/bash
+     sudo curl --connect-timeout 5 -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+     sudo chmod +x /usr/local/bin/docker-compose
   EOF
 }
 
@@ -84,6 +85,7 @@ resource "aws_key_pair" "kp" {
 
   provisioner "local-exec" {
     command = <<-EOF
+      rm ./${var.ssh_key_name}.pem || true
       echo '${tls_private_key.pk.private_key_pem}' > ./${var.ssh_key_name}.pem
       chmod 400 ./${var.ssh_key_name}.pem
     EOF
