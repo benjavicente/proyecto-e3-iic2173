@@ -105,13 +105,14 @@ resource "aws_key_pair" "kp" {
   }
 }
 
+
 # Outputs
 
-# ssh -i ssh-aws-ass.pem $(terraform output -raw instance_ssh_address)
+# ssh -i ssh-aws-ass.pem ubuntu@$(terraform output -raw instance_ssh_address)
 
-output "instance_ssh_address" {
-  value       = "ubuntu@${aws_instance.app_server.public_dns}"
-  description = "SSH Address to the EC2 Instance"
+output "instance_ssh_dns_address" {
+  value       = aws_instance.app_server.public_dns
+  description = "SSH DNS address to the EC2 instance"
 }
 
 output "static_ip" {

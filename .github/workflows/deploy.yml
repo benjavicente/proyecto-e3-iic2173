@@ -33,7 +33,7 @@ jobs:
       - name: Add known_hosts
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-        run: ssh-keyscan -H "${DEPLOY_HOST#*@}" >> ~/.ssh/known_hosts
+        run: ssh-keyscan -H $DEPLOY_HOST >> ~/.ssh/known_hosts
 
       - name: Upload changes to instance
         run: >
