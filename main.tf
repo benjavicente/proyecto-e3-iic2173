@@ -49,6 +49,12 @@ resource "aws_security_group" "app_server" {
   }
 }
 
+resource "aws_eip" "instance_ip" {
+  vpc      = true
+  instance = aws_instance.app_server.id
+}
+
+
 resource "aws_instance" "app_server" {
   ami                    = "ami-04505e74c0741db8d"
   instance_type          = "t2.micro"
@@ -59,11 +65,19 @@ resource "aws_instance" "app_server" {
     Name = "Backend"
   }
 
-  # Install docker
+  # Install docker, docker-compose, and make
   user_data = <<-EOF
-     #!/bin/bash
-     sudo curl --connect-timeout 5 -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-     sudo chmod +x /usr/local/bin/docker-compose
+    #!/bin/bash
+    sudo apt-get update
+    sudo apt-get -y install build-essential
+    curl -fsSL --connect-timeout 5 https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get update
+    sudo apt-get install -y docker-ce
+    sudo service docker start
+    sudo curl --connect-timeout 5 -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    sudo chmod 666 /var/run/docker.sock
   EOF
 }
 
@@ -92,7 +106,16 @@ resource "aws_key_pair" "kp" {
   }
 }
 
+# Outputs
+
+# ssh -i ssh-aws-ass.pem $(terraform output -raw instance_ssh_address)
+
 output "instance_ssh_address" {
   value       = "ubuntu@${aws_instance.app_server.public_dns}"
   description = "SSH Address to the EC2 Instance"
+}
+
+output "static_ip" {
+  value       = aws_eip.instance_ip.public_ip
+  description = "Static IP Address of the EC2 Instance"
 }
