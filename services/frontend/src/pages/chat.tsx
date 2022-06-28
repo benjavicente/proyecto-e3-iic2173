@@ -22,9 +22,9 @@ function Message({ id, from_user_id, message, created_at }: Message) {
     } catch (err) {
       response = 'Sin respuesta'
       console.log('Error de cors')
-    }    
-    
-    alert(`El resultado del sentimiento es: ${response}`)
+    }
+    const data = await response.text();
+    alert(`El resultado del sentimiento es: ${data}`)
   }
 
   const timestamp = new Date(created_at).toLocaleString();
