@@ -46,8 +46,6 @@ function MessagesPanel({ currentChatID }) {
   const messagesContainerRef = useRef<HTMLOListElement>(null)
   const [user] = useLocalStorage<User>('user')
 
-  
-
   useEffect(() => {
     const e = messagesContainerRef.current
     if (e && e.children.length != 0) e.children[e.childNodes.length - 1].scrollIntoView()
@@ -75,11 +73,15 @@ function MessagesPanel({ currentChatID }) {
           {messages.map(message => (<Message key={message.id} {...message} />))}
         </ol>
       )}
-      {user.token ? 
-        <form onSubmit={handleSendMessage} className="flex">
-          <input type="text" placeholder="Mensaje" className="flex-grow bottom-0" value={messageToSend} onChange={(e) => setMessageToSend(e.target.value)} />
-          <button type="submit" className="bg-slate-700 text-slate-100 p-2">Enviar</button>
-        </form>
+      {!!user.token ? 
+        <div className="flex bottom-0 fixed w-full">
+          <form onSubmit={handleSendMessage} className="flex flex-grow justify-start w-full">
+            <input type="text" placeholder="Mensaje" className="w-full" value={messageToSend} onChange={(e) => setMessageToSend(e.target.value)} />
+            <button type="submit" className="bg-slate-700 text-slate-100 p-2 w-min-content flex-grow-0">
+              Enviar
+            </button>
+          </form>
+        </div>
       : null}
       
     </div >
@@ -128,7 +130,7 @@ export default function ChatPage() {
     <>
       <ChatProvider>
       <Navbar />
-        <div className="grid grid-cols-[250px_1fr] bg-slate-300 grid-rows-[100vh]">
+        <div className="grid grid-cols-[250px_1fr] bg-slate-50 grid-rows-[100vh]">
           <div className="flex flex-col bg-slate-700 h-full">
             <ChatList />
           </div>
