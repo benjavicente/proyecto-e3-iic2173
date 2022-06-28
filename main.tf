@@ -90,7 +90,7 @@ resource "aws_key_pair" "kp" {
   }
 }
 
-output "instance_ssh_address" {
-  value       = "ubuntu@${aws_instance.app_server.public_dns}"
-  description = "SSH Address to the EC2 Instance"
+output "instance_ssh_dns_address" {
+  value       = aws_instance.app_server.public_dns
+  description = "SSH DNS address to the EC2 instance"
 }
